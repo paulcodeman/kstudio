@@ -404,8 +404,7 @@ function update_component_tree() {
 	if (!sel) return;
 	sel.innerHTML = '';
 	var selCompName = select_element ? select_element.getAttribute('data-name') : null;
-	var selectedIdx = -1;
-	var optIdx = 0;
+	var selectedValue = null;
 	for (var i = 0; i < count_stack; i++) {
 		var data = window_data[i];
 		var winName = data ? data.name : ('Window_' + (i + 1));
@@ -414,23 +413,26 @@ function update_component_tree() {
 			comps = scan_window_components();
 			if (data) data.components = comps;
 		}
-		if (comps.length == 0) {
-			var opt = createELM('option');
-			opt.value = i + '|';
-			opt.text = winName + ' (нет компонентов)';
-			sel.add(opt);
-			++optIdx;
-		}
+
+		var grp = createELM('optgroup');
+		grp.label = winName;
+		sel.add(grp);
+
+		var winOpt = createELM('option');
+		winOpt.value = i + '|';
+		winOpt.text = winName;
+		if (i == current_win_index && !selCompName) selectedValue = winOpt.value;
+		grp.appendChild(winOpt);
+
 		for (var j = 0; j < comps.length; j++) {
 			var opt = createELM('option');
 			opt.value = i + '|' + comps[j];
-			opt.text = winName + ' / ' + comps[j];
-			sel.add(opt);
-			if (i == current_win_index && comps[j] == selCompName) selectedIdx = optIdx;
-			++optIdx;
+			opt.text = comps[j];
+			if (i == current_win_index && comps[j] == selCompName) selectedValue = opt.value;
+			grp.appendChild(opt);
 		}
 	}
-	sel.selectedIndex = selectedIdx >= 0 ? selectedIdx + 1 : 0;
+	if (selectedValue) sel.value = selectedValue;
 	sel.onchange = function () {
 		var val = this.value.split('|');
 		var winIdx = parseInt(val[0]);
