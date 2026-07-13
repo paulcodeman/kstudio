@@ -31,7 +31,7 @@ function convert_elements(w_obj) {
 			tmp = obj.getAttribute(cmd_event_name[0]);
 			if (tmp != null) {
 				code += name + '.mouseclick(#' + name + '__ptr_func__click_);';
-				add_init_event_func += 'void ' + name + '__ptr_func__click_(dword key,x,y){' + unescape(tmp) + '}';
+				add_init_event_func += 'void ' + name + '__ptr_func__click_(dword key,x,y){' + decodeURIComponent(tmp) + '}';
 			}
 
 			tmp = obj.style.top;

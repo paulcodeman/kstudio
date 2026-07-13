@@ -1,4 +1,8 @@
-﻿<head>
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="style/style.css">
 	<link rel="stylesheet" href="style/gui.css">
 	<script src="js/download.js"></script>
@@ -68,3 +72,4 @@
 
 	<div id="select_elements_rect"></div>
 </body>
+</html>

@@ -469,12 +469,12 @@ function cancel_edit_code() {
 
 function save_edit_code() {
 	getID('window_edit_code').style.display = 'none';
-	select_element.setAttribute(list_eval_select.id, escape(getID('code_edit_rect').value));
+	select_element.setAttribute(list_eval_select.id, encodeURIComponent(getID('code_edit_rect').value));
 }
 
 function click_edit_code() {
 	var tmp = select_element.getAttribute(list_eval_select.id);
-	getID('code_edit_rect').value = tmp == undefined ? '' : unescape(tmp);
+	getID('code_edit_rect').value = tmp == undefined ? '' : decodeURIComponent(tmp);
 	if (list_eval_select != null) getID('window_edit_code').style.display = 'block';
 }
 

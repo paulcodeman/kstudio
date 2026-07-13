@@ -256,9 +256,7 @@ div.button
 	font-weight:800;
 	border:1px solid #4B565D;
 	border-radius:2px;
-	background: -moz-linear-gradient(top, #FFFFFF 0%, #B8C0C9 50%, #B8C0C9 51%, #E6E9EB 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FFFFFF), color-stop(50%,#B8C0C9), color-stop(51%,#B8C0C9), color-stop(100%,#E6E9EB));
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFFFF', endColorstr='#B8C0C9',GradientType=0 );
+	background: linear-gradient(to bottom, #FFFFFF 0%, #B8C0C9 50%, #B8C0C9 51%, #E6E9EB 100%);
 	text-align:center;
 	line-height: 28px;
 	cursor:default;
@@ -270,16 +268,12 @@ div.button img
 }
 div.button:hover
 {
-	background: -moz-linear-gradient(top, #FFFFFF 0%, #8AD7FF 50%, #8AD7FF 51%, #D7FFFF 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FFFFFF), color-stop(50%,#8AD7FF), color-stop(51%,#8AD7FF), color-stop(100%,#D7FFFF));
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFFFF', endColorstr='#8AD7FF',GradientType=0 );
+	background: linear-gradient(to bottom, #FFFFFF 0%, #8AD7FF 50%, #8AD7FF 51%, #D7FFFF 100%);
 	border:1px solid #1F57A8;
 }
 div.button:active
 {
-	background: -moz-linear-gradient(top, #FFFFFF 0%, #8AD7FF 50%, #8AD7FF 51%, #D7FFFF 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#EDFFFF), color-stop(50%,#469BD3), color-stop(51%,#469BD3), color-stop(100%,#9DDFFF));
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFFFF', endColorstr='#8AD7FF',GradientType=0 );
+	background: linear-gradient(to bottom, #FFFFFF 0%, #469BD3 50%, #469BD3 51%, #9DDFFF 100%);
 	border:1px solid #174495;
 }
 div.button img#delete_event
@@ -404,9 +398,7 @@ div#main
 	height:500px;
 	background:#CCC;
 	overflow:auto;
-	-webkit-box-shadow:0 2px 8px rgba(0, 0, 0, 0.5),0px 0px 8px 0px rgba(0, 0, 0, 0.3) inset;
-    -moz-box-shadow:0 2px 8px rgba(0, 0, 0, 0.5),0px 0px 8px 0px rgba(0, 0, 0, 0.3) inset;
-    box-shadow:0 2px 8px rgba(0, 0, 0, 0.5),0px 0px 8px 0px rgba(0, 0, 0, 0.3) inset;
+	box-shadow:0 2px 8px rgba(0, 0, 0, 0.5),0px 0px 8px 0px rgba(0, 0, 0, 0.3) inset;
 }
 
 div.size
