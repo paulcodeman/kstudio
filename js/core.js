@@ -361,6 +361,7 @@ function render_props(el) {
 		container.appendChild(label);
 		container.appendChild(val);
 	}
+	if (!select_element) load_attribute_list_event();
 	update_events_tab_visibility();
 }
 
@@ -803,28 +804,29 @@ function load_help_stat(txt) {
 
 function delete_event_list() {
 	if (list_eval_select === null) return false;
+	const el = select_element || win;
 	const tmp = list_eval_select.parentNode;
 	if (tmp === null) return false;
 	deleteElement(list_eval_select.parentNode);
 	const eventName = list_eval_select.getAttribute('data-sel-event');
-	const events = get_component_events(select_element);
+	const events = get_component_events(el);
 	const x = events.indexOf(eventName);
 	if (x < 0) return false;
 	delete tmp_event_data[tmp_event_data.indexOf(eventName)];
 
-	const data_list_event_atr = select_element.getAttribute('data_list_event');
+	const data_list_event_atr = el.getAttribute('data_list_event');
 	let cmd = data_list_event_atr !== '' ? parseInt(data_list_event_atr) : 0;
 	cmd &= 0xFFFFFFFF ^ (1 << x);
 
-	select_element.removeAttribute(event_attr_name(eventName));
-	select_element.setAttribute('data_list_event', cmd);
+	el.removeAttribute(event_attr_name(eventName));
+	el.setAttribute('data_list_event', cmd);
 }
 
 function add_event_list(eventName) {
 	if (tmp_event_data.indexOf(eventName) >= 0) return false;
-	if (select_element === null) return false;
+	const el = select_element || win;
 
-	const events = get_component_events(select_element);
+	const events = get_component_events(el);
 	const x = events.indexOf(eventName);
 	if (x < 0) return false;
 
@@ -843,10 +845,10 @@ function add_event_list(eventName) {
 	b.appendChild(document.createTextNode((edef && edef.label) || eventName));
 	b.id = event_attr_name(eventName);
 
-	const data_list_event_atr = select_element.getAttribute('data_list_event');
+	const data_list_event_atr = el.getAttribute('data_list_event');
 	let cmd = data_list_event_atr !== '' ? parseInt(data_list_event_atr) : 0;
 	cmd |= 1 << x;
-	select_element.setAttribute('data_list_event', '' + cmd);
+	el.setAttribute('data_list_event', '' + cmd);
 
 	b.className = 'default';
 	b.onmousedown = function () {
@@ -865,10 +867,10 @@ function load_attribute_list_event() {
 	let count = tmp.length;
 	while (count--) element_list_event.removeChild(tmp[count]);
 
-	if (select_element === null) return;
+	const el = select_element || win;
 
-	const events = get_component_events(select_element);
-	const data_list_event_atr = select_element.getAttribute('data_list_event');
+	const events = get_component_events(el);
+	const data_list_event_atr = el.getAttribute('data_list_event');
 	const cmd = data_list_event_atr !== '' ? parseInt(data_list_event_atr) : 0;
 	for (let x = 0; x < events.length; x++) {
 		if (cmd & (1 << x)) {
@@ -904,16 +906,18 @@ function cancel_edit_code() {
 
 function save_edit_code() {
 	getID('window_edit_code').style.display = 'none';
-	if (select_element && list_eval_select) {
+	const el = select_element || win;
+	if (el && list_eval_select) {
 		const attrName = list_eval_select.id || event_attr_name(list_eval_select.getAttribute('data-sel-event'));
-		select_element.setAttribute(attrName, encodeURIComponent(getID('code_edit_rect').value));
+		el.setAttribute(attrName, encodeURIComponent(getID('code_edit_rect').value));
 	}
 }
 
 function click_edit_code() {
-	if (list_eval_select === null || select_element === null) return;
+	if (list_eval_select === null) return;
+	const el = select_element || win;
 	const attrName = list_eval_select.id || event_attr_name(list_eval_select.getAttribute('data-sel-event'));
-	const tmp = select_element.getAttribute(attrName);
+	const tmp = el.getAttribute(attrName);
 	getID('code_edit_rect').value = tmp === undefined ? '' : decodeURIComponent(tmp);
 	getID('window_edit_code').style.display = 'block';
 }
@@ -1039,8 +1043,9 @@ window.onload = function () {
 
 	if (element_add_event) {
 		element_add_event.onclick = function (e) {
-			if (select_element === null) return;
-			const events = get_component_events(select_element);
+			const el = select_element || win;
+			const events = get_component_events(el);
+			if (!events.length) return;
 			let html = '';
 			for (let i = 0; i < events.length; i++) {
 				const ev = events[i];
