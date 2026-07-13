@@ -971,6 +971,7 @@ window.onload = function () {
 	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = 'Window_1';
 
 	update_component_tree();
+	render_props(win);
 	load_help_stat(data_help_status);
 };
 
