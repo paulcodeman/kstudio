@@ -217,11 +217,28 @@ function rgb(r, g, b) {
 	return componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
+function get_prop_def(key) {
+	for (var i = 0; i < PROPS.length; i++) {
+		if (PROPS[i].key === key) return PROPS[i];
+	}
+	return null;
+}
+
 function get_props_for_element(el) {
 	if (select_element == null) return WINDOW_PROPS;
 	var def = get_component_def(el);
-	if (def && def.props) return def.props;
-	return COMPONENTS[0].props;
+	if (!def || !def.props) return COMPONENTS[0].props;
+	var resolved = [];
+	for (var i = 0; i < def.props.length; i++) {
+		var p = def.props[i];
+		if (typeof p === 'string') {
+			var found = get_prop_def(p);
+			if (found) resolved.push(found);
+		} else {
+			resolved.push(p);
+		}
+	}
+	return resolved;
 }
 
 function get_prop_value(el, prop) {

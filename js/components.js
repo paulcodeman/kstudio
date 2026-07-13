@@ -5,163 +5,74 @@ var WINDOW_PROPS = [
 	{ key:'color', label:'Цвет фона', type:'color', target:'style' }
 ];
 
+var PROPS = [
+	{ key:'data-name', label:'Имя', type:'text', target:'attr' },
+	{ key:'data-caption', label:'Заголовок', type:'text', target:'attr' },
+	{ key:'color', label:'Цвет фона', type:'color', target:'style' },
+	{ key:'data-align', label:'Выравнивание', type:'select', target:'attr', options:[{v:'0',l:'По умолчанию'},{v:'1',l:'По центру'}] },
+	{ key:'left', label:'Позиция X', type:'number', target:'style' },
+	{ key:'top', label:'Позиция Y', type:'number', target:'style' },
+	{ key:'width', label:'Ширина', type:'number', target:'style' },
+	{ key:'height', label:'Высота', type:'number', target:'style' },
+	{ key:'image', label:'Картинка', type:'text', target:'src' }
+];
+
 var COMPONENTS = [
 	{ name:'Button', typeClass:'button_element_gui', caption:'Кнопка', icon:'img/TBitBtn.png', group:'Главное', defaultText:'Кнопка', tag:'div',
 		events: ['click', 'dblclick'],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
-			{ key:'data-caption', label:'Заголовок', type:'text', target:'attr' },
-			{ key:'color', label:'Цвет фона', type:'color', target:'style' },
-			{ key:'data-align', label:'Выравнивание', type:'select', target:'attr', options:[{v:'0',l:'По умолчанию'},{v:'1',l:'По центру'}] },
-			{ section:'Положение' },
-			{ key:'left', label:'Позиция X', type:'number', target:'style' },
-			{ key:'top', label:'Позиция Y', type:'number', target:'style' },
-			{ key:'width', label:'Ширина', type:'number', target:'style' },
-			{ key:'height', label:'Высота', type:'number', target:'style' }
-		]
+		props:[{ section:'Главное' },'data-name','data-caption','color','data-align',{ section:'Положение' },'left','top','width','height']
 	},
 	{ name:'Label', typeClass:'label_element_gui', caption:'Текст', icon:'img/TLabel.png', group:'Главное', defaultText:'Текст',
 		events: ['click', 'dblclick'],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
-			{ key:'color', label:'Цвет текста', type:'color', target:'style' },
-			{ key:'data-align', label:'Выравнивание', type:'select', target:'attr', options:[{v:'0',l:'По умолчанию'},{v:'1',l:'По центру'}] },
-			{ section:'Положение' },
-			{ key:'left', label:'Позиция X', type:'number', target:'style' },
-			{ key:'top', label:'Позиция Y', type:'number', target:'style' },
-			{ key:'width', label:'Ширина', type:'number', target:'style' },
-			{ key:'height', label:'Высота', type:'number', target:'style' }
-		]
+		props:[{ section:'Главное' },'data-name',{ key:'color',label:'Цвет текста',type:'color',target:'style' },'data-align',{ section:'Положение' },'left','top','width','height']
 	},
 	{ name:'Edit', typeClass:'', caption:'Однострочное поле', icon:'img/TEdit.png', group:'Главное',
 		events: ['click', 'dblclick', 'change'],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
-			{ key:'data-caption', label:'Текст', type:'text', target:'attr' },
-			{ key:'color', label:'Цвет фона', type:'color', target:'style' },
-			{ section:'Положение' },
-			{ key:'left', label:'Позиция X', type:'number', target:'style' },
-			{ key:'top', label:'Позиция Y', type:'number', target:'style' },
-			{ key:'width', label:'Ширина', type:'number', target:'style' },
-			{ key:'height', label:'Высота', type:'number', target:'style' }
-		]
+		props:[{ section:'Главное' },'data-name',{ key:'data-caption',label:'Текст',type:'text',target:'attr' },'color',{ section:'Положение' },'left','top','width','height']
 	},
 	{ name:'Memo', typeClass:'', caption:'Многострочное поле', icon:'img/TMemo.png', group:'Главное',
 		events: ['click', 'dblclick', 'change'],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
-			{ key:'data-caption', label:'Текст', type:'text', target:'attr' },
-			{ key:'color', label:'Цвет фона', type:'color', target:'style' },
-			{ section:'Положение' },
-			{ key:'left', label:'Позиция X', type:'number', target:'style' },
-			{ key:'top', label:'Позиция Y', type:'number', target:'style' },
-			{ key:'width', label:'Ширина', type:'number', target:'style' },
-			{ key:'height', label:'Высота', type:'number', target:'style' }
-		]
+		props:[{ section:'Главное' },'data-name',{ key:'data-caption',label:'Текст',type:'text',target:'attr' },'color',{ section:'Положение' },'left','top','width','height']
 	},
 	{ name:'Image', typeClass:'image_element_gui', caption:'Изображение', icon:'img/TImage.png', group:'Главное',
 		events: ['click', 'dblclick'],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
-			{ key:'image', label:'Картинка', type:'text', target:'src' },
-			{ section:'Положение' },
-			{ key:'left', label:'Позиция X', type:'number', target:'style' },
-			{ key:'top', label:'Позиция Y', type:'number', target:'style' },
-			{ key:'width', label:'Ширина', type:'number', target:'style' },
-			{ key:'height', label:'Высота', type:'number', target:'style' }
-		]
+		props:[{ section:'Главное' },'data-name','image',{ section:'Положение' },'left','top','width','height']
 	},
 	{ name:'Shape', typeClass:'shape_element_gui', caption:'Фигура', icon:'img/TShape.png', group:'Главное',
 		events: ['click', 'dblclick'],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
-			{ key:'color', label:'Цвет фона', type:'color', target:'style' },
-			{ section:'Положение' },
-			{ key:'left', label:'Позиция X', type:'number', target:'style' },
-			{ key:'top', label:'Позиция Y', type:'number', target:'style' },
-			{ key:'width', label:'Ширина', type:'number', target:'style' },
-			{ key:'height', label:'Высота', type:'number', target:'style' }
-		]
+		props:[{ section:'Главное' },'data-name','color',{ section:'Положение' },'left','top','width','height']
 	},
 	{ name:'ProgressBar', typeClass:'', caption:'Прогресс', icon:'img/TProgressBar.png', group:'Главное',
 		events: ['click'],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
-			{ key:'color', label:'Цвет', type:'color', target:'style' },
-			{ section:'Положение' },
-			{ key:'left', label:'Позиция X', type:'number', target:'style' },
-			{ key:'top', label:'Позиция Y', type:'number', target:'style' },
-			{ key:'width', label:'Ширина', type:'number', target:'style' },
-			{ key:'height', label:'Высота', type:'number', target:'style' }
-		]
+		props:[{ section:'Главное' },'data-name',{ key:'color',label:'Цвет',type:'color',target:'style' },{ section:'Положение' },'left','top','width','height']
 	},
 	{ name:'ScrollBar', typeClass:'', caption:'Панель прокрутки', icon:'img/TScrollBar.png', group:'Дополнительно',
 		events: ['click', 'change'],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
-			{ key:'color', label:'Цвет', type:'color', target:'style' },
-			{ section:'Положение' },
-			{ key:'left', label:'Позиция X', type:'number', target:'style' },
-			{ key:'top', label:'Позиция Y', type:'number', target:'style' },
-			{ key:'width', label:'Ширина', type:'number', target:'style' },
-			{ key:'height', label:'Высота', type:'number', target:'style' }
-		]
+		props:[{ section:'Главное' },'data-name',{ key:'color',label:'Цвет',type:'color',target:'style' },{ section:'Положение' },'left','top','width','height']
 	},
 	{ name:'TrackBar', typeClass:'', caption:'Ползунок', icon:'img/TTrackBar.png', group:'Дополнительно',
 		events: ['click', 'change'],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
-			{ key:'color', label:'Цвет', type:'color', target:'style' },
-			{ section:'Положение' },
-			{ key:'left', label:'Позиция X', type:'number', target:'style' },
-			{ key:'top', label:'Позиция Y', type:'number', target:'style' },
-			{ key:'width', label:'Ширина', type:'number', target:'style' },
-			{ key:'height', label:'Высота', type:'number', target:'style' }
-		]
+		props:[{ section:'Главное' },'data-name',{ key:'color',label:'Цвет',type:'color',target:'style' },{ section:'Положение' },'left','top','width','height']
 	},
 	{ name:'Timer', typeClass:'', caption:'Таймер', icon:'img/TFuncTimer.png', group:'Система', system:true,
 		events: ['timer'],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' }
-		]
+		props:[{ section:'Главное' },'data-name']
 	},
 	{ name:'DataVar', typeClass:'', caption:'Данные', icon:'img/TDataVar.png', group:'Система', system:true,
 		events: [],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' }
-		]
+		props:[{ section:'Главное' },'data-name']
 	},
 	{ name:'Function', typeClass:'', caption:'Функция', icon:'img/TFunction.png', group:'Система', system:true,
 		events: [],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' }
-		]
+		props:[{ section:'Главное' },'data-name']
 	},
 	{ name:'SampleDialog', typeClass:'', caption:'Простой диалог', icon:'img/TSampleDialog.png', group:'Диалоги', system:true,
 		events: [],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' }
-		]
+		props:[{ section:'Главное' },'data-name']
 	},
 	{ name:'Download', typeClass:'', caption:'Загрузчик файлов', icon:'img/TDownload.png', group:'Интернет', system:true,
 		events: [],
-		props:[
-			{ section:'Главное' },
-			{ key:'data-name', label:'Имя', type:'text', target:'attr' }
-		]
+		props:[{ section:'Главное' },'data-name']
 	}
 ];
 
