@@ -104,28 +104,33 @@ div.list_event {
 	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 	overflow: hidden;
 }
-div.list_event table {
+.event-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	width: 100%;
-	margin: 0;
 	cursor: pointer;
-}
-div.list_event table td.title {
 	background: #fafbfc;
-	font-size: 13px;
-	padding: 8px 12px;
 	border-bottom: 1px solid #e0e3e8;
+	padding: 6px 12px;
+}
+.event-item:last-child {
+	border-bottom: none;
+}
+.event-item .title {
+	font-size: 13px;
 	color: #1a1a2e;
 	font-weight: 500;
+	flex: 1;
 }
-div.list_event table td.img {
+.event-item img {
 	width: 24px;
-	padding: 6px 4px 6px 8px;
+	height: 24px;
+	display: block;
+	flex: none;
 }
-div.list_event table:hover {
+.event-item:hover {
 	background: #f0f2f7;
-}
-div.list_event table td {
-	padding: 6px 12px;
 }
 
 div#event_cont table {
@@ -171,24 +176,25 @@ div.EditCode {
 	background: #fafbfc;
 	display: none;
 }
-div.EditCode table {
-	width: 100%;
-	height: 44px;
-	border-bottom: 1px solid #e0e3e8;
+.code-editor-body {
+	width: calc(100% - 24px);
+	height: calc(100% - 60px);
+	margin: 12px;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #e0e3e8;
+	border-radius: 8px;
 	background: #fff;
 }
 
 div.EditCode div.code_title {
 	font-size: 13px;
 	font-weight: 600;
-	margin: 8px 16px;
+	padding: 10px 16px;
 	color: #4f6ef7;
 	font-family: "SF Mono", "Fira Code", "Cascadia Code", "JetBrains Mono", monospace;
-}
-div.table_code td {
-	border: 1px solid #e0e3e8;
-	background: #fff;
-	border-radius: 4px;
+	border-bottom: 1px solid #e0e3e8;
+	flex: none;
 }
 div.table_button_edit_code {
 	width: 260px;
@@ -222,11 +228,8 @@ div.table_button_edit_code button:first-child:hover {
 }
 
 div.EditCode div.body_code_conteiner {
-	width: calc(100% - 24px);
-	height: calc(100% - 100px);
-	border: 1px solid #e0e3e8;
-	border-radius: 8px;
-	margin: 12px;
+	flex: 1;
+	min-height: 0;
 	padding: 0;
 	background: #fff;
 }
@@ -314,17 +317,20 @@ div#properies div.element {
 	margin: 2px 0;
 	cursor: pointer;
 	transition: all 0.12s;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 div#properies div.element:hover {
 	border-color: #4f6ef7;
 	background: #f0f2f7;
 	transform: translateX(2px);
 }
-div#properies div.element td.img {
-	width: 26px;
-}
-div#properies div.element td img {
+div#properies div.element img {
+	width: 24px;
+	height: 24px;
 	display: block;
+	flex: none;
 }
 
 div#properies div.select {
@@ -377,6 +383,26 @@ div.button img#replace_event {
 div.button#edit_event {
 	font-size: 12px;
 	line-height: 28px;
+}
+
+.events-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+.event-actions {
+	display: flex;
+	gap: 4px;
+}
+.event-actions .button {
+	flex: 0 0 auto;
+	width: auto;
+	padding: 0 8px;
+	line-height: 32px;
+	font-size: 12px;
+}
+.event-actions .button.grow {
+	flex: 1;
 }
 
 .mid-layout {

@@ -61,21 +61,17 @@
 	</div>
 		
 	<div>
-		<div class="attr">
-			<table style="width:100%;" cellspacing=0 cellpadding=0>
-				<tr><td colspan="3"><div class="button" id='add_event' onmousedown="return false;"><image src="img/add_list.PNG"></image>Добавить событие</div></td></tr>
-				<tr>
-					<td><div onmousedown="return false;" onclick="delete_event_list();" class="button"><image id="delete_event" src="img/delete.PNG"></image></div></td>
-					<td><div onmousedown="return false;" class="button"><image id="replace_event" src="img/replace_event.PNG"></image></div></td>
-					<td><div onmousedown="return false;" onclick="click_edit_code();" class="button" id="edit_event"><image id="img_replace_event" src="img/edit_event.PNG"></image>Редактировать</div></td>
-				</tr>
-				<tr><td colspan="3">
-					<div id="event_cont">
-						<table id='list_event'>
-						</table>
-					</div>
-				</td></tr>
-			</table>
+		<div class="attr events-panel">
+			<div class="button" id='add_event' onmousedown="return false;"><image src="img/add_list.PNG"></image>Добавить событие</div>
+			<div class="event-actions">
+				<div onmousedown="return false;" onclick="delete_event_list();" class="button"><image id="delete_event" src="img/delete.PNG"></image></div>
+				<div onmousedown="return false;" class="button"><image id="replace_event" src="img/replace_event.PNG"></image></div>
+				<div onmousedown="return false;" onclick="click_edit_code();" class="button grow" id="edit_event"><image id="img_replace_event" src="img/edit_event.PNG"></image>Редактировать</div>
+			</div>
+			<div id="event_cont">
+				<table id='list_event'>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>

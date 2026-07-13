@@ -7,8 +7,8 @@
 <script src="js/compiler.js"></script>
 <body onmousedown="element_list.style.display='none';" onmousemove="mouse.getX(window.event);mouse.getY(window.event);" onkeydown="window.ee = event;CmdKeyDown(event);">
 	<div id="list_add_event" class="list_event">
-		<table onmousedown="add_event_list(0);"><tr><td class="img"><image src="img/onclick.png"></td><td class="title">Клик</td></tr></table>
-		<table onmousedown="add_event_list(1);"><tr><td class="img"><image src="img/ondblclick.png"></td><td class="title">2х Клик</td></tr></table>
+		<div class="event-item" onmousedown="add_event_list(0);"><img src="img/onclick.png"><span class="title">Клик</span></div>
+		<div class="event-item" onmousedown="add_event_list(1);"><img src="img/ondblclick.png"><span class="title">2х Клик</span></div>
 	</div>
 	<div class="panel" id="TopPanel">
 		<div class="toolbar">
@@ -47,19 +47,12 @@
 	<div class="statbar" id="text_status_bar"></div>
 
 	<div id="window_edit_code" class="EditCode">
-		<table>
-			<tr><td></td><td></td></tr>
-		</table>
-		<table class="table_code">
-			<tr>
-				<td>
-					<div class="code_title">void onClick(byte key){</div>
-					<div class="body_code_conteiner">
-						<textarea id="code_edit_rect"></textarea>
-					</div>
-				</td>
-			</tr>
-		</table>
+		<div class="code-editor-body">
+			<div class="code_title">void onClick(byte key){</div>
+			<div class="body_code_conteiner">
+				<textarea id="code_edit_rect"></textarea>
+			</div>
+		</div>
 		<div class="table_button_edit_code"><button onclick="save_edit_code();">Ок</button><button onclick="cancel_edit_code();">Отмена</button></div>
 	</div>
 
