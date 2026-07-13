@@ -423,6 +423,10 @@ function update_window_select() {
 		var idx = parseInt(this.value);
 		if (idx == -1) { add_new_window(); }
 		else if (idx != current_win_index) switch_window(idx);
+		else if (select_element != null) {
+			select_element = null;
+			hide_atr_element(win);
+		}
 	};
 }
 
@@ -475,6 +479,9 @@ function update_component_tree() {
 					break;
 				}
 			}
+		} else if (select_element != null) {
+			select_element = null;
+			hide_atr_element(win);
 		}
 	};
 }
