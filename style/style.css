@@ -265,6 +265,56 @@ select.list_window:focus {
 	box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
 }
 
+.palette-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 4px 6px;
+	font-weight: 600;
+	color: #1a1a2e;
+	font-size: 13px;
+}
+.palette-view-btn {
+	cursor: pointer;
+	padding: 4px 6px;
+	border-radius: 4px;
+	color: #6b7280;
+	transition: all 0.12s;
+	font-size: 14px;
+}
+.palette-view-btn:hover {
+	background: #f0f2f7;
+	color: #4f6ef7;
+}
+
+.palette-tile #properies {
+	display: flex;
+	flex-wrap: wrap;
+	align-content: flex-start;
+	gap: 4px;
+	flex: 0 1 auto;
+}
+.palette-tile #properies .element {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 4px 6px;
+	margin: 0;
+	gap: 0;
+	width: 52px;
+}
+.palette-tile #properies .element span {
+	display: none;
+}
+.palette-tile #properies .element img {
+	width: 32px;
+	height: 32px;
+}
+.palette-tile #properies .title {
+	flex: 0 0 100%;
+	margin: 4px 0 0;
+}
+
 #properies {
 	border: 1px solid #e0e3e8;
 	border-radius: 8px;

@@ -628,6 +628,25 @@ function scan_window_components() {
 	return comps;
 }
 
+function set_palette_view(mode) {
+	const panel = getID('LeftPanel');
+	const btn = getID('palette_view_btn');
+	if (!panel || !btn) return;
+	if (mode === 'tile') {
+		panel.classList.add('palette-tile');
+		btn.innerHTML = '<i class="fa-solid fa-list"></i>';
+	} else {
+		panel.classList.remove('palette-tile');
+		btn.innerHTML = '<i class="fa-solid fa-table-cells"></i>';
+	}
+	localStorage.setItem('kstudio_palette_view', mode);
+}
+
+function toggle_palette_view() {
+	const current = localStorage.getItem('kstudio_palette_view') || 'list';
+	set_palette_view(current === 'list' ? 'tile' : 'list');
+}
+
 function render_palette() {
 	const container = getID('properies');
 	if (!container) return;
@@ -1003,6 +1022,7 @@ function init_panel_resizers() {
 window.onload = function () {
 	init_panel_resizers();
 	render_palette();
+	set_palette_view(localStorage.getItem('kstudio_palette_view') || 'list');
 	win = getID('window_background');
 	addwinelm = getID('window');
 	select_element_rect = getID('select_elements_rect');
