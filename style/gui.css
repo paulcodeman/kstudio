@@ -1,0 +1,91 @@
+﻿div#window_background
+{
+	width:300px;
+	height:230px;
+	background:#E1E1E1;
+	border:1px solid #457;
+}
+div#window
+{
+	width:100%;
+	height:100%;
+	background:url("../img/background/5px.png");
+	position:absolute;
+	-webkit-box-shadow:0 2px 8px rgba(0, 0, 0, 0.7);
+    -moz-box-shadow:0 2px 8px rgba(0, 0, 0, 0.7);
+    box-shadow:0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+
+
+div.button_element_gui
+{
+	border:1px solid #949494;
+	background:#F5F5F5;
+	
+	background: -moz-linear-gradient(top, #F6F6F6 0%, #DDDDDD 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F6F6F6), color-stop(100%,#DDDDDD));
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F6F6F6', endColorstr='#DDDDDD',GradientType=0 );
+	
+	position:absolute;
+	left:0px;
+	top:0px;
+	width:150px;
+	height:25px;
+	font-family:Tahoma;
+	font-size:12px;
+	text-align:center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor:default;
+}
+
+div.shape_element_gui
+{
+	border:1px solid #000000;
+	background:#FFFFFF;
+	position:absolute;
+	left:0px;
+	top:0px;
+	width:50px;
+	height:50px;
+}
+
+img.image_element_gui
+{
+	position:absolute;
+	left:0px;
+	top:0px;
+}
+
+div.label_element_gui
+{
+	position:absolute;
+	left:0px;
+	top:0px;
+	width:150px;
+	height:25px;
+	font-family:Tahoma;
+	font-size:12px;
+	cursor:default;
+}
+
+table.simple_object_code
+{
+	position:absolute;
+	left:0px;
+	top:0px;
+	cursor:default;
+}
+table.simple_object_code td img
+{
+	border:2px solid #555555;
+	padding:2px;
+}
+table.simple_object_code td
+{
+	text-align:center;
+	font-size:11px;
+	font-weight:700;
+}

@@ -1,0 +1,153 @@
+﻿<head>
+	<link rel="stylesheet" href="style/style.css">
+	<link rel="stylesheet" href="style/gui.css">
+	<script src="js/download.js"></script>
+	<script src="js/serializer.js"></script>
+	<script src="js/core.js"></script>
+	<script src="js/compiler.js"></script>
+</head>
+<body onmousedown="element_list.style.display='none';" onmousemove="mouse.getX(window.event);mouse.getY(window.event);" onkeydown="window.ee = event;CmdKeyDown(event);">
+	<div id="list_add_event" class="list_event">
+		<table onmousedown="add_event_list(0);"><tr><td class="img"><image src="img/onclick.png"></td><td class="title">Клик</td></tr></table>
+		<table onmousedown="add_event_list(1);"><tr><td class="img"><image src="img/ondblclick.png"></td><td class="title">2х Клик</td></tr></table>
+	</div>
+	<div class="panel" id="TopPanel">
+		<table>
+			<tr>
+				<td><div class="button" onmousedown="compile(1);">Компилировать и запустить</div></td>
+				<td><div class="button" onmousedown="compile(2);">Компилировать и скачать</div></td>
+				<td><a href="" onmousedown="downloadfile(to_source_project(),this);" download="project.kcm">Скачать проект</a></td>
+				<td>
+					<select class="list_window" id="list_window_add"></select>
+				</td>
+				<td>
+					Сетка:
+					<select class="list_window" onchange="change_setka_option(this);">
+						<option>Без сетки</option>
+						<option selected>5 px</option>
+						<option>10 px</option>
+						<option>15 px</option>
+					</select>
+				</td>
+				<td>
+					Показывать сетку:
+				</td>
+				<td>
+					<input onchange="alert(this.value);" class="chckbox" type="checkbox" checked>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div>
+		<table cellspacing=0 cellpadding=0 class="global">
+			<tr>
+				<td id="LeftPanel"><div id="properies">
+					<div class="title">Главное</div>
+					<div name="Button" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TBitBtn.png"></td><td>Кнопка</td></tr></table></div>
+					<div name="Label" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TLabel.png"></td><td>Текст</td></tr></table></div>
+					<div name="Edit" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TEdit.png"></td><td>Однострочное поле</td></tr></table></div>
+					<div name="Memo" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TMemo.png"></td><td>Многострочное поле</td></tr></table></div>
+					<div name="Image" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TImage.png"></td><td>Изображение</td></tr></table></div>
+					<div name="Shape" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TShape.png"></td><td>Фигура</td></tr></table></div>
+					<div name="ProgressBar" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TProgressBar.png"></td><td>Прогресс</td></tr></table></div>
+					<div class="title">Дополнительно</div>
+					<div name="ScrollBar" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TScrollBar.png"></td><td>Панель прокрутки</td></tr></table></div>
+					<div name="TrackBar" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TTrackBar.png"></td><td>Ползунок</td></tr></table></div>
+					<div class="title">Система</div>
+					<div name="Timer" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TFuncTimer.png"></td><td>Таймер</td></tr></table></div>
+					<div name="DataVar" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TDataVar.png"></td><td>Данные</td></tr></table></div>
+					<div name="Function" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TFunction.png"></td><td>Функция</td></tr></table></div>
+					<div class="title">Диалоги</div>
+					<div name="SampleDialog" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TSampleDialog.png"></td><td>Простой диалог</td></tr></table></div>
+					<div class="title">Интернет</div>
+					<div name="Download" class="element" onclick="return select_element_menu(this);"><table><tr><td class="img"><image src="img/TDownload.png"></td><td>Загрузчик файлов</td></tr></table></div>
+				</div></td>
+				<td><div id="main"><div id="window_background" onmousedown="return false;"><div id="window" oncontextmenu="return false;"></div></div></div></td>
+				<td><div class="conteiner">
+					<input type="radio" name="odin" checked="checked" id="vkl1"><label for="vkl1" onmousedown="return false;">Свойства</label>
+					<input type="radio" name="odin" id="vkl2"><label for="vkl2" onmousedown="return false;">События</label>
+					<div>
+						<div class="glob_title">Компоненты</div>
+						<div class="title"><select class="list" id="list_element_add"></select></div>
+						<div class="attr">
+							<table id="attribute_element" style="width:100%;" cellspacing="1" cellpadding="0">
+								<tr><td class="opt_spis"><div id="open_block"></div></td><td class="title_pod" colspan="2">Главное</td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Имя</td><td><input onkeyup="change_value_element('name',this);" onmouseup="this.select();" value="Win1" id="name_window"></td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Заголовок</td><td><input onkeyup="change_value_element('caption',this);" onmouseup="this.select();" id="CaptionElement"></td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Цвет</td><td><input id="color" onchange="change_value_element('color',this);" type="color" value="#FFFFFF"></td></tr>
+								<tr id="display_border_color"><td class="opt_spis"></td><td class="title_atr">Цвет рамки</td><td><input id="color_border_element" onchange="change_value_element('image',this);" type="color" value="#FFFFFF"></td></tr>
+								<tr id="display_border_color"><td class="opt_spis"></td><td class="title_atr">Картинка</td><td><input onchange="change_value_element('image',this);"></td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Стиль</td>
+									<td>
+										<select id="style_element" class="list_atr">
+											<option value="0">Плоский</option>
+											<option value="1">Объемный</option>
+											<option value="2">Градиент</option>
+										</select>
+									</td>
+								</tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Прилипание</td><td><input class="check_atr" type="checkbox"></td></tr>
+								<tr><td class="opt_spis"><div id="open_block"></div></td><td class="title_pod" colspan="2">Дополнительно</td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Курсор</td><td>
+									<select class="list_atr">
+										<option>crDefault</option>
+									</select>
+								</td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Позиция X</td><td><input onmouseup="this.select();" id="position_x_atr" type="number"></td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Позиция Y</td><td><input onmouseup="this.select();" id="position_y_atr" type="number"></td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Позиция Z</td><td><input onmouseup="this.select();" id="position_z_atr" type="number"></td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Ширина</td><td><input onmouseup="this.select();" id="size_width_atr" type="number"></td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Высота</td><td><input onmouseup="this.select();" id="size_height_atr" type="number"></td></tr>
+								<tr><td class="opt_spis"></td><td class="title_atr">Выравнивание</td>
+									<td>
+										<select id="align_element" class="list_atr">
+											<option value="0">По умолчанию</option>
+											<option value="1">По центру</option>
+										</select>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div>
+						<div class="attr">
+							<table style="width:100%;" cellspacing="0" cellpadding="0">
+								<tr><td colspan="3"><div class="button" id="add_event" onmousedown="return false;"><image src="img/add_list.PNG">Добавить событие</div></td></tr>
+								<tr>
+									<td><div onmousedown="return false;" onclick="delete_event_list();" class="button"><image id="delete_event" src="img/delete.PNG"></div></td>
+									<td><div onmousedown="return false;" class="button"><image id="replace_event" src="img/replace_event.PNG"></div></td>
+									<td><div onmousedown="return false;" onclick="click_edit_code();" class="button" id="edit_event"><image id="img_replace_event" src="img/edit_event.PNG">Редактировать</div></td>
+								</tr>
+								<tr><td colspan="3">
+									<div id="event_cont">
+										<table id="list_event"></table>
+									</div>
+								</td></tr>
+							</table>
+						</div>
+					</div>
+				</div></td>
+			</tr>
+		</table>
+	</div>
+	<div class="statbar" id="text_status_bar"></div>
+
+	<div id="window_edit_code" class="EditCode">
+		<table>
+			<tr><td></td><td></td></tr>
+		</table>
+		<table class="table_code">
+			<tr>
+				<td>
+					<div class="code_title">void onClick(byte key){</div>
+					<div class="body_code_conteiner">
+						<textarea id="code_edit_rect"></textarea>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<div class="table_button_edit_code"><button onclick="save_edit_code();">Ок</button><button onclick="cancel_edit_code();">Отмена</button></div>
+	</div>
+
+	<div id="select_elements_rect"></div>
+</body>
