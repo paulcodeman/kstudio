@@ -577,7 +577,7 @@ function init_panel_resizers() {
 		if (!dragData) return;
 		var dx = e.clientX - dragData.startX;
 		var panel = dragData.panel;
-		var w = dragData.startWidth + dx;
+		var w = dragData.startWidth + dx * dragData.sign;
 		w = Math.max(dragData.minWidth, Math.min(w, dragData.maxWidth));
 		panel.style.width = w + 'px';
 	}
@@ -611,7 +611,8 @@ function init_panel_resizers() {
 				maxWidth: 500,
 				panel: panel,
 				splitter: splitter,
-				side: side
+				side: side,
+				sign: side === 'right' ? -1 : 1
 			};
 			splitter.classList.add('active');
 			document.body.style.cursor = 'col-resize';
