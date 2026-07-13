@@ -5,7 +5,7 @@ const WINDOW_PROPS = [
 	{key: 'color', label: 'Цвет фона', type: 'color', target: 'style'}
 ];
 
-const WINDOW_EVENTS = ['create', 'close', 'closequery', 'active', 'deactive', 'show', 'hide', 'resize', 'paint', 'execute', 'keydown', 'keypress', 'keyup', 'mouseenter', 'mouseleave'];
+const WINDOW_EVENTS = ['create', 'close', 'closequery', 'active', 'deactive', 'show', 'hide', 'resize', 'paint', 'execute', 'keydown', 'keypress', 'keyup', 'mouseenter', 'mouseleave', 'mousedown', 'mouseup', 'mousemove', 'mousewheel', 'formsubmit', 'error'];
 
 const PROPS = [
 	{key: 'data-name', label: 'Имя', type: 'text', target: 'attr', group: 'Главное'},
@@ -23,7 +23,10 @@ const PROPS = [
 	{key: 'top', label: 'Позиция Y', type: 'number', target: 'style', group: 'Положение'},
 	{key: 'width', label: 'Ширина', type: 'number', target: 'style', group: 'Положение'},
 	{key: 'height', label: 'Высота', type: 'number', target: 'style', group: 'Положение'},
-	{key: 'image', label: 'Картинка', type: 'text', target: 'src', group: 'Главное'}
+	{key: 'image', label: 'Картинка', type: 'text', target: 'src', group: 'Главное'},
+	{key: 'visible', label: 'Видимость', type: 'select', target: 'attr', options: [{v: '1', l: 'Да'}, {v: '0', l: 'Нет'}], group: 'Главное'},
+	{key: 'enabled', label: 'Доступность', type: 'select', target: 'attr', options: [{v: '1', l: 'Да'}, {v: '0', l: 'Нет'}], group: 'Главное'},
+	{key: 'hint', label: 'Подсказка', type: 'text', target: 'attr', group: 'Главное'}
 ];
 
 const COMPONENTS = [
@@ -94,6 +97,21 @@ const COMPONENTS = [
 		}, 'left', 'top', 'width', 'height']
 	},
 	{
+		name: 'GroupBox', typeClass: 'groupbox_element_gui', caption: 'Группа', icon: 'img/TGroupBox.png', group: 'Главное',
+		events: ['click', 'dblclick', 'mouseenter', 'mouseleave', 'mousedown', 'mouseup'],
+		props: ['data-name', 'data-caption', 'color', 'visible', 'enabled', 'hint', 'left', 'top', 'width', 'height']
+	},
+	{
+		name: 'Panel', typeClass: 'panel_element_gui', caption: 'Панель', icon: 'img/TPanel.png', group: 'Главное',
+		events: ['click', 'dblclick', 'mouseenter', 'mouseleave'],
+		props: ['data-name', 'color', 'visible', 'enabled', 'left', 'top', 'width', 'height']
+	},
+	{
+		name: 'ScrollBox', typeClass: 'scrollbox_element_gui', caption: 'Прокрутка', icon: 'img/TScrollBox.png', group: 'Главное',
+		events: ['click', 'dblclick', 'scroll', 'mouseenter', 'mouseleave'],
+		props: ['data-name', 'visible', 'enabled', 'left', 'top', 'width', 'height']
+	},
+	{
 		name: 'ScrollBar',
 		typeClass: '',
 		caption: 'Панель прокрутки',
@@ -118,6 +136,11 @@ const COMPONENTS = [
 		}, 'left', 'top', 'width', 'height']
 	},
 	{
+		name: 'WebBrowserEx', typeClass: 'webbrowser_element_gui', caption: 'Браузер', icon: 'img/TWebBrowserEx.png', group: 'Дополнительно',
+		events: ['execute', 'closequery', 'create', 'hide', 'show', 'resize', 'paint', 'error', 'formsubmit'],
+		props: ['data-name', 'visible', 'enabled', 'left', 'top', 'width', 'height']
+	},
+	{
 		name: 'Timer', typeClass: '', caption: 'Таймер', icon: 'img/TFuncTimer.png', group: 'Система', system: true,
 		events: ['timer'],
 		props: ['data-name']
@@ -129,6 +152,11 @@ const COMPONENTS = [
 	},
 	{
 		name: 'Function', typeClass: '', caption: 'Функция', icon: 'img/TFunction.png', group: 'Система', system: true,
+		events: [],
+		props: ['data-name']
+	},
+	{
+		name: 'Cursor', typeClass: '', caption: 'Курсор', icon: 'img/TCursor.png', group: 'Система', system: true,
 		events: [],
 		props: ['data-name']
 	},
@@ -150,6 +178,11 @@ const COMPONENTS = [
 		group: 'Интернет',
 		system: true,
 		events: [],
+		props: ['data-name']
+	},
+	{
+		name: 'HttpClient', typeClass: '', caption: 'HTTP клиент', icon: 'img/THttpClient.png', group: 'Интернет', system: true,
+		events: ['error', 'execute'],
 		props: ['data-name']
 	}
 ];
@@ -180,7 +213,13 @@ const EVENTS = [
 	{name: 'starttrack', label: 'Начало трека', icon: '24/onstarttrack.bmp'},
 	{name: 'endtrack', label: 'Конец трека', icon: '24/onendtrack.bmp'},
 	{name: 'hotspotclick', label: 'Клик по hotspot', icon: '24/onhotspotclick.bmp'},
-	{name: 'hotspotcovered', label: 'Наведение на hotspot', icon: '24/onhotspotcovered.bmp'}
+	{name: 'hotspotcovered', label: 'Наведение на hotspot', icon: '24/onhotspotcovered.bmp'},
+	{name: 'mousewheel', label: 'Колесико мыши', icon: '24/omousewheel.bmp'},
+	{name: 'formsubmit', label: 'Отправка формы', icon: '24/onformsubmit.png'},
+	{name: 'mousedown', label: 'Нажатие кнопки мыши', icon: '24/mousedown.bmp'},
+	{name: 'mouseup', label: 'Отпускание кнопки мыши', icon: '24/mouseup.bmp'},
+	{name: 'mousemove', label: 'Движение мыши', icon: '24/mousemove.bmp'},
+	{name: 'error', label: 'Ошибка', icon: '24/error.png'}
 ];
 
 const list_element_system = COMPONENTS.filter(function (c) {
