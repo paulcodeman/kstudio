@@ -6,7 +6,7 @@ var WINDOW_PROPS = [
 ];
 
 var COMPONENTS = [
-	{ name:'Button', typeClass:'button_element_gui', caption:'Кнопка', icon:'img/TBitBtn.png', group:'Главное', defaultText:'Кнопка',
+	{ name:'Button', typeClass:'button_element_gui', caption:'Кнопка', icon:'img/TBitBtn.png', group:'Главное', defaultText:'Кнопка', tag:'div',
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' },

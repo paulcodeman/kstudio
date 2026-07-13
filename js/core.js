@@ -310,63 +310,54 @@ function apply_prop(input) {
 	update_component_tree();
 }
 
-function past_gui_window(win, type, atr, name_type) {
-	if (list_element_system.indexOf(name_type) != -1) {
-		var element = createELM('TABLE');
-		var img_url = '';
-		for (var ci = 0; ci < COMPONENTS.length; ci++) {
-			if (COMPONENTS[ci].name == name_type) { img_url = COMPONENTS[ci].icon; break; }
-		}
+function past_gui_window(win, name_type) {
+	var comp;
+	for (var ci = 0; ci < COMPONENTS.length; ci++) {
+		if (COMPONENTS[ci].name == name_type) { comp = COMPONENTS[ci]; break; }
+	}
+	if (!comp) return;
+
+	var element;
+	if (comp.system) {
+		element = createELM('TABLE');
 		element.className = 'simple_object_code';
-		element.style.left = Math.round(event.offsetX / grid_distance) * grid_distance;
-		element.style.top = Math.round(event.offsetY / grid_distance) * grid_distance;
+	} else if (name_type == 'Image') {
+		element = createELM('IMG');
+		element.src = comp.icon || 'img/TImage.png';
+	} else {
+		element = createELM('DIV');
+		element.className = comp.typeClass || '';
+	}
+	element.style.left = Math.round(event.offsetX / grid_distance) * grid_distance;
+	element.style.top = Math.round(event.offsetY / grid_distance) * grid_distance;
 
-		if (count_element_add[name_type] == undefined) count_element_add[name_type] = 0;
-		var name = name_type + '_' + (++count_element_add[name_type]);
-		element.setAttribute('data-name', name);
-		element.onmousedown = function () { select_element_added(this); global_lock_event = true; };
-		if (cmd_sensor) element.ontouchstart = element.onmousedown;
-		element.setAttribute('data-hide-prop', atr);
-		render_props(element);
+	if (count_element_add[name_type] == undefined) count_element_add[name_type] = 0;
+	var name = name_type + '_' + (++count_element_add[name_type]);
+	element.setAttribute('data-name', name);
+	element.onmousedown = comp.system ? function () { select_element_added(this); global_lock_event = true; } : func_define_select;
+	if (cmd_sensor) element.ontouchstart = element.onmousedown;
 
+	render_props(element);
+
+	if (comp.system) {
 		var tr = createELM('TR');
 		var td = createELM('TD');
 		var img = createELM('IMG');
-		img.src = img_url;
+		img.src = comp.icon;
 		td.appendChild(img);
 		tr.appendChild(td);
 		element.appendChild(tr);
-
 		tr = createELM('TR');
 		td = createELM('TD');
 		td.innerText = name;
 		tr.appendChild(td);
 		element.appendChild(tr);
-
-		win.appendChild(element);
-		select_element_added(element);
-	} else {
-		var element;
-		if (name_type == 'Image') {
-			element = createELM('IMG');
-			element.src = 'img/TImage.png';
-		} else element = createELM('DIV');
-		element.className = type;
-		element.style.left = Math.round(event.offsetX / grid_distance) * grid_distance;
-		element.style.top = Math.round(event.offsetY / grid_distance) * grid_distance;
-		if (name_type == 'Button') element.innerText = 'Кнопка';
-		if (name_type == 'Label') element.innerText = 'Текст';
-
-		if (count_element_add[name_type] == undefined) count_element_add[name_type] = 0;
-		element.setAttribute('data-name', name_type + '_' + (++count_element_add[name_type]));
-		element.onmousedown = func_define_select;
-		if (cmd_sensor) element.ontouchstart = element.onmousedown;
-		element.setAttribute('data-hide-prop', atr);
-		render_props(element);
-
-		win.appendChild(element);
-		select_element_added(element);
+	} else if (comp.defaultText) {
+		element.innerText = comp.defaultText;
 	}
+
+	win.appendChild(element);
+	select_element_added(element);
 	update_component_tree();
 }
 
@@ -916,14 +907,11 @@ window.onload = function () {
 
 	addwinelm.onmousedown = function (event) {
 		if (list_element_select != null) {
-			var type = list_element_select.getAttribute('data-name');
-			for (var ci = 0; ci < COMPONENTS.length; ci++) {
-				if (COMPONENTS[ci].name == type) {
-					past_gui_window(this, COMPONENTS[ci].typeClass || 0, '', type);
-					return true;
+				var type = list_element_select.getAttribute('data-name');
+				for (var ci = 0; ci < COMPONENTS.length; ci++) {
+					if (COMPONENTS[ci].name == type) { past_gui_window(this, type); return true; }
 				}
 			}
-		}
 		if (!global_lock_event) {
 			select_element = null;
 			TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
