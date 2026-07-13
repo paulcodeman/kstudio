@@ -335,6 +335,15 @@ function render_props(el) {
 			}
 			input.onchange = function () { apply_prop(this); };
 		} else if (p.type === 'color') {
+			const toHex = function (v) {
+				const m = v && v.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+				if (m) return '#' + ((1 << 24) + (parseInt(m[1]) << 16) + (parseInt(m[2]) << 8) + parseInt(m[3])).toString(16).slice(1);
+				if (v && /^#[0-9a-f]{6}$/i.test(v)) return v.toLowerCase();
+				if (v && /^#[0-9a-f]{3}$/i.test(v)) return '#' + v[1] + v[1] + v[2] + v[2] + v[3] + v[3];
+				return '#ffffff';
+			};
+			const hexVal = toHex(value);
+
 			const colorWrap = createELM('div');
 			colorWrap.style.display = 'flex';
 			colorWrap.style.gap = '4px';
@@ -342,13 +351,13 @@ function render_props(el) {
 
 			const textInput = createELM('input');
 			textInput.type = 'text';
-			textInput.value = value || '#ffffff';
+			textInput.value = hexVal;
 			textInput.style.flex = '1';
 			textInput.style.minWidth = '0';
 
 			const colorInput = createELM('input');
 			colorInput.type = 'color';
-			colorInput.value = value || '#ffffff';
+			colorInput.value = hexVal;
 			colorInput.style.width = '28px';
 			colorInput.style.height = '28px';
 			colorInput.style.flex = 'none';
@@ -359,8 +368,9 @@ function render_props(el) {
 			colorInput.style.background = 'none';
 
 			textInput.oninput = function () {
-				colorInput.value = this.value;
-				apply_prop(this);
+				const h = toHex(this.value);
+				colorInput.value = h;
+				if (h !== '#ffffff' || this.value === '#ffffff') apply_prop(this);
 			};
 			colorInput.oninput = function () {
 				textInput.value = this.value;
