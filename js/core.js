@@ -311,8 +311,8 @@ function create_window() {
 	var name = 'Window_' + count_stack;
 	win.setAttribute('name', name);
 
-	getID('main').style.width = document.body.offsetWidth - 420;
-	getID('main').style.height = document.body.offsetHeight - 60;
+	getID('main').style.width = window.innerWidth - 420;
+	getID('main').style.height = window.innerHeight - 60;
 
 	addwinelm.style.width = win.offsetWidth - 2;
 	addwinelm.style.height = win.offsetHeight - 2;
@@ -563,8 +563,8 @@ window.onload = function () {
 };
 
 window.onresize = function () {
-	getID('main').style.width = document.body.offsetWidth - 420;
-	getID('main').style.height = document.body.offsetHeight - 60;
+	getID('main').style.width = window.innerWidth - 420;
+	getID('main').style.height = window.innerHeight - 60;
 };
 
 window.onmouseup = function () {
