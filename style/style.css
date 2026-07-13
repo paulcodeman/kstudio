@@ -504,49 +504,7 @@ select.list:focus {
 	box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
 }
 
-div#component_tree {
-	width: 100%;
-	max-height: 200px;
-	overflow-y: auto;
-	background: #fff;
-	border: 1px solid #d0d5de;
-	border-radius: 6px;
-	font-size: 12px;
-	user-select: none;
-}
-.tree-win {
-	padding: 4px 8px;
-	cursor: pointer;
-	color: #1a1a2e;
-	font-weight: 600;
-	border-bottom: 1px solid #eef0f4;
-}
-.tree-toggle {
-	display: inline-block;
-	width: 14px;
-	font-size: 10px;
-	color: #888;
-}
-.tree-win:hover {
-	background: #f0f2f7;
-}
-.tree-win.tree-selected {
-	background: #e8ecf8;
-	color: #4f6ef7;
-}
-.tree-comp {
-	padding: 3px 8px 3px 20px;
-	cursor: pointer;
-	color: #444;
-	font-size: 12px;
-}
-.tree-comp:hover {
-	background: #f0f2f7;
-}
-.tree-comp.tree-selected {
-	background: #e8ecf8;
-	color: #4f6ef7;
-}
+
 
 
 input.check_atr {

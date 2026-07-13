@@ -366,7 +366,6 @@ function switch_window(index) {
 	select_element = null;
 	hide_atr_element(win);
 	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
-	tree_expanded[index] = true;
 	update_component_tree();
 }
 
@@ -400,57 +399,54 @@ function scan_window_components() {
 	return comps;
 }
 
-var tree_expanded = {};
-
 function update_component_tree() {
-	var tree = getID('component_tree');
-	if (!tree) return;
-	tree.innerHTML = '';
+	var sel = getID('component_tree');
+	if (!sel) return;
+	sel.innerHTML = '';
+	var selCompName = select_element ? select_element.getAttribute('data-name') : null;
+	var selectedIdx = -1;
+	var optIdx = 0;
 	for (var i = 0; i < count_stack; i++) {
 		var data = window_data[i];
 		var winName = data ? data.name : ('Window_' + (i + 1));
-		var isActiveWin = (i == current_win_index);
-		var expanded = tree_expanded[i] !== false;
-
-		var winItem = createELM('div');
-		winItem.className = 'tree-win' + (isActiveWin ? ' tree-selected' : '');
-		winItem.innerHTML = '<span class="tree-toggle">' + (expanded ? '\u25BC' : '\u25B6') + '</span>' + winName;
-		winItem.onclick = function (idx) { return function () {
-			tree_expanded[idx] = tree_expanded[idx] === false ? true : false;
-			update_component_tree();
-		}; }(i);
-		tree.appendChild(winItem);
-
-		if (!expanded) continue;
-
 		var comps = data ? (data.components || []) : [];
-		if (isActiveWin) {
+		if (i == current_win_index) {
 			comps = scan_window_components();
 			if (data) data.components = comps;
 		}
-		var selCompName = (select_element && isActiveWin) ? select_element.getAttribute('data-name') : null;
+		if (comps.length == 0) {
+			var opt = createELM('option');
+			opt.value = i + '|';
+			opt.text = winName + ' (нет компонентов)';
+			sel.add(opt);
+			++optIdx;
+		}
 		for (var j = 0; j < comps.length; j++) {
-			var compItem = createELM('div');
-			compItem.className = 'tree-comp' + (comps[j] == selCompName ? ' tree-selected' : '');
-			compItem.innerHTML = '\u2514 ' + comps[j];
-			compItem.onclick = (function (winIdx, compName) {
-				return function (e) {
-					e.stopPropagation();
-					if (winIdx != current_win_index) switch_window(winIdx);
-					var children = addwinelm.children;
-					for (var k = 0; k < children.length; k++) {
-						if (children[k].getAttribute('data-name') == compName) {
-							select_element_added(children[k]);
-							global_lock_event = true;
-							update_component_tree();
-							break;
-						}
-					}
-				};
-			})(i, comps[j]);
-			tree.appendChild(compItem);
+			var opt = createELM('option');
+			opt.value = i + '|' + comps[j];
+			opt.text = winName + ' / ' + comps[j];
+			sel.add(opt);
+			if (i == current_win_index && comps[j] == selCompName) selectedIdx = optIdx;
+			++optIdx;
 		}
 	}
+	sel.selectedIndex = selectedIdx >= 0 ? selectedIdx + 1 : 0;
+	sel.onchange = function () {
+		var val = this.value.split('|');
+		var winIdx = parseInt(val[0]);
+		var compName = val[1];
+		if (winIdx != current_win_index) switch_window(winIdx);
+		if (compName) {
+			var children = addwinelm.children;
+			for (var k = 0; k < children.length; k++) {
+				if (children[k].getAttribute('data-name') == compName) {
+					select_element_added(children[k]);
+					global_lock_event = true;
+					break;
+				}
+			}
+		}
+	};
 }
 
 function create_size_rect_change() {
@@ -786,7 +782,6 @@ window.onload = function () {
 	current_win_index = 0;
 	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = 'Window_1';
 
-	tree_expanded[0] = true;
 	update_component_tree();
 	load_help_stat(data_help_status);
 };
