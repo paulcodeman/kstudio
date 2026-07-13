@@ -11,9 +11,7 @@ var data_help_status = [
 var win, addwinelm, select_element = null;
 var select_element_rect, select_element_rect_timer = null, sel_rect_x, sel_rect_y;
 var win_x, win_y, win_w, win_h, r_size, int_ptr = null, t_size, rt_size;
-var element_width_atr, element_height_atr, element_name;
-var element_add_event, element_list, caption_element, align_element;
-var pos_x_element, pos_y_element;
+var element_add_event, element_list;
 var element_list_event, tmp_event_data = [];
 var list_eval_select = null;
 var list_element_select = null;
@@ -63,10 +61,17 @@ function getID(x) { return document.getElementById(x); }
 function createELM(x) { return document.createElement(x); }
 function elmADD(x) { return document.body.appendChild(x); }
 
+function refresh_prop_input(key, val) {
+	var table = getID('attribute_element');
+	if (!table) return;
+	var inputs = table.querySelectorAll('input[data-prop-key="' + key + '"]');
+	if (inputs.length) inputs[0].value = val;
+}
+
 function RrefreshPOS(o) {
 	var tmp = parseInt(o.offsetWidth);
-	element_width_atr.value = tmp - 2;
-	pos_x_element.value = o.offsetLeft;
+	refresh_prop_input('width', tmp - 2);
+	refresh_prop_input('left', o.offsetLeft);
 	var r = o.getBoundingClientRect();
 	r_size.style.left = r.left + r.width - r_size.offsetWidth / 2;
 	r_size.style.top = r.top + r.height / 2 - r_size.offsetHeight / 2;
@@ -74,8 +79,8 @@ function RrefreshPOS(o) {
 
 function TrefreshPOS(o) {
 	var tmp = parseInt(o.offsetHeight);
-	element_height_atr.value = tmp - 2;
-	pos_y_element.value = o.offsetTop;
+	refresh_prop_input('height', tmp - 2);
+	refresh_prop_input('top', o.offsetTop);
 	var r = o.getBoundingClientRect();
 	t_size.style.left = r.left + r.width / 2 - t_size.offsetWidth / 2;
 	t_size.style.top = r.top + tmp - t_size.offsetHeight / 2;
@@ -143,7 +148,7 @@ function MoveSelectedElement() {
 }
 
 function select_element_added(o) {
-	hide_atr_element(o);
+	render_props(o);
 	if (int_ptr == null) {
 		save_x = mouse.x - parseInt(o.style.left);
 		save_y = mouse.y - parseInt(o.style.top);
@@ -188,28 +193,121 @@ function rgb(r, g, b) {
 	return componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
-function hide_atr_element(o) {
-	if (o == null) o = win;
-	var a = o.getAttribute('data-hide-prop').split(',');
-	var i = 0;
-	var atr_tr = getID('attribute_element').children[0].children;
-	test_ = atr_tr;
-	var count = atr_tr.length;
-	while (i < count) {
-		if (a.indexOf('' + i) != -1) { atr_tr[i].style.display = 'none'; ++i; continue; }
-		if (i == 1) {
-			var name = o.getAttribute('data-name');
-			atr_tr[i].children[2].children[0].value = name;
-		} else if (i == 2) {
-			if (select_element == null) atr_tr[i].children[2].children[0].value = o.getAttribute('data-caption');
-			else atr_tr[i].children[2].children[0].value = o.innerText;
-		} else if (i == 3 && atr_tr[i].children[2].children[0]) {
-			var bg = o.style.background;
-			if (bg && bg != '') atr_tr[i].children[2].children[0].value = bg;
-		}
-		atr_tr[i].style.display = 'table-row';
-		++i;
+function get_props_for_element(el) {
+	if (select_element == null) return WINDOW_PROPS;
+	for (var i = 0; i < COMPONENTS.length; i++) {
+		if (COMPONENTS[i].name == el.getAttribute('data-name') && COMPONENTS[i].props) return COMPONENTS[i].props;
 	}
+	return COMPONENTS[0].props;
+}
+
+function get_prop_value(el, prop) {
+	if (prop.key == 'color') {
+		if (el.className == 'label_element_gui' && el.style.color) return el.style.color;
+		return el.style.background || '#f8f9fb';
+	}
+	var val = '';
+	if (prop.target == 'attr') val = el.getAttribute(prop.key) || '';
+	else if (prop.target == 'style') {
+		val = el.style[prop.key] || '';
+		if (!val) {
+			var cs = getComputedStyle(el);
+			if (cs && prop.key.match(/^(left|top|width|height)$/)) val = parseInt(cs[prop.key]) + 'px';
+		}
+	}
+	else if (prop.target == 'src') val = el.src || '';
+	else if (prop.target == 'innerText') val = el.innerText || '';
+	if (prop.type == 'number' && val) val = '' + parseInt(val);
+	return val;
+}
+
+function render_props(el) {
+	if (!el) el = win;
+	var props = get_props_for_element(el);
+	var table = getID('attribute_element');
+	if (!table) return;
+	table.innerHTML = '';
+	for (var i = 0; i < props.length; i++) {
+		var p = props[i];
+		if (p.section) {
+			var tr = createELM('tr');
+			var td1 = createELM('td'); td1.className = 'opt_spis';
+			if (i == 0) {
+				var ob = createELM('div'); ob.id = 'open_block';
+				td1.appendChild(ob);
+			}
+			var td2 = createELM('td'); td2.colSpan = 2; td2.className = 'title_pod'; td2.innerText = p.section;
+			tr.appendChild(td1); tr.appendChild(td2);
+			table.appendChild(tr);
+			continue;
+		}
+		var value = get_prop_value(el, p);
+		var tr = createELM('tr');
+		var td1 = createELM('td'); td1.className = 'opt_spis';
+		var td2 = createELM('td'); td2.className = 'title_atr'; td2.innerText = p.label;
+		var td3 = createELM('td');
+		var input;
+		if (p.type == 'select') {
+			input = createELM('select'); input.className = 'list_atr';
+			for (var j = 0; j < p.options.length; j++) {
+				var opt = createELM('option'); opt.value = p.options[j].v; opt.text = p.options[j].l;
+				if ('' + opt.value == '' + value) opt.selected = true;
+				input.add(opt);
+			}
+			input.onchange = function () { apply_prop(this); };
+		} else if (p.type == 'color') {
+			input = createELM('input'); input.type = 'color';
+			if (value) input.value = value;
+			input.onchange = function () { apply_prop(this); };
+		} else if (p.type == 'number') {
+			input = createELM('input'); input.type = 'number'; input.value = value;
+			input.onmouseup = function () { this.select(); };
+			input.oninput = function () { apply_prop(this); };
+		} else {
+			input = createELM('input'); input.value = value;
+			input.onmouseup = function () { this.select(); };
+			input.oninput = function () { apply_prop(this); };
+		}
+		input.setAttribute('data-prop-key', p.key);
+		input.setAttribute('data-prop-target', p.target);
+		if (p.type == 'select') input.setAttribute('data-prop-type', 'select');
+		td3.appendChild(input);
+		tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+		table.appendChild(tr);
+	}
+}
+
+function apply_prop(input) {
+	var key = input.getAttribute('data-prop-key');
+	var target = input.getAttribute('data-prop-target');
+	var propType = input.getAttribute('data-prop-type');
+	var val = input.value;
+	var el = select_element || win;
+	var isComponent = (select_element != null);
+
+	if (key == 'data-name') {
+		var skip = isComponent ? select_element : window_data[current_win_index];
+		if (is_name_taken(val, skip)) { alert('Имя "' + val + '" уже используется'); input.value = get_prop_value(el, {key:key,target:target,type:propType||'text'}); return; }
+		if (!isComponent && window_data[current_win_index]) {
+			window_data[current_win_index] = upgrade_window_data(window_data[current_win_index]);
+			window_data[current_win_index].attrs['data-name'] = val;
+		}
+	}
+
+	if (target == 'attr') el.setAttribute(key, val);
+	else if (target == 'style') {
+		if (key == 'color') {
+			if (isComponent && el.className == 'label_element_gui') el.style.color = val;
+			else el.style.background = val;
+		} else {
+			el.style[key] = val;
+			if (key.match(/^(left|top|width|height)$/)) el.style[key] = val + 'px';
+		}
+	}
+	else if (target == 'src') el.src = val;
+	else if (target == 'innerText') el.innerText = val;
+
+	update_component_tree();
 }
 
 function past_gui_window(win, type, atr, name_type) {
@@ -229,7 +327,7 @@ function past_gui_window(win, type, atr, name_type) {
 		element.onmousedown = function () { select_element_added(this); global_lock_event = true; };
 		if (cmd_sensor) element.ontouchstart = element.onmousedown;
 		element.setAttribute('data-hide-prop', atr);
-		hide_atr_element(element);
+		render_props(element);
 
 		var tr = createELM('TR');
 		var td = createELM('TD');
@@ -264,7 +362,7 @@ function past_gui_window(win, type, atr, name_type) {
 		element.onmousedown = func_define_select;
 		if (cmd_sensor) element.ontouchstart = element.onmousedown;
 		element.setAttribute('data-hide-prop', atr);
-		hide_atr_element(element);
+		render_props(element);
 
 		win.appendChild(element);
 		select_element_added(element);
@@ -415,7 +513,7 @@ function switch_window(index) {
 	current_win_index = index;
 	load_window_data(index);
 	select_element = null;
-	hide_atr_element(win);
+	render_props(win);
 	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 	update_component_tree();
 }
@@ -505,7 +603,7 @@ function update_window_select() {
 		else if (idx != current_win_index) switch_window(idx);
 		else if (select_element != null) {
 			select_element = null;
-			hide_atr_element(win);
+			render_props(win);
 		}
 	};
 }
@@ -561,7 +659,7 @@ function update_component_tree() {
 			}
 		} else if (select_element != null) {
 			select_element = null;
-			hide_atr_element(win);
+			render_props(win);
 		}
 	};
 }
@@ -612,7 +710,7 @@ function delete_select_element() {
 		select_element.parentNode.removeChild(select_element);
 		select_element = null;
 		TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
-		hide_atr_element(win);
+		render_props(win);
 		update_component_tree();
 	}
 }
@@ -806,33 +904,15 @@ window.onload = function () {
 	win = getID('window_background');
 	addwinelm = getID('window');
 	select_element_rect = getID('select_elements_rect');
-	element_width_atr = getID("size_width_atr");
-	element_height_atr = getID("size_height_atr");
-	element_name = getID("name_window");
 	element_add_event = getID("add_event");
-	caption_element = getID("CaptionElement");
 	element_list = getID("list_add_event");
 	element_list_event = getID("list_event");
-
-	pos_x_element = getID('position_x_atr');
-	pos_y_element = getID('position_y_atr');
-
-	var colorborder_element = getID("color_border_element");
-	align_element = getID("align_element");
 	win_x = getID("LeftPanel").offsetWidth;
 	win_y = getID("TopPanel").offsetHeight;
-
-	if (align_element) {
-		align_element.onchange = function () {
-			win.setAttribute('data-align', this.value);
-		};
-	}
 
 	create_size_rect_change();
 
 	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
-
-	if (caption_element) caption_element.value = "Окно " + count_stack;
 
 	addwinelm.onmousedown = function (event) {
 		if (list_element_select != null) {
@@ -847,7 +927,7 @@ window.onload = function () {
 		if (!global_lock_event) {
 			select_element = null;
 			TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
-			hide_atr_element(win);
+			render_props(win);
 			update_component_tree();
 			var ey = event && event.pageY ? event.pageY : (event && event.clientY ? event.clientY : mouse.y);
 			var ex = event && event.pageX ? event.pageX : (event && event.clientX ? event.clientX : mouse.x);
@@ -862,11 +942,6 @@ window.onload = function () {
 
 	if (cmd_sensor) addwinelm.ontouchstart = addwinelm.onmousedown;
 
-	if (colorborder_element) {
-		colorborder_element.onchange = function () {
-			select_element.style.borderColor = this.value;
-		};
-	}
 	if (element_add_event) {
 		element_add_event.onclick = function (e) {
 			var ex = e && e.pageX ? e.pageX : (e && e.clientX ? e.clientX : mouse.x);

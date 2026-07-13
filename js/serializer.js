@@ -154,7 +154,7 @@ function import_project(input) {
 		current_win_index = -1;
 		switch_window(0);
 		select_element = null;
-		hide_atr_element(win);
+		render_props(win);
 		update_component_tree();
 	};
 	reader.readAsText(file);
