@@ -36,20 +36,22 @@ if ('ontouchstart' in window) cmd_sensor = true;
 var mouse = {
 	x: 0, y: 0,
 	getX: function (e) {
+		if (!e) return this.x;
 		if (e.pageX) { this.x = e.pageX; return this.x; }
 		if (e.clientX) {
 			this.x = e.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft) - document.documentElement.clientLeft;
 			return this.x;
 		}
-		this.x = 0; return this.x;
+		return this.x;
 	},
 	getY: function (e) {
+		if (!e) return this.y;
 		if (e.pageY) { this.y = e.pageY; return this.y; }
 		if (e.clientY) {
 			this.y = e.clientY + (document.documentElement.scrollTop || document.body.scrollTop) - document.documentElement.clientTop;
 			return this.y;
 		}
-		this.y = 0; return this.y;
+		return this.y;
 	}
 };
 
@@ -711,9 +713,6 @@ window.onload = function () {
 		};
 	}
 
-	getID('main').style.width = window.innerWidth - 420;
-	getID('main').style.height = window.innerHeight - 60;
-
 	win.setAttribute('name', 'Window_1');
 	win.setAttribute('caption', 'Окно');
 	win.setAttribute('hide_prop', '');
@@ -740,10 +739,7 @@ window.onload = function () {
 	load_help_stat(data_help_status);
 };
 
-window.onresize = function () {
-	getID('main').style.width = window.innerWidth - 420;
-	getID('main').style.height = window.innerHeight - 60;
-};
+window.onresize = function () {};
 
 window.onmouseup = function () {
 	clearInterval(int_ptr);

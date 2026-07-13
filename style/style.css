@@ -2,11 +2,12 @@
 	box-sizing: border-box;
 }
 
-html, body {
+html {
 	height: 100%;
 	overflow: hidden;
 }
 body {
+	height: 100%;
 	margin: 0;
 	padding: 0;
 	background: #f5f6f8;
@@ -14,6 +15,7 @@ body {
 	color: #1a1a2e;
 	display: flex;
 	flex-direction: column;
+	position: relative;
 }
 
 div.conteiner {

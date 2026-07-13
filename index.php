@@ -1,11 +1,12 @@
-﻿<meta charset="UTF-8">
+﻿<!DOCTYPE html>
+<meta charset="UTF-8">
 <link rel="stylesheet" href="style/style.css">
 <link rel="stylesheet" href="style/gui.css">
 <script src="js/download.js"></script>
 <script src="js/serializer.js"></script>
 <script src="js/core.js"></script>
 <script src="js/compiler.js"></script>
-<body onmousedown="element_list.style.display='none';" onmousemove="mouse.getX(window.event);mouse.getY(window.event);" onkeydown="window.ee = event;CmdKeyDown(event);">
+<body onmousedown="element_list.style.display='none';" onmousemove="mouse.getX(event);mouse.getY(event);" onkeydown="window.ee = event;CmdKeyDown(event);">
 	<div id="list_add_event" class="list_event">
 		<div class="event-item" onmousedown="add_event_list(0);"><img src="img/onclick.png"><span class="title">Клик</span></div>
 		<div class="event-item" onmousedown="add_event_list(1);"><img src="img/ondblclick.png"><span class="title">2х Клик</span></div>

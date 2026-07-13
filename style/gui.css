@@ -5,6 +5,7 @@
 	border: 1px solid #c5c9d4;
 	border-radius: 6px;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+	position: relative;
 }
 
 div#window {
