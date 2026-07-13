@@ -417,6 +417,7 @@ function init_window_dropdown() {
 function create_size_rect_change() {
 	r_size = createELM('DIV');
 	r_size.className = "size";
+	r_size.style.cursor = 'ew-resize';
 	r_size.onmousedown = function () {
 		int_ptr = window.setInterval(function () { newRightPosition(mouse.x); }, grid_distance);
 		return false;
@@ -426,6 +427,7 @@ function create_size_rect_change() {
 
 	t_size = createELM('DIV');
 	t_size.className = "size";
+	t_size.style.cursor = 'ns-resize';
 	t_size.onmousedown = function () {
 		int_ptr = window.setInterval(function () { newTopPosition(mouse.y); }, grid_distance);
 		return false;
@@ -435,6 +437,7 @@ function create_size_rect_change() {
 
 	rt_size = createELM('DIV');
 	rt_size.className = "size";
+	rt_size.style.cursor = 'nwse-resize';
 	rt_size.onmousedown = function () {
 		int_ptr = window.setInterval(function () { newRightPosition(mouse.x); newTopPosition(mouse.y); }, grid_distance);
 		return false;

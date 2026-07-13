@@ -102,7 +102,7 @@ div.list_event {
 div.list_event table {
 	width: 100%;
 	margin: 0;
-	cursor: default;
+	cursor: pointer;
 }
 div.list_event table td.title {
 	background: #fafbfc;
@@ -136,6 +136,7 @@ div#event_cont table td.default {
 	color: #1a1a2e;
 	padding: 6px 12px;
 	transition: all 0.12s;
+	cursor: pointer;
 }
 div#event_cont table td.default:hover {
 	background: #f0f2f7;
@@ -236,6 +237,7 @@ div.EditCode div.body_code_conteiner textarea {
 	padding: 16px;
 	resize: none;
 	line-height: 1.5;
+	cursor: text;
 }
 
 select.list_window {
