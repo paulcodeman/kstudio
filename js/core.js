@@ -291,11 +291,14 @@ function change_value_element(name, o) {
 function change_setka_option(e) {
 	var data = e.value.split(' ');
 	if (data[1] == 'px') {
-		addwinelm.style.background = 'url("img/background/' + data[0] + 'px.png")';
-		grid_distance = parseInt(data[0]);
+		var px = parseInt(data[0]);
+		addwinelm.style.backgroundImage = 'radial-gradient(circle, #c0c4d0 0.5px, transparent 0.5px)';
+		addwinelm.style.backgroundSize = px + 'px ' + px + 'px';
+		grid_distance = px;
 		return true;
 	} else {
-		addwinelm.style.background = 'none';
+		addwinelm.style.backgroundImage = 'none';
+		addwinelm.style.backgroundSize = '';
 		grid_distance = 1;
 		return true;
 	}
