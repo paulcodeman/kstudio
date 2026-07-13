@@ -29,7 +29,6 @@ var global_lock_event = false;
 var save_x, save_y;
 var copy_element_object = null;
 var cmd_event_ctrl = false;
-var lr_size;
 var test_;
 
 if ('ontouchstart' in window) cmd_sensor = true;
@@ -62,29 +61,24 @@ function RrefreshPOS(o) {
 	var tmp = parseInt(o.offsetWidth);
 	element_width_atr.value = tmp - 2;
 	pos_x_element.value = o.offsetLeft;
-	r_size.style.left = addwinelm.offsetLeft + tmp - r_size.offsetWidth / 2 + o.offsetLeft;
-	r_size.style.top = addwinelm.offsetTop + o.offsetHeight / 2 - r_size.offsetHeight / 2 + o.offsetTop;
-}
-
-function LRrefreshPOS(o) {
-	var tmp = parseInt(o.offsetWidth);
-	element_width_atr.value = tmp - 2;
-	pos_x_element.value = o.offsetLeft;
-	lr_size.style.left = addwinelm.offsetLeft - lr_size.offsetWidth / 2 + o.offsetLeft;
-	lr_size.style.top = addwinelm.offsetTop + o.offsetHeight / 2 - lr_size.offsetHeight / 2 + o.offsetTop;
+	var r = o.getBoundingClientRect();
+	r_size.style.left = r.left + r.width - r_size.offsetWidth / 2;
+	r_size.style.top = r.top + r.height / 2 - r_size.offsetHeight / 2;
 }
 
 function TrefreshPOS(o) {
 	var tmp = parseInt(o.offsetHeight);
 	element_height_atr.value = tmp - 2;
 	pos_y_element.value = o.offsetTop;
-	t_size.style.left = addwinelm.offsetLeft + o.offsetWidth / 2 - t_size.offsetWidth / 2 + o.offsetLeft;
-	t_size.style.top = addwinelm.offsetTop + tmp - t_size.offsetHeight / 2 + o.offsetTop;
+	var r = o.getBoundingClientRect();
+	t_size.style.left = r.left + r.width / 2 - t_size.offsetWidth / 2;
+	t_size.style.top = r.top + tmp - t_size.offsetHeight / 2;
 }
 
 function RTrefreshPOS(o) {
-	rt_size.style.left = addwinelm.offsetLeft + o.offsetWidth - rt_size.offsetWidth / 2 + o.offsetLeft;
-	rt_size.style.top = addwinelm.offsetTop + o.offsetHeight - rt_size.offsetHeight / 2 + o.offsetTop;
+	var r = o.getBoundingClientRect();
+	rt_size.style.left = r.left + r.width - rt_size.offsetWidth / 2;
+	rt_size.style.top = r.top + r.height - rt_size.offsetHeight / 2;
 }
 
 function newRightPosition(x) {
@@ -360,9 +354,7 @@ function switch_window(index) {
 	load_window_data(index);
 	select_element = null;
 	hide_atr_element(win);
-	requestAnimationFrame(function () {
-		TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
-	});
+	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 	update_window_list();
 }
 
@@ -670,9 +662,7 @@ window.onload = function () {
 
 	create_size_rect_change();
 
-	requestAnimationFrame(function () {
-		TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
-	});
+	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 
 	if (caption_element) caption_element.value = "Окно " + count_stack;
 
