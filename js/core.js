@@ -370,15 +370,18 @@ function render_props(el) {
 
 			let lastValid = hexVal;
 			textInput.oninput = function () {
-				const raw = this.value;
-				const upper = raw.toUpperCase();
-				if (upper !== raw) this.value = upper;
-				const h = toHex(upper);
-				colorInput.value = h;
-				if (h === '#FFFFFF' && upper !== '#FFFFFF') {
+				this.value = this.value.toUpperCase();
+				colorInput.value = toHex(this.value);
+			};
+			textInput.onchange = function () {
+				const h = toHex(this.value);
+				if (h === '#FFFFFF' && this.value !== '#FFFFFF') {
 					this.value = lastValid;
+					colorInput.value = lastValid;
 				} else {
+					this.value = h;
 					lastValid = h;
+					colorInput.value = h;
 					apply_prop(this);
 				}
 			};
