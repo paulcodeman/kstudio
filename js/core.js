@@ -155,7 +155,7 @@ function deleteElement(elem) {
 
 function select_element_menu(o) {
 	list_element_select = o;
-	o.className = 'select';
+	o.className = 'element select';
 	return false;
 }
 
