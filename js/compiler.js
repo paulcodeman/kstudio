@@ -14,14 +14,14 @@ function convert_elements(w_obj) {
 	var obj;
 	var code = '';
 	var name;
-	var name_window = w_obj.getAttribute('name');
+	var name_window = w_obj.getAttribute('data-name');
 	var cmd;
 	while (count) {
 		obj = list[--count];
 		cmd = class_gui_list_elements.indexOf(obj.className);
 
 		if (cmd != -1) {
-			name = obj.getAttribute('name');
+			name = obj.getAttribute('data-name');
 			gui_list_init[gui_list_count++] = name;
 			code += name_window + '.adds(#' + name + ',' + cmd + ');';
 			var tmp = obj.style.left;
@@ -64,8 +64,8 @@ function convert_elements(w_obj) {
 
 function compile_window_from_data(data) {
 	addwinelm.innerHTML = data.html || '';
-	win.setAttribute('name', data.name);
-	win.setAttribute('caption', data.caption || '');
+	win.setAttribute('data-name', data.name);
+	win.setAttribute('data-caption', data.caption || '');
 	win.style.width = data.width || '300px';
 	win.style.height = data.height || '230px';
 	win.style.background = data.bg || '#e6e9ef';

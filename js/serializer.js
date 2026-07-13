@@ -22,7 +22,7 @@ function load_project_source(code) {
 	addwinelm.onmousedown = tmp;
 	set_element_defunc(addwinelm);
 	window_stack[count_stack++] = win;
-	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = win.getAttribute('name');
+	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = win.getAttribute('data-name');
 	select_element = null;
 	select_element_added(win);
 }

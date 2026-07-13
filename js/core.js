@@ -22,7 +22,7 @@ var element_stack = [];
 var count_element_add = {};
 var list_element_system = ['Timer', 'DataVar', 'Function', 'Download', 'SampleDialog'];
 var class_gui_list_elements = ['button_element_gui', 'shape_element_gui', 'label_element_gui', 'image_element_gui'];
-var cmd_event_name = ['event_click', 'event_dblclick'];
+var cmd_event_name = ['data-event-click', 'data-event-dblclick'];
 var GLOBAL_INIT_ELEMENT = [], GLOBAL_INIT_COUNT = 0;
 var cmd_sensor = false;
 var global_lock_event = false;
@@ -37,8 +37,8 @@ var mouse = {
 	x: 0, y: 0,
 	getX: function (e) {
 		if (!e) return this.x;
-		if (e.pageX) { this.x = e.pageX; return this.x; }
-		if (e.clientX) {
+		if (e.pageX !== undefined) { this.x = e.pageX; return this.x; }
+		if (e.clientX !== undefined) {
 			this.x = e.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft) - document.documentElement.clientLeft;
 			return this.x;
 		}
@@ -46,14 +46,19 @@ var mouse = {
 	},
 	getY: function (e) {
 		if (!e) return this.y;
-		if (e.pageY) { this.y = e.pageY; return this.y; }
-		if (e.clientY) {
+		if (e.pageY !== undefined) { this.y = e.pageY; return this.y; }
+		if (e.clientY !== undefined) {
 			this.y = e.clientY + (document.documentElement.scrollTop || document.body.scrollTop) - document.documentElement.clientTop;
 			return this.y;
 		}
 		return this.y;
 	}
 };
+
+document.addEventListener('mousemove', function (e) {
+	mouse.x = e.pageX !== undefined ? e.pageX : e.clientX;
+	mouse.y = e.pageY !== undefined ? e.pageY : e.clientY;
+}, { passive: true });
 
 function getID(x) { return document.getElementById(x); }
 function createELM(x) { return document.createElement(x); }
@@ -84,7 +89,8 @@ function RTrefreshPOS(o) {
 }
 
 function newRightPosition(x) {
-	var tmp = x - addwinelm.offsetLeft;
+	var r = addwinelm.getBoundingClientRect();
+	var tmp = x - r.left;
 	if (tmp < 0) tmp = 0;
 	if (select_element == null) {
 		addwinelm.style.width = win.style.width = Math.round(tmp / grid_distance) * grid_distance;
@@ -98,7 +104,8 @@ function newRightPosition(x) {
 }
 
 function newTopPosition(y) {
-	var tmp = y - addwinelm.offsetTop;
+	var r = addwinelm.getBoundingClientRect();
+	var tmp = y - r.top;
 	if (tmp < 0) tmp = 0;
 	if (select_element == null) {
 		addwinelm.style.height = win.style.height = Math.round(tmp / grid_distance) * grid_distance;
@@ -182,7 +189,7 @@ function rgb(r, g, b) {
 
 function hide_atr_element(o) {
 	if (o == null) o = win;
-	var a = o.getAttribute('hide_prop').split(',');
+	var a = o.getAttribute('data-hide-prop').split(',');
 	var i = 0;
 	var atr_tr = getID('attribute_element').children[0].children;
 	test_ = atr_tr;
@@ -190,10 +197,10 @@ function hide_atr_element(o) {
 	while (i < count) {
 		if (a.indexOf('' + i) != -1) { atr_tr[i].style.display = 'none'; ++i; continue; }
 		if (i == 1) {
-			var name = o.getAttribute('name');
+			var name = o.getAttribute('data-name');
 			atr_tr[i].children[2].children[0].value = name;
 		} else if (i == 2) {
-			if (select_element == null) atr_tr[i].children[2].children[0].value = o.getAttribute('caption');
+			if (select_element == null) atr_tr[i].children[2].children[0].value = o.getAttribute('data-caption');
 			else atr_tr[i].children[2].children[0].value = o.innerText;
 		}
 		atr_tr[i].style.display = 'table-row';
@@ -211,10 +218,10 @@ function past_gui_window(win, type, atr, name_type) {
 
 		if (count_element_add[name_type] == undefined) count_element_add[name_type] = 0;
 		var name = name_type + '_' + (++count_element_add[name_type]);
-		element.setAttribute('name', name);
+		element.setAttribute('data-name', name);
 		element.onmousedown = function () { select_element_added(this); global_lock_event = true; };
 		if (cmd_sensor) element.ontouchstart = element.onmousedown;
-		element.setAttribute('hide_prop', atr);
+		element.setAttribute('data-hide-prop', atr);
 		hide_atr_element(element);
 
 		var tr = createELM('TR');
@@ -246,10 +253,10 @@ function past_gui_window(win, type, atr, name_type) {
 		if (name_type == 'Label') element.innerText = 'Текст';
 
 		if (count_element_add[name_type] == undefined) count_element_add[name_type] = 0;
-		element.setAttribute('name', name_type + '_' + (++count_element_add[name_type]));
+		element.setAttribute('data-name', name_type + '_' + (++count_element_add[name_type]));
 		element.onmousedown = func_define_select;
 		if (cmd_sensor) element.ontouchstart = element.onmousedown;
-		element.setAttribute('hide_prop', atr);
+		element.setAttribute('data-hide-prop', atr);
 		hide_atr_element(element);
 
 		win.appendChild(element);
@@ -265,7 +272,7 @@ function change_value_element(name, o) {
 	if (select_element == null) {
 		if (name == 'color') win.style.background = o.value;
 		else {
-			if (name == 'name') {
+			if (name == 'data-name') {
 				var i, a = getID('list_window_add');
 				for (i = 0; i < a.options.length; i++) {
 					if (a.options[i].innerText == win.getAttribute(name)) { a.options[i].innerText = o.value; }
@@ -274,7 +281,7 @@ function change_value_element(name, o) {
 			win.setAttribute(name, o.value);
 		}
 	} else {
-		if (name == 'caption') select_element.innerText = o.value;
+		if (name == 'data-caption') select_element.innerText = o.value;
 		else if (name == 'color') {
 			if (select_element.className == 'label_element_gui') select_element.style.color = o.value;
 			else select_element.style.background = o.value;
@@ -312,13 +319,13 @@ function save_window_state() {
 	if (current_win_index < 0) return;
 	window_data[current_win_index] = {
 		html: addwinelm.innerHTML,
-		name: win.getAttribute('name'),
-		caption: win.getAttribute('caption'),
+		name: win.getAttribute('data-name'),
+		caption: win.getAttribute('data-caption'),
 		width: win.style.width,
 		height: win.style.height,
 		bg: win.style.background,
-		hide_prop: win.getAttribute('hide_prop'),
-		align: win.getAttribute('align')
+		hide_prop: win.getAttribute('data-hide-prop'),
+		align: win.getAttribute('data-align')
 	};
 }
 
@@ -326,23 +333,23 @@ function load_window_data(index) {
 	var data = window_data[index];
 	if (data) {
 		addwinelm.innerHTML = data.html || '';
-		win.setAttribute('name', data.name);
-		win.setAttribute('caption', data.caption || '');
+		win.setAttribute('data-name', data.name);
+		win.setAttribute('data-caption', data.caption || '');
 		win.style.width = data.width || '300px';
 		win.style.height = data.height || '230px';
 		win.style.background = data.bg || '#e6e9ef';
-		win.setAttribute('hide_prop', data.hide_prop || '');
-		if (data.align) win.setAttribute('align', data.align);
-		else win.removeAttribute('align');
+		win.setAttribute('data-hide-prop', data.hide_prop || '');
+		if (data.align) win.setAttribute('data-align', data.align);
+		else win.removeAttribute('data-align');
 	} else {
 		addwinelm.innerHTML = '';
-		win.setAttribute('name', 'Window_' + (index + 1));
-		win.setAttribute('caption', 'Окно');
+		win.setAttribute('data-name', 'Window_' + (index + 1));
+		win.setAttribute('data-caption', 'Окно');
 		win.style.width = '300px';
 		win.style.height = '230px';
 		win.style.background = '#e6e9ef';
-		win.setAttribute('hide_prop', '');
-		win.removeAttribute('align');
+		win.setAttribute('data-hide-prop', '');
+		win.removeAttribute('data-align');
 	}
 	addwinelm.style.width = parseInt(win.style.width) - 2;
 	addwinelm.style.height = parseInt(win.style.height) - 2;
@@ -366,13 +373,13 @@ function add_new_window() {
 	window_data[index] = null;
 	window_data[current_win_index] = window_data[current_win_index] || {
 		html: addwinelm.innerHTML,
-		name: win.getAttribute('name'),
-		caption: win.getAttribute('caption'),
+		name: win.getAttribute('data-name'),
+		caption: win.getAttribute('data-caption'),
 		width: win.style.width,
 		height: win.style.height,
 		bg: win.style.background,
-		hide_prop: win.getAttribute('hide_prop'),
-		align: win.getAttribute('align')
+		hide_prop: win.getAttribute('data-hide-prop'),
+		align: win.getAttribute('data-align')
 	};
 	count_stack++;
 	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = 'Window_' + (index + 1);
@@ -478,7 +485,7 @@ function delete_event_list() {
 	var tmp = list_eval_select.parentNode;
 	if (tmp == null) return false;
 	deleteElement(list_eval_select.parentNode);
-	var x = parseInt(list_eval_select.getAttribute('sel_num'));
+	var x = parseInt(list_eval_select.getAttribute('data-sel-num'));
 	delete tmp_event_data[tmp_event_data.indexOf(x)];
 
 	var data_list_event_atr = select_element.getAttribute('data_list_event');
@@ -495,7 +502,7 @@ function add_event_list(x) {
 
 	var a = createELM('TR');
 	var b = createELM('TD');
-	b.setAttribute('sel_num', x);
+	b.setAttribute('data-sel-num', x);
 	if (!x) { b.innerText = 'Клик'; b.id = cmd_event_name[x]; }
 	else if (x == 1) { b.innerText = 'Двойной клик'; b.id = cmd_event_name[x]; }
 	if (select_element == null) return false;
@@ -531,7 +538,7 @@ function load_attribute_list_event() {
 			b.id = cmd_event_name[x];
 			if (!x) b.innerText = 'Клик';
 			else if (x == 1) b.innerText = 'Двойной клик';
-			b.setAttribute('sel_num', x);
+			b.setAttribute('data-sel-num', x);
 			tmp_event_data[tmp_event_data.length] = x;
 			b.className = 'default';
 			b.onmousedown = function () {
@@ -664,7 +671,7 @@ window.onload = function () {
 
 	if (align_element) {
 		align_element.onchange = function () {
-			win.setAttribute('align', this.value);
+			win.setAttribute('data-align', this.value);
 		};
 	}
 
@@ -676,7 +683,7 @@ window.onload = function () {
 
 	addwinelm.onmousedown = function (event) {
 		if (list_element_select != null) {
-			var type = list_element_select.getAttribute('name');
+			var type = list_element_select.getAttribute('data-name');
 			if (type == 'Button') { past_gui_window(this, 'button_element_gui', '', type); return true; }
 			if (type == 'Shape') { past_gui_window(this, 'shape_element_gui', '', type); return true; }
 			if (type == 'Label') { past_gui_window(this, 'label_element_gui', '', type); return true; }
@@ -713,9 +720,9 @@ window.onload = function () {
 		};
 	}
 
-	win.setAttribute('name', 'Window_1');
-	win.setAttribute('caption', 'Окно');
-	win.setAttribute('hide_prop', '');
+	win.setAttribute('data-name', 'Window_1');
+	win.setAttribute('data-caption', 'Окно');
+	win.setAttribute('data-hide-prop', '');
 	addwinelm.style.width = win.offsetWidth - 2;
 	addwinelm.style.height = win.offsetHeight - 2;
 
