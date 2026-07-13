@@ -6,7 +6,6 @@ var add_init_event_func = '';
 
 function convert_elements(w_obj) {
 	var w = w_obj.children[0];
-	add_init_event_func = '';
 	var list = w.children;
 	var count = list.length;
 	img_list_count = 0;
@@ -27,10 +26,16 @@ function convert_elements(w_obj) {
 			var tmp = obj.style.left;
 			if (tmp != '') code += name + '.left(' + parseInt(obj.offsetLeft) + ');';
 
-			tmp = obj.getAttribute(cmd_event_name[0]);
-			if (tmp != null) {
-				code += name + '.mouseclick(#' + name + '__ptr_func__click_);';
-				add_init_event_func += 'void ' + name + '__ptr_func__click_(dword key,x,y){' + decodeURIComponent(tmp) + '}';
+			var events = get_component_events(obj);
+			for (var ei = 0; ei < events.length; ei++) {
+				var evName = events[ei];
+				var evAttr = event_attr_name(evName);
+				var evCode = obj.getAttribute(evAttr);
+				if (evCode != null) {
+					var funcSuffix = evName.replace(/-/g, '_');
+					code += name + '.' + evName + '(#' + name + '__ptr_func__' + funcSuffix + '_);';
+					add_init_event_func += 'void ' + name + '__ptr_func__' + funcSuffix + '_(dword key,x,y){' + decodeURIComponent(evCode) + '}';
+				}
 			}
 
 			tmp = obj.style.top;
@@ -90,6 +95,9 @@ function compile(cmd) {
 	c_count = 0;
 	gui_list_init = [];
 	gui_list_count = 0;
+	add_init_event_func = '';
+
+	save_window_state();
 
 	var main_code = '';
 	var count = count_stack;

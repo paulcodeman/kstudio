@@ -69,8 +69,7 @@
 				<div onmousedown="return false;" onclick="click_edit_code();" class="button grow" id="edit_event"><image id="img_replace_event" src="img/edit_event.PNG"></image>Редактировать</div>
 			</div>
 			<div id="event_cont">
-				<table id='list_event'>
-				</table>
+				<table id="list_event"></table>
 			</div>
 		</div>
 	</div>

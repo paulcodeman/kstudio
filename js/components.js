@@ -7,6 +7,7 @@ var WINDOW_PROPS = [
 
 var COMPONENTS = [
 	{ name:'Button', typeClass:'button_element_gui', caption:'Кнопка', icon:'img/TBitBtn.png', group:'Главное', defaultText:'Кнопка', tag:'div',
+		events: ['click', 'dblclick'],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
@@ -21,6 +22,7 @@ var COMPONENTS = [
 		]
 	},
 	{ name:'Label', typeClass:'label_element_gui', caption:'Текст', icon:'img/TLabel.png', group:'Главное', defaultText:'Текст',
+		events: ['click', 'dblclick'],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
@@ -34,6 +36,7 @@ var COMPONENTS = [
 		]
 	},
 	{ name:'Edit', typeClass:'', caption:'Однострочное поле', icon:'img/TEdit.png', group:'Главное',
+		events: ['click', 'dblclick', 'change'],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
@@ -47,6 +50,7 @@ var COMPONENTS = [
 		]
 	},
 	{ name:'Memo', typeClass:'', caption:'Многострочное поле', icon:'img/TMemo.png', group:'Главное',
+		events: ['click', 'dblclick', 'change'],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
@@ -60,6 +64,7 @@ var COMPONENTS = [
 		]
 	},
 	{ name:'Image', typeClass:'image_element_gui', caption:'Изображение', icon:'img/TImage.png', group:'Главное',
+		events: ['click', 'dblclick'],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
@@ -72,6 +77,7 @@ var COMPONENTS = [
 		]
 	},
 	{ name:'Shape', typeClass:'shape_element_gui', caption:'Фигура', icon:'img/TShape.png', group:'Главное',
+		events: ['click', 'dblclick'],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
@@ -84,6 +90,7 @@ var COMPONENTS = [
 		]
 	},
 	{ name:'ProgressBar', typeClass:'', caption:'Прогресс', icon:'img/TProgressBar.png', group:'Главное',
+		events: ['click'],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
@@ -96,6 +103,7 @@ var COMPONENTS = [
 		]
 	},
 	{ name:'ScrollBar', typeClass:'', caption:'Панель прокрутки', icon:'img/TScrollBar.png', group:'Дополнительно',
+		events: ['click', 'change'],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
@@ -108,6 +116,7 @@ var COMPONENTS = [
 		]
 	},
 	{ name:'TrackBar', typeClass:'', caption:'Ползунок', icon:'img/TTrackBar.png', group:'Дополнительно',
+		events: ['click', 'change'],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' },
@@ -120,35 +129,69 @@ var COMPONENTS = [
 		]
 	},
 	{ name:'Timer', typeClass:'', caption:'Таймер', icon:'img/TFuncTimer.png', group:'Система', system:true,
+		events: ['timer'],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' }
 		]
 	},
 	{ name:'DataVar', typeClass:'', caption:'Данные', icon:'img/TDataVar.png', group:'Система', system:true,
+		events: [],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' }
 		]
 	},
 	{ name:'Function', typeClass:'', caption:'Функция', icon:'img/TFunction.png', group:'Система', system:true,
+		events: [],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' }
 		]
 	},
 	{ name:'SampleDialog', typeClass:'', caption:'Простой диалог', icon:'img/TSampleDialog.png', group:'Диалоги', system:true,
+		events: [],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' }
 		]
 	},
 	{ name:'Download', typeClass:'', caption:'Загрузчик файлов', icon:'img/TDownload.png', group:'Интернет', system:true,
+		events: [],
 		props:[
 			{ section:'Главное' },
 			{ key:'data-name', label:'Имя', type:'text', target:'attr' }
 		]
 	}
+];
+
+var EVENTS = [
+	{ name: 'click', label: 'Клик', icon: 'img/onclick.png' },
+	{ name: 'dblclick', label: 'Двойной клик', icon: 'img/ondblclick.png' },
+	{ name: 'change', label: 'Изменение', icon: '24/onchange.png' },
+	{ name: 'timer', label: 'Таймер', icon: '24/ontimer.bmp' },
+	{ name: 'execute', label: 'Выполнение', icon: '24/onexecute.bmp' },
+	{ name: 'active', label: 'Активация', icon: '24/onactive.bmp' },
+	{ name: 'deactive', label: 'Деактивация', icon: '24/ondeactive.bmp' },
+	{ name: 'close', label: 'Закрытие', icon: '24/onclose.bmp' },
+	{ name: 'closequery', label: 'Запрос закрытия', icon: '24/onclosequery.bmp' },
+	{ name: 'create', label: 'Создание', icon: '24/oncreate.bmp' },
+	{ name: 'hide', label: 'Скрытие', icon: '24/onhide.bmp' },
+	{ name: 'show', label: 'Показ', icon: '24/onshow.bmp' },
+	{ name: 'resize', label: 'Изменение размера', icon: '24/onresize.bmp' },
+	{ name: 'paint', label: 'Перерисовка', icon: '24/onpaint.bmp' },
+	{ name: 'mouseenter', label: 'Вход мыши', icon: '24/onmouseenter.bmp' },
+	{ name: 'mouseleave', label: 'Выход мыши', icon: '24/onmouseleave.bmp' },
+	{ name: 'keydown', label: 'Клавиша нажата', icon: '24/onkeydown.bmp' },
+	{ name: 'keypress', label: 'Клавиша зажата', icon: '24/onkeypress.bmp' },
+	{ name: 'keyup', label: 'Клавиша отпущена', icon: '24/onkeyup.bmp' },
+	{ name: 'scroll', label: 'Прокрутка', icon: '24/onscroll.bmp' },
+	{ name: 'select', label: 'Выбор', icon: '24/onselect.bmp' },
+	{ name: 'selectdialog', label: 'Выбор диалога', icon: '24/onselectdialog.bmp' },
+	{ name: 'starttrack', label: 'Начало трека', icon: '24/onstarttrack.bmp' },
+	{ name: 'endtrack', label: 'Конец трека', icon: '24/onendtrack.bmp' },
+	{ name: 'hotspotclick', label: 'Клик по hotspot', icon: '24/onhotspotclick.bmp' },
+	{ name: 'hotspotcovered', label: 'Наведение на hotspot', icon: '24/onhotspotcovered.bmp' }
 ];
 
 var list_element_system = COMPONENTS.filter(function(c){return c.system;}).map(function(c){return c.name;});

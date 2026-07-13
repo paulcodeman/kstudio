@@ -19,7 +19,31 @@ var window_stack = [], count_stack = 0;
 var element_stack = [];
 var count_element_add = {};
 // list_element_system and class_gui_list_elements are now in components.js
-var cmd_event_name = ['data-event-click', 'data-event-dblclick'];
+function get_event_def(name) {
+	for (var i = 0; i < EVENTS.length; i++) {
+		if (EVENTS[i].name === name) return EVENTS[i];
+	}
+	return null;
+}
+
+function event_attr_name(name) { return 'data-event-' + name; }
+
+function get_component_def(el) {
+	if (!el) return null;
+	var dataName = el.getAttribute('data-name');
+	if (!dataName) return null;
+	for (var i = 0; i < COMPONENTS.length; i++) {
+		if (dataName === COMPONENTS[i].name) return COMPONENTS[i];
+		var prefix = COMPONENTS[i].name + '_';
+		if (dataName.indexOf(prefix) === 0) return COMPONENTS[i];
+	}
+	return null;
+}
+
+function get_component_events(el) {
+	var def = get_component_def(el);
+	return def && def.events ? def.events : ['click', 'dblclick'];
+}
 var GLOBAL_INIT_ELEMENT = [], GLOBAL_INIT_COUNT = 0;
 var cmd_sensor = false;
 var global_lock_event = false;
@@ -195,9 +219,8 @@ function rgb(r, g, b) {
 
 function get_props_for_element(el) {
 	if (select_element == null) return WINDOW_PROPS;
-	for (var i = 0; i < COMPONENTS.length; i++) {
-		if (COMPONENTS[i].name == el.getAttribute('data-name') && COMPONENTS[i].props) return COMPONENTS[i].props;
-	}
+	var def = get_component_def(el);
+	if (def && def.props) return def.props;
 	return COMPONENTS[0].props;
 }
 
@@ -721,27 +744,42 @@ function delete_event_list() {
 	var tmp = list_eval_select.parentNode;
 	if (tmp == null) return false;
 	deleteElement(list_eval_select.parentNode);
-	var x = parseInt(list_eval_select.getAttribute('data-sel-num'));
-	delete tmp_event_data[tmp_event_data.indexOf(x)];
+	var eventName = list_eval_select.getAttribute('data-sel-event');
+	var events = get_component_events(select_element);
+	var x = events.indexOf(eventName);
+	if (x < 0) return false;
+	delete tmp_event_data[tmp_event_data.indexOf(eventName)];
 
 	var data_list_event_atr = select_element.getAttribute('data_list_event');
 	var cmd = data_list_event_atr != '' ? parseInt(data_list_event_atr) : 0;
 	cmd &= 0xFFFFFFFF ^ (1 << x);
 
-	select_element.removeAttribute(cmd_event_name[x]);
+	select_element.removeAttribute(event_attr_name(eventName));
 	select_element.setAttribute('data_list_event', cmd);
 }
 
-function add_event_list(x) {
-	if (tmp_event_data.indexOf(x) >= 0) return false;
-	tmp_event_data[tmp_event_data.length] = x;
+function add_event_list(eventName) {
+	if (tmp_event_data.indexOf(eventName) >= 0) return false;
+	if (select_element == null) return false;
+
+	var events = get_component_events(select_element);
+	var x = events.indexOf(eventName);
+	if (x < 0) return false;
+
+	tmp_event_data[tmp_event_data.length] = eventName;
 
 	var a = createELM('TR');
 	var b = createELM('TD');
-	b.setAttribute('data-sel-num', x);
-	if (!x) { b.innerText = 'Клик'; b.id = cmd_event_name[x]; }
-	else if (x == 1) { b.innerText = 'Двойной клик'; b.id = cmd_event_name[x]; }
-	if (select_element == null) return false;
+	b.setAttribute('data-sel-event', eventName);
+	var edef = get_event_def(eventName);
+	if (edef && edef.icon) {
+		var iconImg = createELM('IMG');
+		iconImg.src = edef.icon;
+		iconImg.style.cssText = 'vertical-align:middle;margin-right:4px;width:16px;height:16px;';
+		b.appendChild(iconImg);
+	}
+	b.appendChild(document.createTextNode((edef && edef.label) || eventName));
+	b.id = event_attr_name(eventName);
 
 	var data_list_event_atr = select_element.getAttribute('data_list_event');
 	var cmd = data_list_event_atr != '' ? parseInt(data_list_event_atr) : 0;
@@ -756,6 +794,7 @@ function add_event_list(x) {
 	};
 	a.appendChild(b);
 	element_list_event.appendChild(a);
+	element_list.style.display = 'none';
 }
 
 function load_attribute_list_event() {
@@ -764,18 +803,27 @@ function load_attribute_list_event() {
 	var count = tmp.length;
 	while (count--) element_list_event.removeChild(tmp[count]);
 
+	if (select_element == null) return;
+
+	var events = get_component_events(select_element);
 	var data_list_event_atr = select_element.getAttribute('data_list_event');
 	var cmd = data_list_event_atr != '' ? parseInt(data_list_event_atr) : 0;
-	var x = 0;
-	while (cmd) {
-		if (cmd & 1) {
+	for (var x = 0; x < events.length; x++) {
+		if (cmd & (1 << x)) {
+			var eventName = events[x];
 			var a = createELM('TR');
 			var b = createELM('TD');
-			b.id = cmd_event_name[x];
-			if (!x) b.innerText = 'Клик';
-			else if (x == 1) b.innerText = 'Двойной клик';
-			b.setAttribute('data-sel-num', x);
-			tmp_event_data[tmp_event_data.length] = x;
+			var edef = get_event_def(eventName);
+			if (edef && edef.icon) {
+				var iconImg = createELM('IMG');
+				iconImg.src = edef.icon;
+				iconImg.style.cssText = 'vertical-align:middle;margin-right:4px;width:16px;height:16px;';
+				b.appendChild(iconImg);
+			}
+			b.appendChild(document.createTextNode((edef && edef.label) || eventName));
+			b.id = event_attr_name(eventName);
+			b.setAttribute('data-sel-event', eventName);
+			tmp_event_data[tmp_event_data.length] = eventName;
 			b.className = 'default';
 			b.onmousedown = function () {
 				if (list_eval_select != null) list_eval_select.className = 'default';
@@ -785,8 +833,6 @@ function load_attribute_list_event() {
 			a.appendChild(b);
 			element_list_event.appendChild(a);
 		}
-		++x;
-		cmd >>= 1;
 	}
 }
 
@@ -796,13 +842,18 @@ function cancel_edit_code() {
 
 function save_edit_code() {
 	getID('window_edit_code').style.display = 'none';
-	select_element.setAttribute(list_eval_select.id, encodeURIComponent(getID('code_edit_rect').value));
+	if (select_element && list_eval_select) {
+		var attrName = list_eval_select.id || event_attr_name(list_eval_select.getAttribute('data-sel-event'));
+		select_element.setAttribute(attrName, encodeURIComponent(getID('code_edit_rect').value));
+	}
 }
 
 function click_edit_code() {
-	var tmp = select_element.getAttribute(list_eval_select.id);
+	if (list_eval_select == null || select_element == null) return;
+	var attrName = list_eval_select.id || event_attr_name(list_eval_select.getAttribute('data-sel-event'));
+	var tmp = select_element.getAttribute(attrName);
 	getID('code_edit_rect').value = tmp == undefined ? '' : decodeURIComponent(tmp);
-	if (list_eval_select != null) getID('window_edit_code').style.display = 'block';
+	getID('window_edit_code').style.display = 'block';
 }
 
 function CmdKeyDown(event) {
@@ -927,10 +978,27 @@ window.onload = function () {
 
 	if (element_add_event) {
 		element_add_event.onclick = function (e) {
+			if (select_element == null) return;
+			var events = get_component_events(select_element);
+			var html = '';
+			for (var i = 0; i < events.length; i++) {
+				var ev = events[i];
+				if (tmp_event_data.indexOf(ev) >= 0) continue;
+				var edef = get_event_def(ev);
+			var icon = edef && edef.icon ? '<img src="' + edef.icon + '">' : '';
+			html += '<div class="event-item" data-event="' + ev + '">' +
+				icon + '<span class="title">' + ((edef && edef.label) || ev) + '</span></div>';
+			}
+			element_list.innerHTML = html;
+			Array.from(element_list.children).forEach(function(item) {
+				item.onmousedown = function() {
+					add_event_list(this.getAttribute('data-event'));
+				};
+			});
 			var ex = e && e.pageX ? e.pageX : (e && e.clientX ? e.clientX : mouse.x);
 			var ey = e && e.pageY ? e.pageY : (e && e.clientY ? e.clientY : mouse.y);
 			element_list.style.top = ey;
-			element_list.style.display = 'block';
+			element_list.style.display = html ? 'block' : 'none';
 			element_list.style.left = ex - element_list.offsetWidth / 2;
 		};
 	}
