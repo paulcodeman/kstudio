@@ -204,6 +204,9 @@ function hide_atr_element(o) {
 		} else if (i == 2) {
 			if (select_element == null) atr_tr[i].children[2].children[0].value = o.getAttribute('data-caption');
 			else atr_tr[i].children[2].children[0].value = o.innerText;
+		} else if (i == 3 && atr_tr[i].children[2].children[0]) {
+			var bg = o.style.background;
+			if (bg && bg != '') atr_tr[i].children[2].children[0].value = bg;
 		}
 		atr_tr[i].style.display = 'table-row';
 		++i;
