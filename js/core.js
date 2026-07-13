@@ -274,7 +274,7 @@ function get_props_for_element(el) {
 function get_prop_value(el, prop) {
 	if (prop.key === 'color') {
 		if (el.className === 'label_element_gui' && el.style.color) return el.style.color;
-		return el.style.background || '#f8f9fb';
+		return el.style.background || '#ffffff';
 	}
 	let val = '';
 	if (prop.target === 'attr') val = el.getAttribute(prop.key) || '';
@@ -547,7 +547,7 @@ function upgrade_window_data(data) {
 		style: {
 			width: data.width || '300px',
 			height: data.height || '230px',
-			background: data.bg || '#f8f9fb'
+			background: data.bg || '#ffffff'
 		},
 		components: data.components || []
 	};
@@ -565,14 +565,14 @@ function load_window_data(index) {
 		const s = window_data[index].style || {};
 		win.style.width = s.width || '300px';
 		win.style.height = s.height || '230px';
-		win.style.background = s.background || '#f8f9fb';
+		win.style.background = s.background || '#ffffff';
 	} else {
 		addwinelm.innerHTML = '';
 		win.setAttribute('data-name', 'Window_' + (index + 1));
 		win.setAttribute('data-caption', 'Окно');
 		win.style.width = '300px';
 		win.style.height = '230px';
-		win.style.background = '#f8f9fb';
+		win.style.background = '#ffffff';
 	}
 	addwinelm.style.width = parseInt(win.style.width) - 2;
 	addwinelm.style.height = parseInt(win.style.height) - 2;
@@ -610,7 +610,7 @@ function add_new_window(name) {
 	window_data[index] = {
 		html: '',
 		attrs: { 'data-name': name, 'data-caption': '', 'data-hide-prop': '', 'data-align': '' },
-		style: { width: '300px', height: '230px', background: '#f8f9fb' },
+		style: { width: '300px', height: '230px', background: '#ffffff' },
 		components: []
 	};
 	count_stack++;
@@ -1092,7 +1092,7 @@ window.onload = function () {
 	win.setAttribute('data-name', 'Window_1');
 	win.setAttribute('data-caption', 'Окно');
 	win.setAttribute('data-hide-prop', '');
-	win.style.background = '#f8f9fb';
+	win.style.background = '#ffffff';
 	addwinelm.style.width = win.offsetWidth - 2;
 	addwinelm.style.height = win.offsetHeight - 2;
 

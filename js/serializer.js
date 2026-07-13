@@ -137,7 +137,7 @@ function import_project(input) {
 				window_data[i].style = {
 					width: window_data[i].width || '300px',
 					height: window_data[i].height || '230px',
-					background: window_data[i].bg || '#f8f9fb'
+					background: window_data[i].bg || '#ffffff'
 				};
 				delete window_data[i].name;
 				delete window_data[i].caption;

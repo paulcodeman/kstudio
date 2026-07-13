@@ -81,7 +81,7 @@ function compile_window_from_data(data) {
 	const s = data.style || {};
 	win.style.width = (s.width || data.width || '300px');
 	win.style.height = (s.height || data.height || '230px');
-	win.style.background = (s.background || data.bg || '#f8f9fb');
+	win.style.background = (s.background || data.bg || '#ffffff');
 	addwinelm.style.width = parseInt(win.style.width) - 2;
 	addwinelm.style.height = parseInt(win.style.height) - 2;
 	set_element_defunc(addwinelm);
