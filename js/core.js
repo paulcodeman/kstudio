@@ -278,28 +278,37 @@ function get_prop_value(el, prop) {
 function render_props(el) {
 	if (!el) el = win;
 	const props = get_props_for_element(el);
-	const table = getID('attribute_element');
-	if (!table) return;
-	table.innerHTML = '';
+	const container = getID('attribute_element');
+	if (!container) return;
+	container.innerHTML = '';
+	container.className = 'prop-grid';
+	let currentSection = null;
 	for (let i = 0; i < props.length; i++) {
 		const p = props[i];
 		if (p.section) {
-			const tr = createELM('tr');
-			const td1 = createELM('td'); td1.className = 'opt_spis';
-			if (i === 0) {
-				const ob = createELM('div'); ob.id = 'open_block';
-				td1.appendChild(ob);
-			}
-			const td2 = createELM('td'); td2.colSpan = 2; td2.className = 'title_pod'; td2.innerText = p.section;
-			tr.appendChild(td1); tr.appendChild(td2);
-			table.appendChild(tr);
+			currentSection = p.section;
+			const header = createELM('div');
+			header.className = 'title_pod';
+			header.style.gridColumn = '1 / -1';
+			header.style.cursor = 'pointer';
+			const storageKey = 'kstudio_collapsed_' + currentSection;
+			const collapsed = localStorage.getItem(storageKey) === '1';
+			header.innerText = (collapsed ? '▶ ' : '▼ ') + currentSection;
+			header.onclick = (function (key) {
+				return function () {
+					localStorage.setItem(key, localStorage.getItem(key) === '1' ? '0' : '1');
+					render_props(select_element || win);
+				};
+			})(storageKey);
+			container.appendChild(header);
 			continue;
 		}
 		const value = get_prop_value(el, p);
-		const tr = createELM('tr');
-		const td1 = createELM('td'); td1.className = 'opt_spis';
-		const td2 = createELM('td'); td2.className = 'title_atr'; td2.innerText = p.label;
-		const td3 = createELM('td');
+		const label = createELM('div');
+		label.className = 'title_atr';
+		label.innerText = p.label;
+		const val = createELM('div');
+		val.className = 'prop-val';
 		let input;
 		if (p.type === 'select') {
 			input = createELM('select'); input.className = 'list_atr';
@@ -325,9 +334,16 @@ function render_props(el) {
 		input.setAttribute('data-prop-key', p.key);
 		input.setAttribute('data-prop-target', p.target);
 		if (p.type === 'select') input.setAttribute('data-prop-type', 'select');
-		td3.appendChild(input);
-		tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
-		table.appendChild(tr);
+		val.appendChild(input);
+		if (currentSection) {
+			const storageKey = 'kstudio_collapsed_' + currentSection;
+			if (localStorage.getItem(storageKey) === '1') {
+				label.style.display = 'none';
+				val.style.display = 'none';
+			}
+		}
+		container.appendChild(label);
+		container.appendChild(val);
 	}
 }
 

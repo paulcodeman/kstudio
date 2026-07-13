@@ -273,10 +273,6 @@ select.list_window:focus {
 	background: #fff;
 	overflow-y: auto;
 }
-#properies table {
-	width: 100%;
-}
-
 #properies .title {
 	width: auto;
 	height: auto;
@@ -301,12 +297,6 @@ select.list_window:focus {
 	z-index: 100;
 	display: none;
 	border-radius: 2px;
-}
-
-#properies table td {
-	font-size: 13px;
-	padding: 3px 6px;
-	color: #1a1a2e;
 }
 
 #properies .element {
@@ -463,19 +453,21 @@ select.list_window:focus {
 	background: #4f6ef7;
 }
 
-td.title_atr {
+.prop-grid {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: center;
+}
+
+.title_atr {
 	font-size: 12px;
 	padding: 4px 8px;
 	color: #6b7280;
 	white-space: nowrap;
-	width: 1%;
 }
 
-.attr {
-	background: #fff;
-	border: 1px solid #e0e3e8;
-	border-radius: 8px;
-	padding: 8px;
+.prop-val {
+	padding: 3px 6px;
 }
 
 .title {
@@ -524,24 +516,7 @@ select.list_atr {
 	padding: 0 6px;
 }
 
-.attr table td {
-	background: transparent;
-	padding: 3px 4px;
-}
-
-.attr table td.opt_spis {
-	background: transparent;
-	width: 14px;
-}
-
-#open_block {
-	background: url("../img/raskr.PNG");
-	padding: 4px;
-	margin-top: 4px;
-	opacity: 0.6;
-}
-
-.attr table td.title_pod {
+.title_pod {
 	background: #f0f2f7;
 	border-radius: 5px;
 	padding: 5px 10px;
