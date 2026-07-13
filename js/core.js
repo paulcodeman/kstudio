@@ -319,7 +319,7 @@ function past_gui_window(win, name_type) {
 
 	var element;
 	if (comp.system) {
-		element = createELM('TABLE');
+		element = createELM('DIV');
 		element.className = 'simple_object_code';
 	} else if (name_type == 'Image') {
 		element = createELM('IMG');
@@ -340,18 +340,13 @@ function past_gui_window(win, name_type) {
 	render_props(element);
 
 	if (comp.system) {
-		var tr = createELM('TR');
-		var td = createELM('TD');
 		var img = createELM('IMG');
 		img.src = comp.icon;
-		td.appendChild(img);
-		tr.appendChild(td);
-		element.appendChild(tr);
-		tr = createELM('TR');
-		td = createELM('TD');
-		td.innerText = name;
-		tr.appendChild(td);
-		element.appendChild(tr);
+		element.appendChild(img);
+		var nameDiv = createELM('DIV');
+		nameDiv.className = 'soc_name';
+		nameDiv.innerText = name;
+		element.appendChild(nameDiv);
 	} else if (comp.defaultText) {
 		element.innerText = comp.defaultText;
 	}
