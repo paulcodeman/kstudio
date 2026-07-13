@@ -566,7 +566,7 @@ div.panel {
 	grid-auto-flow: column;
 	justify-content: start;
 	align-items: center;
-	gap: 0;
+	gap: 1rem;
 }
 .tool-group {
 	white-space: nowrap;
@@ -584,7 +584,6 @@ div.panel {
 	text-decoration: none;
 	color: #1a1a2e;
 	line-height: 28px;
-	padding: 0 12px;
 	display: inline-block;
 	font-weight: 500;
 }
@@ -594,7 +593,6 @@ div.panel {
 .tool-sep {
 	width: 0;
 	height: 20px;
-	padding: 0 6px;
 	border-left: 1px solid #e0e3e8;
 	background: transparent;
 }
