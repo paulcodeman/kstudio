@@ -89,12 +89,7 @@ div.label_element_gui {
 }
 
 .simple_object_code img {
-	border: 2px solid #d0d5de;
-	border-radius: 4px;
-	padding: 2px;
 	display: block;
-	width: 32px;
-	height: 32px;
 }
 
 .simple_object_code .soc_name {

@@ -31,7 +31,7 @@ body {
 .conteiner > div, .conteiner > input { display: none; }
 
 .conteiner label {
-	padding: 8px 16px;
+	padding: 4px 16px;
 	border: 1px solid #e0e3e8;
 	line-height: 28px;
 	cursor: pointer;
@@ -125,8 +125,6 @@ input:focus {
 	flex: 1;
 }
 .event-item img {
-	width: 24px;
-	height: 24px;
 	display: block;
 	flex: none;
 }
@@ -301,15 +299,12 @@ select.list_window:focus {
 	padding: 4px 6px;
 	margin: 0;
 	gap: 0;
-	width: 52px;
+
 }
 .palette-tile #properies .element span {
 	display: none;
 }
-.palette-tile #properies .element img {
-	width: 32px;
-	height: 32px;
-}
+
 .palette-tile #properies .title {
 	flex: 0 0 100%;
 	margin: 4px 0 0;
@@ -368,8 +363,6 @@ select.list_window:focus {
 	transform: translateX(2px);
 }
 #properies .element img {
-	width: 24px;
-	height: 24px;
 	display: block;
 	flex: none;
 }
@@ -520,12 +513,7 @@ select.list_window:focus {
 	padding: 3px 6px;
 }
 
-.title {
-	padding-left: 4px;
-}
-
 .glob_title {
-	padding: 8px 4px 4px;
 	font-weight: 600;
 	color: #1a1a2e;
 	font-size: 13px;
