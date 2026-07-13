@@ -156,6 +156,7 @@ function select_element_added(o) {
 		save_y -= parseInt(o.style.top);
 		select_element = o;
 	}
+	RrefreshPOS(o); TrefreshPOS(o); RTrefreshPOS(o);
 	return false;
 }
 
@@ -696,8 +697,10 @@ window.onload = function () {
 			select_element = null;
 			TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 			hide_atr_element(win);
-			sel_rect_y = select_element_rect.style.top = mouse.y;
-			sel_rect_x = select_element_rect.style.left = mouse.x;
+			var ey = event && event.pageY ? event.pageY : (event && event.clientY ? event.clientY : mouse.y);
+			var ex = event && event.pageX ? event.pageX : (event && event.clientX ? event.clientX : mouse.x);
+			sel_rect_y = select_element_rect.style.top = ey;
+			sel_rect_x = select_element_rect.style.left = ex;
 			select_element_rect.style.display = 'block';
 			select_element_rect_timer = setInterval(changer_rect_select, 50);
 			return true;
@@ -713,10 +716,12 @@ window.onload = function () {
 		};
 	}
 	if (element_add_event) {
-		element_add_event.onclick = function () {
-			element_list.style.top = mouse.y;
+		element_add_event.onclick = function (e) {
+			var ex = e && e.pageX ? e.pageX : (e && e.clientX ? e.clientX : mouse.x);
+			var ey = e && e.pageY ? e.pageY : (e && e.clientY ? e.clientY : mouse.y);
+			element_list.style.top = ey;
 			element_list.style.display = 'block';
-			element_list.style.left = mouse.x - element_list.offsetWidth / 2;
+			element_list.style.left = ex - element_list.offsetWidth / 2;
 		};
 	}
 
