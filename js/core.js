@@ -937,7 +937,7 @@ function click_edit_code() {
 	const el = select_element || win;
 	const attrName = list_eval_select.id || event_attr_name(list_eval_select.getAttribute('data-sel-event'));
 	const tmp = el.getAttribute(attrName);
-	getID('code_edit_rect').value = tmp === undefined ? '' : decodeURIComponent(tmp);
+	getID('code_edit_rect').value = tmp ? decodeURIComponent(tmp) : '';
 	getID('window_edit_code').style.display = 'flex';
 }
 

@@ -1,127 +1,126 @@
-let gui_list_init = [];
-let gui_list_count = 0;
-let img_list_load = {};
-let img_list_count = 0;
-let add_init_event_func = '';
+let componentDeclarations = [];
+let imageResources = {};
+let eventHandlerCode = '';
+let eventHandlerId = 0;
 
-const PROP_METHODS = {
-	left:         { m: 'left',        f: 'int' },
-	top:          { m: 'top',         f: 'int' },
-	width:        { m: 'width',       f: 'int' },
-	height:       { m: 'height',      f: 'int' },
-	color:        { m: 'color',       f: 'hexcolor' },
-	image:        { m: 'image',       f: 'imgsrc' },
+const PROPERTY_FORMATS = {
+	left:   { method: 'left',   format: 'int' },
+	top:    { method: 'top',    format: 'int' },
+	width:  { method: 'width',  format: 'int' },
+	height: { method: 'height', format: 'int' },
+	color:  { method: 'color',  format: 'hexColor' },
+	image:  { method: 'image',  format: 'imageSource' },
 };
 
-function resolve_compiler_props(def) {
-	if (!def || !def.props) return [];
-	const resolved = [];
-	for (let i = 0; i < def.props.length; i++) {
-		const p = def.props[i];
-		if (typeof p === 'string') {
-			const found = get_prop_def(p);
-			if (found) resolved.push(found);
+function getComponentProps(componentDef) {
+	if (!componentDef || !componentDef.props) return [];
+	const result = [];
+	for (const prop of componentDef.props) {
+		if (typeof prop === 'string') {
+			const found = get_prop_def(prop);
+			if (found) result.push(found);
 		} else {
-			resolved.push(p);
+			result.push(prop);
 		}
 	}
-	return resolved;
+	return result;
 }
 
-function convert_elements(w_obj) {
-	const w = w_obj.children[0];
-	const list = w.children;
-	let count = list.length;
-	img_list_count = 0;
-	img_list_load = [];
+function readPropertyValue(element, prop) {
+	switch (prop.key) {
+		case 'color':
+			return element.className === 'label_element_gui' && element.style.color
+				? element.style.color : element.style.background;
+		case 'left':
+			return element.style.left ? '' + parseInt(element.offsetLeft) : '';
+		case 'top':
+			return element.style.top ? '' + parseInt(element.offsetTop) : '';
+		case 'width':
+		case 'height':
+			return '' + parseInt(element['offset' + prop.key[0].toUpperCase() + prop.key.slice(1)]);
+		default:
+			if (prop.target === 'attr') return element.getAttribute(prop.key) || '';
+			if (prop.target === 'src') return element.src || '';
+			if (prop.target === 'style') return element.style[prop.key] || '';
+			return '';
+	}
+}
+
+function formatPropertyValue(method, format, value) {
+	switch (format) {
+		case 'int':        return method + '(' + parseInt(value) + ');';
+		case 'string':     return method + '("' + value + '");';
+		case 'hexColor':   return method + '(0x' + eval(value) + ');';
+		case 'imageSource': return '';
+		default:           return method + '(' + value + ');';
+	}
+}
+
+function convertElements(windowElement) {
+	const container = windowElement.children[0];
+	const children = container.children;
 	let code = '';
-	const name_window = w_obj.getAttribute('data-name');
+	const windowName = windowElement.getAttribute('data-name');
 
-	while (count) {
-		const obj = list[--count];
-		const def = get_component_def(obj);
-		if (!def) continue;
-		const cmd = class_gui_list_elements.indexOf(def.typeClass);
-		if (cmd === -1) continue;
+	imageResources = {};
 
-		const name = obj.getAttribute('data-name');
-		gui_list_init[gui_list_count++] = name;
-		code += name_window + '.adds(#' + name + ',' + cmd + ');';
+	for (let i = children.length - 1; i >= 0; i--) {
+		const element = children[i];
+		const componentDef = get_component_def(element);
+		if (!componentDef) continue;
 
-		const hasImage = def.props.indexOf('image') !== -1;
-		const props = resolve_compiler_props(def);
+		const typeIndex = class_gui_list_elements.indexOf(componentDef.typeClass);
+		if (typeIndex === -1) continue;
+
+		const componentName = element.getAttribute('data-name');
+		componentDeclarations.push(componentName);
+		code += windowName + '.adds(#' + componentName + ',' + typeIndex + ');';
+
+		const isImage = componentDef.props.indexOf('image') !== -1;
+		const props = getComponentProps(componentDef);
 
 		for (const prop of props) {
 			if (prop.key === 'data-name') continue;
-			const map = PROP_METHODS[prop.key];
-			if (!map) continue;
+			const propFormat = PROPERTY_FORMATS[prop.key];
+			if (!propFormat) continue;
 
-			let val;
-			if (prop.key === 'width') {
-				if (!hasImage && obj.style.width === '') continue;
-				val = '' + parseInt(obj.offsetWidth);
-			} else if (prop.key === 'height') {
-				if (!hasImage && obj.style.height === '') continue;
-				val = '' + parseInt(obj.offsetHeight);
-			} else if (prop.key === 'color') {
-				val = (obj.className === 'label_element_gui' && obj.style.color) ? obj.style.color : obj.style.background;
-			} else if (prop.key === 'left') {
-				if (obj.style.left === '') continue;
-				val = '' + parseInt(obj.offsetLeft);
-			} else if (prop.key === 'top') {
-				if (obj.style.top === '') continue;
-				val = '' + parseInt(obj.offsetTop);
-			} else if (prop.target === 'attr') {
-				val = obj.getAttribute(prop.key) || '';
-			} else if (prop.target === 'src') {
-				val = obj.src || '';
-			} else {
-				val = obj.style[prop.key] || '';
-			}
-			if (!val) continue;
+			if ((prop.key === 'width' || prop.key === 'height') && !isImage && !element.style[prop.key]) continue;
+
+			const value = readPropertyValue(element, prop);
+			if (!value) continue;
 
 			if (prop.key === 'image') {
-				if (val !== 'img/TImage.png' && val !== '') {
-					code += name + '.image(#' + name + '_img_src_data_);';
-					img_list_load[name + '_img_src_data_'] = val;
-					img_list_count = 1;
+				if (value !== 'img/TImage.png') {
+					code += componentName + '.image(#' + componentName + '_img_src_data_);';
+					imageResources[componentName + '_img_src_data_'] = value;
 				}
 				continue;
 			}
 
-			if (map.f === 'int') {
-				code += name + '.' + map.m + '(' + parseInt(val) + ');';
-			} else if (map.f === 'string') {
-				code += name + '.' + map.m + '("' + val + '");';
-			} else if (map.f === 'hexcolor') {
-				code += name + '.color(0x' + eval(val) + ');';
-			} else if (map.f === 'raw') {
-				code += name + '.' + map.m + '(' + val + ');';
-			}
+			code += componentName + '.' + formatPropertyValue(propFormat.method, propFormat.format, value);
 		}
 
-		const bc = obj.style.borderColor;
-		if (bc !== '') code += name + '.bordercolor(' + bc + ');';
+		const borderColor = element.style.borderColor;
+		if (borderColor) code += componentName + '.bordercolor(' + borderColor + ');';
 
-		const text = obj.innerText;
-		if (text !== '') code += name + '.caption("' + text + '");';
+		const captionText = element.innerText;
+		if (captionText) code += componentName + '.caption("' + captionText + '");';
 
-		const events = get_component_events(obj);
-		for (let ei = 0; ei < events.length; ei++) {
-			const evName = events[ei];
-			const evAttr = event_attr_name(evName);
-			const evCode = obj.getAttribute(evAttr);
-			if (evCode !== null) {
-				const funcSuffix = evName.replace(/-/g, '_');
-				code += name + '.' + evName + '(#' + name + '__ptr_func__' + funcSuffix + '_);';
-				add_init_event_func += 'void ' + name + '__ptr_func__' + funcSuffix + '_(dword key,x,y){' + decodeURIComponent(evCode) + '}';
+		const events = get_component_events(element);
+		for (const eventName of events) {
+			const eventAttr = event_attr_name(eventName);
+			const eventCode = element.getAttribute(eventAttr);
+			if (eventCode !== null) {
+				const handlerId = '_ev' + (eventHandlerId++);
+				code += componentName + '.' + eventName + '(#' + componentName + handlerId + '_);';
+				eventHandlerCode += 'void ' + componentName + handlerId + '_(dword key,x,y){' + decodeURIComponent(eventCode) + '}';
 			}
 		}
 	}
 	return code;
 }
 
-function compile_window_from_data(data) {
+function applyWindowData(data) {
 	addwinelm.innerHTML = data.html || '';
 	if (data.attrs) {
 		for (const key in data.attrs) {
@@ -136,106 +135,114 @@ function compile_window_from_data(data) {
 		else win.removeAttribute('data-align');
 	}
 	const s = data.style || {};
-	win.style.width = (s.width || data.width || '300px');
-	win.style.height = (s.height || data.height || '230px');
-	win.style.background = (s.background || data.bg || '#ffffff');
+	win.style.width = s.width || data.width || '300px';
+	win.style.height = s.height || data.height || '230px';
+	win.style.background = s.background || data.bg || '#ffffff';
 	addwinelm.style.width = parseInt(win.style.width) - 2;
 	addwinelm.style.height = parseInt(win.style.height) - 2;
 	set_element_defunc(addwinelm);
 }
 
-function generate_code_string() {
-	c_code = [];
-	c_count = 0;
-	gui_list_init = [];
-	gui_list_count = 0;
-	add_init_event_func = '';
+function generateCode() {
+	componentDeclarations = [];
+	eventHandlerCode = '';
+	eventHandlerId = 0;
 
 	save_window_state();
 
-	let main_code = '';
-	const count = count_stack;
-	c_code[c_count++] = 'window ' + GLOBAL_INIT_ELEMENT.join(',') + ';';
-	const save_gui_init_position = c_count;
-	c_code[c_count++] = '';
-	const save_img_init_position = c_count;
-	c_code[c_count++] = '';
+	const codeParts = [];
+	const windowCount = count_stack;
 
-	const saved_index = current_win_index;
-	const saved_html = addwinelm.innerHTML;
+	codeParts.push('window ' + GLOBAL_INIT_ELEMENT.join(',') + ';');
 
-	for (let i = 0; i < count; i++) {
+	const guiDeclIndex = codeParts.length;
+	codeParts.push('');
+
+	const imgDeclIndex = codeParts.length;
+	codeParts.push('');
+
+	let mainCode = '';
+	const savedIndex = current_win_index;
+	const savedHtml = addwinelm.innerHTML;
+
+	for (let i = 0; i < windowCount; i++) {
 		const data = window_data[i];
 		if (!data) continue;
 
-		compile_window_from_data(data);
+		applyWindowData(data);
+
 		const name = data.attrs ? (data.attrs['data-name'] || 'Window') : (data.name || 'Window');
 		const s = data.style || {};
-		const w = parseInt(s.width || data.width || '300') - 2;
-		const h = parseInt(s.height || data.height || '230') - 2;
-		const cap = data.attrs ? (data.attrs['data-caption'] || '') : (data.caption || '');
-		const tmp = data.attrs ? (data.attrs['data-align'] || '') : (data.align || '');
+		const windowWidth = parseInt(s.width || data.width || '300') - 2;
+		const windowHeight = parseInt(s.height || data.height || '230') - 2;
+		const caption = data.attrs ? (data.attrs['data-caption'] || '') : (data.caption || '');
+		const align = data.attrs ? (data.attrs['data-align'] || '') : (data.align || '');
 
-		main_code += name + '.prepare();';
-		main_code += name + '.width(' + w + ');';
-		main_code += name + '.height(' + h + ');';
-		main_code += name + '.caption("' + cap + '");';
-		main_code += name + '.color(0x' + eval(window.getComputedStyle(win).backgroundColor) + ');';
-		if (tmp === '1') main_code += name + '.StartPosition(' + tmp + ');';
-		main_code += convert_elements(win);
-		main_code += name + '.create();';
+		mainCode += name + '.prepare();';
+		mainCode += name + '.width(' + windowWidth + ');';
+		mainCode += name + '.height(' + windowHeight + ');';
+		mainCode += name + '.caption("' + caption + '");';
+		mainCode += name + '.color(0x' + eval(window.getComputedStyle(win).backgroundColor) + ');';
+		if (align === '1') mainCode += name + '.StartPosition(' + align + ');';
+		mainCode += convertElements(win);
+		mainCode += name + '.create();';
 	}
 
-	addwinelm.innerHTML = saved_html;
-	compile_window_from_data(window_data[saved_index]);
+	addwinelm.innerHTML = savedHtml;
+	applyWindowData(window_data[savedIndex]);
 
-	if (gui_list_count) c_code[save_gui_init_position] = 'gui ' + gui_list_init.join(',') + ';';
-	if (img_list_count) {
-		let img = '';
-		for (const key in img_list_load) {
-			img += key + '=@img"' + img_list_load[key] + '"';
+	if (componentDeclarations.length) {
+		codeParts[guiDeclIndex] = 'gui ' + componentDeclarations.join(',') + ';';
+	}
+
+	const imageKeys = Object.keys(imageResources);
+	if (imageKeys.length) {
+		let imgPart = '';
+		for (const key of imageKeys) {
+			imgPart += key + '=@img"' + imageResources[key] + '"';
 		}
-		c_code[save_img_init_position] = 'dword ' + img + ';';
+		codeParts[imgDeclIndex] = 'dword ' + imgPart + ';';
 	}
-	if (add_init_event_func !== '') c_code[c_count++] = add_init_event_func;
-	c_code[c_count++] = 'void main(){';
-	c_code[c_count++] = main_code;
-	c_code[c_count++] = '}';
 
-	return c_code.join('');
+	if (eventHandlerCode) codeParts.push(eventHandlerCode);
+	codeParts.push('void main(){');
+	codeParts.push(mainCode);
+	codeParts.push('}');
+
+	return codeParts.join('');
 }
 
-function compile(cmd) {
-	const codes = generate_code_string();
-	if (cmd === 1) return return_code(codes);
-	if (cmd === 2) return downloads_apps(codes);
+function compile(mode) {
+	const code = generateCode();
+	if (mode === 1) sendToCompiler(code);
+	if (mode === 2) downloadExecutable(code);
 }
 
-function show_compiled_code() {
-	const codes = generate_code_string();
-	document.getElementById('view_code_text').value = codes;
+function showGeneratedCode() {
+	const code = generateCode();
+	document.getElementById('view_code_text').value = code;
 	document.getElementById('window_view_code').style.display = 'flex';
 }
 
-function close_view_code() {
+function closeCodeViewer() {
 	document.getElementById('window_view_code').style.display = 'none';
 }
 
-function return_code(codes) {
+function sendToCompiler(code) {
 	const xhr = new XMLHttpRequest();
 	xhr.open('POST', 'http://127.0.0.1/CMM_SERVER/server/compile.php', true);
 	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	xhr.send('CODE=' + encodeURIComponent(codes));
+	xhr.send('CODE=' + encodeURIComponent(code));
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === 4 && xhr.responseText !== 'okey') alert(xhr.responseText);
 	};
 }
 
-function downloads_apps(codes) {
+function downloadExecutable(code) {
 	const xhr = new XMLHttpRequest();
 	xhr.open('POST', 'api/save.php', true);
 	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	xhr.send('CODE=' + encodeURIComponent(codes));
+	xhr.send('CODE=' + encodeURIComponent(code));
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === 4) document.location.href = 'api/compile.php';
 	};
