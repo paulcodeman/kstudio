@@ -15,6 +15,7 @@
 			<div class="tool-group">
 				<div class="button" onmousedown="compile(1);" title="Скомпилировать и запустить"><i class="fa-solid fa-play"></i> Запустить</div>
 				<div class="button" onmousedown="compile(2);" title="Скомпилировать и скачать .exe"><i class="fa-solid fa-download"></i> Скачать</div>
+				<div class="button" onmousedown="show_compiled_code();" title="Посмотреть скомпилированный код"><i class="fa-solid fa-code"></i> Код</div>
 			</div>
 			<div class="tool-sep"></div>
 			<div class="tool-group">
@@ -85,6 +86,11 @@
 			</div>
 		</div>
 		<div class="table_button_edit_code"><button onclick="save_edit_code();">Ок</button><button onclick="cancel_edit_code();">Отмена</button></div>
+	</div>
+
+	<div id="window_view_code" class="ViewCode">
+		<textarea id="view_code_text" readonly></textarea>
+		<div class="view-code-close"><button class="button" onclick="close_view_code();">Закрыть</button></div>
 	</div>
 
 	<div id="select_elements_rect"></div>

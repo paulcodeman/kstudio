@@ -87,7 +87,7 @@ function compile_window_from_data(data) {
 	set_element_defunc(addwinelm);
 }
 
-function compile(cmd) {
+function generate_code_string() {
 	c_code = [];
 	c_count = 0;
 	gui_list_init = [];
@@ -145,8 +145,23 @@ function compile(cmd) {
 	c_code[c_count++] = main_code;
 	c_code[c_count++] = '}';
 
-	if (cmd === 1) return return_code(c_code.join(''));
-	if (cmd === 2) return downloads_apps(c_code.join(''));
+	return c_code.join('');
+}
+
+function compile(cmd) {
+	const codes = generate_code_string();
+	if (cmd === 1) return return_code(codes);
+	if (cmd === 2) return downloads_apps(codes);
+}
+
+function show_compiled_code() {
+	const codes = generate_code_string();
+	document.getElementById('view_code_text').value = codes;
+	document.getElementById('window_view_code').style.display = 'flex';
+}
+
+function close_view_code() {
+	document.getElementById('window_view_code').style.display = 'none';
 }
 
 function return_code(codes) {
