@@ -335,9 +335,45 @@ function render_props(el) {
 			}
 			input.onchange = function () { apply_prop(this); };
 		} else if (p.type === 'color') {
-			input = createELM('input'); input.type = 'color';
-			if (value) input.value = value;
-			input.onchange = function () { apply_prop(this); };
+			const colorWrap = createELM('div');
+			colorWrap.style.display = 'flex';
+			colorWrap.style.gap = '4px';
+			colorWrap.style.alignItems = 'center';
+
+			const textInput = createELM('input');
+			textInput.type = 'text';
+			textInput.value = value || '#ffffff';
+			textInput.style.flex = '1';
+			textInput.style.minWidth = '0';
+
+			const colorInput = createELM('input');
+			colorInput.type = 'color';
+			colorInput.value = value || '#ffffff';
+			colorInput.style.width = '28px';
+			colorInput.style.height = '28px';
+			colorInput.style.flex = 'none';
+			colorInput.style.padding = '0';
+			colorInput.style.border = 'none';
+			colorInput.style.borderRadius = '4px';
+			colorInput.style.cursor = 'pointer';
+			colorInput.style.background = 'none';
+
+			textInput.oninput = function () {
+				colorInput.value = this.value;
+				apply_prop(this);
+			};
+			colorInput.oninput = function () {
+				textInput.value = this.value;
+				apply_prop(this);
+			};
+			textInput.setAttribute('data-prop-key', p.key);
+			textInput.setAttribute('data-prop-target', p.target);
+			colorInput.setAttribute('data-prop-key', p.key);
+			colorInput.setAttribute('data-prop-target', p.target);
+
+			colorWrap.appendChild(textInput);
+			colorWrap.appendChild(colorInput);
+			input = colorWrap;
 		} else if (p.type === 'number') {
 			input = createELM('input'); input.type = 'number'; input.value = value;
 			input.onmouseup = function () { this.select(); };
