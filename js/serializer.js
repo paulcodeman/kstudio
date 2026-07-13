@@ -12,6 +12,7 @@ function convert_dom_to_element(window_object, str) {
 
 function load_project_source(code) {
 	count_stack = 0;
+	current_win_index = 0;
 	GLOBAL_INIT_COUNT = 0;
 	GLOBAL_INIT_ELEMENT = [];
 
@@ -22,9 +23,21 @@ function load_project_source(code) {
 	addwinelm.onmousedown = tmp;
 	set_element_defunc(addwinelm);
 	window_stack[count_stack++] = win;
-	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = win.getAttribute('data-name');
+	window_data[0] = {
+		html: addwinelm.innerHTML,
+		name: win.getAttribute('data-name') || ('Window_1'),
+		caption: win.getAttribute('data-caption') || 'Окно',
+		width: win.style.width,
+		height: win.style.height,
+		bg: win.style.background,
+		hide_prop: win.getAttribute('data-hide-prop') || '',
+		align: null,
+		components: []
+	};
+	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = window_data[0].name;
 	select_element = null;
 	select_element_added(win);
+	update_component_tree();
 }
 
 function load_project(src) {

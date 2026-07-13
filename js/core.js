@@ -157,6 +157,7 @@ function select_element_added(o) {
 		select_element = o;
 	}
 	RrefreshPOS(o); TrefreshPOS(o); RTrefreshPOS(o);
+	update_component_tree();
 	return false;
 }
 
@@ -263,6 +264,7 @@ function past_gui_window(win, type, atr, name_type) {
 		win.appendChild(element);
 		select_element_added(element);
 	}
+	update_component_tree();
 }
 
 function change_value_element(name, o) {
@@ -274,10 +276,7 @@ function change_value_element(name, o) {
 		if (name == 'color') win.style.background = o.value;
 		else {
 			if (name == 'data-name') {
-				var i, a = getID('list_window_add');
-				for (i = 0; i < a.options.length; i++) {
-					if (a.options[i].innerText == win.getAttribute(name)) { a.options[i].innerText = o.value; }
-				}
+				if (window_data[current_win_index]) window_data[current_win_index].name = o.value;
 			}
 			win.setAttribute(name, o.value);
 		}
@@ -290,6 +289,7 @@ function change_value_element(name, o) {
 			select_element.src = o.value;
 		} else select_element.setAttribute(name, o.value);
 	}
+	update_component_tree();
 }
 
 function change_setka_option(e) {
@@ -326,7 +326,8 @@ function save_window_state() {
 		height: win.style.height,
 		bg: win.style.background,
 		hide_prop: win.getAttribute('data-hide-prop'),
-		align: win.getAttribute('data-align')
+		align: win.getAttribute('data-align'),
+		components: scan_window_components()
 	};
 }
 
@@ -365,7 +366,7 @@ function switch_window(index) {
 	select_element = null;
 	hide_atr_element(win);
 	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
-	update_window_list();
+	update_component_tree();
 }
 
 function add_new_window() {
@@ -380,41 +381,71 @@ function add_new_window() {
 		height: win.style.height,
 		bg: win.style.background,
 		hide_prop: win.getAttribute('data-hide-prop'),
-		align: win.getAttribute('data-align')
+		align: win.getAttribute('data-align'),
+		components: scan_window_components()
 	};
 	count_stack++;
 	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = 'Window_' + (index + 1);
 	switch_window(index);
 }
 
-function update_window_list() {
-	var list = getID('list_window_add');
-	if (!list) return;
-	list.innerHTML = '';
-	for (var i = 0; i < count_stack; i++) {
-		var opt = createELM('option');
-		opt.value = i;
-		opt.text = window_data[i] ? window_data[i].name : ('Window_' + (i + 1));
-		list.add(opt);
+function scan_window_components() {
+	var comps = [];
+	var list = addwinelm.children;
+	for (var i = 0; i < list.length; i++) {
+		var name = list[i].getAttribute('data-name');
+		if (name) comps.push(name);
 	}
-	var addOpt = createELM('option');
-	addOpt.value = -1;
-	addOpt.text = '+ Добавить окно';
-	list.add(addOpt);
-	list.selectedIndex = current_win_index;
+	return comps;
 }
 
-function init_window_dropdown() {
-	var list = getID('list_window_add');
-	if (!list) return;
-	list.onchange = function () {
-		var val = parseInt(this.value);
-		if (val == -1) {
-			add_new_window();
-		} else {
-			switch_window(val);
+function update_component_tree() {
+	var tree = getID('component_tree');
+	if (!tree) return;
+	tree.innerHTML = '';
+	for (var i = 0; i < count_stack; i++) {
+		var data = window_data[i];
+		var winName = data ? data.name : ('Window_' + (i + 1));
+		var isActiveWin = (i == current_win_index);
+
+		var winItem = createELM('div');
+		winItem.className = 'tree-win' + (isActiveWin ? ' tree-selected' : '');
+		winItem.textContent = winName;
+		winItem.onclick = function (idx) { return function () { switch_window(idx); }; }(i);
+		tree.appendChild(winItem);
+
+		var comps = data ? (data.components || []) : [];
+		if (isActiveWin) {
+			comps = scan_window_components();
+			if (data) data.components = comps;
 		}
-	};
+		var selCompName = (select_element && isActiveWin) ? select_element.getAttribute('data-name') : null;
+		for (var j = 0; j < comps.length; j++) {
+			var compItem = createELM('div');
+			compItem.className = 'tree-comp' + (comps[j] == selCompName ? ' tree-selected' : '');
+			compItem.textContent = '  \u2514 ' + comps[j];
+			compItem.onclick = (function (winIdx, compName) {
+				return function () {
+					if (winIdx != current_win_index) switch_window(winIdx);
+					var children = addwinelm.children;
+					for (var k = 0; k < children.length; k++) {
+						if (children[k].getAttribute('data-name') == compName) {
+							select_element_added(children[k]);
+							global_lock_event = true;
+							update_component_tree();
+							break;
+						}
+					}
+				};
+			})(i, comps[j]);
+			tree.appendChild(compItem);
+		}
+	}
+	var addBtn = createELM('div');
+	addBtn.className = 'tree-add';
+	addBtn.textContent = '+ Добавить окно';
+	addBtn.onclick = function () { add_new_window(); };
+	tree.appendChild(addBtn);
 }
 
 function create_size_rect_change() {
@@ -463,6 +494,8 @@ function delete_select_element() {
 		select_element.parentNode.removeChild(select_element);
 		select_element = null;
 		TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+		hide_atr_element(win);
+		update_component_tree();
 	}
 }
 
@@ -697,6 +730,7 @@ window.onload = function () {
 			select_element = null;
 			TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 			hide_atr_element(win);
+			update_component_tree();
 			var ey = event && event.pageY ? event.pageY : (event && event.clientY ? event.clientY : mouse.y);
 			var ex = event && event.pageX ? event.pageX : (event && event.clientX ? event.clientX : mouse.x);
 			sel_rect_y = select_element_rect.style.top = ey;
@@ -740,14 +774,14 @@ window.onload = function () {
 		height: win.style.height,
 		bg: win.style.background,
 		hide_prop: '',
-		align: null
+		align: null,
+		components: []
 	};
 	count_stack = 1;
 	current_win_index = 0;
 	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = 'Window_1';
 
-	init_window_dropdown();
-	update_window_list();
+	update_component_tree();
 	load_help_stat(data_help_status);
 };
 
