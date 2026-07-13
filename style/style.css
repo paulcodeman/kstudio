@@ -1,11 +1,7 @@
-﻿html, body
+﻿body
 {
-	height:100%;
 	margin:0px;
 	padding:0px;
-}
-body
-{
 	background:#F4F8FC;
 	font-family:Verdana;
 }

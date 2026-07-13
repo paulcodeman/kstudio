@@ -1,7 +1,4 @@
-﻿<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
+﻿<meta charset="UTF-8">
 <link rel="stylesheet" href="style/style.css">
 <link rel="stylesheet" href="style/gui.css">
 <script src="js/download.js"></script>
@@ -70,4 +67,3 @@
 
 	<div id="select_elements_rect"></div>
 </body>
-</html>
