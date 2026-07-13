@@ -18,14 +18,13 @@ body {
 	position: relative;
 }
 
-div.conteiner {
-	z-index: 9;
+.conteiner {
 	background: #fff;
 	border: 1px solid #e0e3e8;
+	border-radius: 8px;
 	padding: 0;
 	font-size: 13px;
 	z-index: 95;
-	border-radius: 8px;
 	overflow: hidden;
 }
 
@@ -66,7 +65,7 @@ div.conteiner {
 	clear: both;
 }
 
-div.statbar {
+.statbar {
 	width: 100%;
 	height: 24px;
 	background: #fafbfc;
@@ -93,7 +92,7 @@ input:focus {
 	box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
 }
 
-div.list_event {
+.list_event {
 	display: none;
 	width: 180px;
 	left: 0;
@@ -135,12 +134,12 @@ div.list_event {
 	background: #f0f2f7;
 }
 
-div#event_cont table {
+#event_cont table {
 	font-size: 13px;
 	width: 100%;
 	cursor: default;
 }
-div#event_cont table td.default {
+#event_cont table td.default {
 	border: 1px solid #e0e3e8;
 	border-radius: 6px;
 	width: 100%;
@@ -150,16 +149,16 @@ div#event_cont table td.default {
 	transition: all 0.12s;
 	cursor: pointer;
 }
-div#event_cont table td.default:hover {
+#event_cont table td.default:hover {
 	background: #f0f2f7;
 	border-color: #c5c9d4;
 }
-div#event_cont table td.select {
+#event_cont table td.select {
 	border: 1px solid #4f6ef7;
 	background: #eef1ff;
 	color: #1a1a2e;
 }
-div#event_cont {
+#event_cont {
 	overflow: auto;
 	width: 100%;
 	height: 280px;
@@ -168,7 +167,7 @@ div#event_cont {
 	background: #fff;
 }
 
-div.EditCode {
+.EditCode {
 	position: absolute;
 	left: 0;
 	top: 0;
@@ -189,7 +188,7 @@ div.EditCode {
 	background: #fff;
 }
 
-div.EditCode div.code_title {
+.EditCode .code_title {
 	font-size: 13px;
 	font-weight: 600;
 	padding: 10px 16px;
@@ -198,12 +197,12 @@ div.EditCode div.code_title {
 	border-bottom: 1px solid #e0e3e8;
 	flex: none;
 }
-div.table_button_edit_code {
+.table_button_edit_code {
 	width: 260px;
 	float: right;
 	padding: 12px 16px;
 }
-div.table_button_edit_code button {
+.table_button_edit_code button {
 	margin: 0 4px;
 	padding: 8px 20px;
 	border: 1px solid #d0d5de;
@@ -215,27 +214,27 @@ div.table_button_edit_code button {
 	font-weight: 500;
 	transition: all 0.15s;
 }
-div.table_button_edit_code button:hover {
+.table_button_edit_code button:hover {
 	background: #f0f2f7;
 	border-color: #c5c9d4;
 }
-div.table_button_edit_code button:first-child {
+.table_button_edit_code button:first-child {
 	background: #4f6ef7;
 	border-color: #4f6ef7;
 	color: #fff;
 }
-div.table_button_edit_code button:first-child:hover {
+.table_button_edit_code button:first-child:hover {
 	background: #3d5ce5;
 	border-color: #3d5ce5;
 }
 
-div.EditCode div.body_code_conteiner {
+.EditCode .body_code_conteiner {
 	flex: 1;
 	min-height: 0;
 	padding: 0;
 	background: #fff;
 }
-div.EditCode div.body_code_conteiner textarea {
+.EditCode .body_code_conteiner textarea {
 	width: 100%;
 	height: 100%;
 	outline: none;
@@ -266,7 +265,7 @@ select.list_window:focus {
 	box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
 }
 
-div#properies {
+#properies {
 	border: 1px solid #e0e3e8;
 	border-radius: 8px;
 	padding: 6px;
@@ -274,11 +273,11 @@ div#properies {
 	background: #fff;
 	overflow-y: auto;
 }
-div#properies table {
+#properies table {
 	width: 100%;
 }
 
-div#properies div.title {
+#properies .title {
 	width: auto;
 	height: auto;
 	border: none;
@@ -293,7 +292,7 @@ div#properies div.title {
 	color: #4f6ef7;
 }
 
-div#select_elements_rect {
+#select_elements_rect {
 	position: absolute;
 	border: 2px solid #4f6ef7;
 	background: rgba(79, 110, 247, 0.08);
@@ -304,13 +303,13 @@ div#select_elements_rect {
 	border-radius: 2px;
 }
 
-div#properies table td {
+#properies table td {
 	font-size: 13px;
 	padding: 3px 6px;
 	color: #1a1a2e;
 }
 
-div#properies div.element {
+#properies .element {
 	width: auto;
 	background: #fafbfc;
 	border: 1px solid #e0e3e8;
@@ -323,19 +322,19 @@ div#properies div.element {
 	align-items: center;
 	gap: 8px;
 }
-div#properies div.element:hover {
+#properies .element:hover {
 	border-color: #4f6ef7;
 	background: #f0f2f7;
 	transform: translateX(2px);
 }
-div#properies div.element img {
+#properies .element img {
 	width: 24px;
 	height: 24px;
 	display: block;
 	flex: none;
 }
 
-div#properies div.select {
+#properies .select {
 	width: auto;
 	background: #eef1ff;
 	border: 1px solid #4f6ef7;
@@ -343,12 +342,12 @@ div#properies div.select {
 	padding: 5px 10px;
 	margin: 2px 0;
 }
-div#properies div.select:hover {
+#properies .select:hover {
 	background: #eef1ff;
 	border-color: #4f6ef7;
 }
 
-div.button {
+.button {
 	width: 100%;
 	font-size: 13px;
 	font-weight: 500;
@@ -362,27 +361,27 @@ div.button {
 	transition: all 0.15s;
 	user-select: none;
 }
-div.button img {
+.button img {
 	vertical-align: middle;
 	margin-right: 6px;
 }
-div.button:hover {
+.button:hover {
 	background: #f0f2f7;
 	border-color: #4f6ef7;
 	color: #4f6ef7;
 }
-div.button:active {
+.button:active {
 	background: #eef1ff;
 	border-color: #4f6ef7;
 }
 
-div.button img#delete_event {
+.button img#delete_event {
 	margin: 4px;
 }
-div.button img#replace_event {
+.button img#replace_event {
 	margin: 2px;
 }
-div.button#edit_event {
+.button#edit_event {
 	font-size: 12px;
 	line-height: 28px;
 }
@@ -440,6 +439,7 @@ div.button#edit_event {
 .mid-right > .conteiner {
 	flex: 1;
 	min-height: 0;
+	border-radius: 8px;
 }
 #RightPanel { background: transparent; }
 .mid-center {
@@ -447,6 +447,7 @@ div.button#edit_event {
 	min-width: 0;
 	overflow: hidden;
 	display: flex;
+	padding: 6px;
 }
 .panel-splitter {
 	flex: 0 0 auto;
@@ -470,18 +471,18 @@ td.title_atr {
 	width: 1%;
 }
 
-div.attr {
+.attr {
 	background: #fff;
 	border: 1px solid #e0e3e8;
 	border-radius: 8px;
 	padding: 8px;
 }
 
-div.title {
+.title {
 	padding-left: 4px;
 }
 
-div.glob_title {
+.glob_title {
 	padding: 8px 4px 4px;
 	font-weight: 600;
 	color: #1a1a2e;
@@ -504,9 +505,6 @@ select.list:focus {
 	box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
 }
 
-
-
-
 input.check_atr {
 	width: 16px;
 	height: 16px;
@@ -526,24 +524,24 @@ select.list_atr {
 	padding: 0 6px;
 }
 
-div.attr table td {
+.attr table td {
 	background: transparent;
 	padding: 3px 4px;
 }
 
-div.attr table td.opt_spis {
+.attr table td.opt_spis {
 	background: transparent;
 	width: 14px;
 }
 
-div#open_block {
+#open_block {
 	background: url("../img/raskr.PNG");
 	padding: 4px;
 	margin-top: 4px;
 	opacity: 0.6;
 }
 
-div.attr table td.title_pod {
+.attr table td.title_pod {
 	background: #f0f2f7;
 	border-radius: 5px;
 	padding: 5px 10px;
@@ -554,7 +552,7 @@ div.attr table td.title_pod {
 	letter-spacing: 0.5px;
 }
 
-div.panel {
+.panel {
 	background: #fff;
 	padding: 6px 12px;
 	font-size: 14px;
@@ -609,25 +607,16 @@ table {
 	border-collapse: collapse;
 }
 
-
-
 td {
 	font-size: 13px;
 }
 
-div#main {
+#main {
 	overflow: auto;
 	flex: 1;
 }
-.mid-center {
-	padding: 6px;
-}
-.mid-right > .conteiner {
-	border-radius: 8px;
-}
 
-
-div.size {
+.size {
 	position: absolute;
 	width: 10px;
 	height: 10px;
@@ -639,7 +628,7 @@ div.size {
 	cursor: default;
 	transition: transform 0.12s, box-shadow 0.12s;
 }
-div.size:hover {
+.size:hover {
 	transform: scale(1.25);
 	box-shadow: 0 3px 8px rgba(79, 110, 247, 0.25);
 }
