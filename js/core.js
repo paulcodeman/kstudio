@@ -360,8 +360,9 @@ function switch_window(index) {
 	load_window_data(index);
 	select_element = null;
 	hide_atr_element(win);
-	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
-	load_attribute_list_event();
+	requestAnimationFrame(function () {
+		TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+	});
 	update_window_list();
 }
 
@@ -604,7 +605,9 @@ window.onload = function () {
 
 	create_size_rect_change();
 
-	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+	requestAnimationFrame(function () {
+		TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+	});
 
 	if (caption_element) caption_element.value = "Окно " + count_stack;
 
