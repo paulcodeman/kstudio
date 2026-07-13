@@ -229,12 +229,26 @@ function get_props_for_element(el) {
 	var def = get_component_def(el);
 	if (!def || !def.props) return COMPONENTS[0].props;
 	var resolved = [];
+	var currentGroup = null;
 	for (var i = 0; i < def.props.length; i++) {
 		var p = def.props[i];
 		if (typeof p === 'string') {
 			var found = get_prop_def(p);
-			if (found) resolved.push(found);
+			if (found) {
+				if (found.group && found.group !== currentGroup) {
+					currentGroup = found.group;
+					resolved.push({ section: currentGroup });
+				}
+				resolved.push(found);
+			}
 		} else {
+			if (p.group && p.group !== currentGroup) {
+				currentGroup = p.group;
+				resolved.push({ section: currentGroup });
+			} else if (!p.group && !p.section) {
+				var prev = resolved.length > 0 ? resolved[resolved.length - 1] : null;
+				if (prev && prev.group) currentGroup = prev.group;
+			}
 			resolved.push(p);
 		}
 	}
