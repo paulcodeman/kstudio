@@ -270,6 +270,18 @@ function past_gui_window(win, type, atr, name_type) {
 	update_component_tree();
 }
 
+function is_name_taken(newName, skipElement) {
+	for (var i = 0; i < count_stack; i++) {
+		var data = window_data[i];
+		if (data && data.name == newName && data != skipElement) return true;
+		var comps = (i == current_win_index) ? scan_window_components() : (data ? (data.components || []) : []);
+		for (var j = 0; j < comps.length; j++) {
+			if (comps[j] == newName) return true;
+		}
+	}
+	return false;
+}
+
 function change_value_element(name, o) {
 	if (o.value == '') {
 		o.value = win.getAttribute(name);
@@ -279,6 +291,7 @@ function change_value_element(name, o) {
 		if (name == 'color') win.style.background = o.value;
 		else {
 			if (name == 'data-name') {
+				if (is_name_taken(o.value, window_data[current_win_index])) { alert('Имя "' + o.value + '" уже используется'); o.value = win.getAttribute(name); return; }
 				if (window_data[current_win_index]) window_data[current_win_index].name = o.value;
 			}
 			win.setAttribute(name, o.value);
@@ -290,7 +303,10 @@ function change_value_element(name, o) {
 			else select_element.style.background = o.value;
 		} else if (name == 'image') {
 			select_element.src = o.value;
-		} else select_element.setAttribute(name, o.value);
+		} else {
+			if (name == 'data-name' && is_name_taken(o.value, select_element)) { alert('Имя "' + o.value + '" уже используется'); o.value = select_element.getAttribute(name); return; }
+			select_element.setAttribute(name, o.value);
+		}
 	}
 	update_component_tree();
 }
@@ -375,9 +391,9 @@ function switch_window(index) {
 function add_new_window(name) {
 	if (!name) name = prompt('Введите название окна:', 'Window_' + (count_stack + 1));
 	if (!name) return;
+	if (is_name_taken(name)) { alert('Имя "' + name + '" уже используется'); add_new_window(); return; }
 	var index = count_stack;
 	window_stack[index] = null;
-	window_data[index] = null;
 	window_data[current_win_index] = window_data[current_win_index] || {
 		html: addwinelm.innerHTML,
 		name: win.getAttribute('data-name'),
@@ -389,11 +405,10 @@ function add_new_window(name) {
 		align: win.getAttribute('data-align'),
 		components: scan_window_components()
 	};
+	window_data[index] = { name: name, caption: '', width: '300px', height: '230px', bg: '#f8f9fb', hide_prop: '', components: [] };
 	count_stack++;
 	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = name;
 	switch_window(index);
-	win.setAttribute('data-name', name);
-	if (window_data[index]) window_data[index].name = name;
 }
 
 function scan_window_components() {
