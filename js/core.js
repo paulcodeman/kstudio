@@ -195,7 +195,7 @@ function update_events_tab_visibility() {
 	const hasEvents = events && events.length > 0;
 	const label = document.querySelector('label[for="vkl2"]');
 	const radio = getID('vkl2');
-	const content = document.querySelector('.conteiner > div:nth-of-type(2)');
+	const content = document.querySelector('.container > div:nth-of-type(2)');
 	if (!label || !radio || !content) return;
 	label.style.display = hasEvents ? '' : 'none';
 	radio.style.display = hasEvents ? '' : 'none';
@@ -648,7 +648,7 @@ function toggle_palette_view() {
 }
 
 function render_palette() {
-	const container = getID('properies');
+	const container = getID('properties');
 	if (!container) return;
 	container.innerHTML = '';
 	for (let i = 0; i < COMPONENTS.length; i++) {
