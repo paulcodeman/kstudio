@@ -292,8 +292,7 @@ function change_setka_option(e) {
 	var data = e.value.split(' ');
 	if (data[1] == 'px') {
 		var px = parseInt(data[0]);
-		var dot = Math.max(0.75, px / 8);
-		addwinelm.style.backgroundImage = 'radial-gradient(circle, #c0c4d0 ' + dot + 'px, transparent ' + dot + 'px)';
+		addwinelm.style.backgroundImage = 'radial-gradient(circle, #c0c4d0 1px, transparent 1px)';
 		addwinelm.style.backgroundSize = px + 'px ' + px + 'px';
 		grid_distance = px;
 		return true;
