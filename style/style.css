@@ -24,6 +24,7 @@ div.conteiner {
 	font-size: 13px;
 	z-index: 95;
 	border-radius: 8px;
+	overflow: hidden;
 }
 
 .conteiner > div, .conteiner > input { display: none; }
