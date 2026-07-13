@@ -68,7 +68,7 @@ function compile_window_from_data(data) {
 	win.setAttribute('data-caption', data.caption || '');
 	win.style.width = data.width || '300px';
 	win.style.height = data.height || '230px';
-	win.style.background = data.bg || '#e6e9ef';
+	win.style.background = data.bg || '#f8f9fb';
 	addwinelm.style.width = parseInt(win.style.width) - 2;
 	addwinelm.style.height = parseInt(win.style.height) - 2;
 	set_element_defunc(addwinelm);

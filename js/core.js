@@ -339,7 +339,7 @@ function load_window_data(index) {
 		win.setAttribute('data-caption', data.caption || '');
 		win.style.width = data.width || '300px';
 		win.style.height = data.height || '230px';
-		win.style.background = data.bg || '#e6e9ef';
+		win.style.background = data.bg || '#f8f9fb';
 		win.setAttribute('data-hide-prop', data.hide_prop || '');
 		if (data.align) win.setAttribute('data-align', data.align);
 		else win.removeAttribute('data-align');
@@ -349,7 +349,7 @@ function load_window_data(index) {
 		win.setAttribute('data-caption', 'Окно');
 		win.style.width = '300px';
 		win.style.height = '230px';
-		win.style.background = '#e6e9ef';
+		win.style.background = '#f8f9fb';
 		win.setAttribute('data-hide-prop', '');
 		win.removeAttribute('data-align');
 	}
@@ -793,6 +793,7 @@ window.onload = function () {
 	win.setAttribute('data-name', 'Window_1');
 	win.setAttribute('data-caption', 'Окно');
 	win.setAttribute('data-hide-prop', '');
+	win.style.background = '#f8f9fb';
 	addwinelm.style.width = win.offsetWidth - 2;
 	addwinelm.style.height = win.offsetHeight - 2;
 
