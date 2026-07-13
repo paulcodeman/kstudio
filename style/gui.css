@@ -78,9 +78,6 @@ div.label_element_gui {
 	left: 0;
 	top: 0;
 	cursor: default;
-	border-radius: 8px;
-	padding: 6px;
-	border: 1px dotted #e0e3e8;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
