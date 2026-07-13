@@ -592,6 +592,11 @@ function init_panel_resizers() {
 		try {
 			localStorage.setItem('kstudio_panel_' + dragData.side, dragData.panel.style.width);
 		} catch (e) {}
+		if (select_element) {
+			TrefreshPOS(select_element); RrefreshPOS(select_element); RTrefreshPOS(select_element);
+		} else {
+			TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+		}
 		dragData = null;
 	}
 
