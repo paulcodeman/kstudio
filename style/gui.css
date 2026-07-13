@@ -78,11 +78,9 @@ div.label_element_gui {
 	left: 0;
 	top: 0;
 	cursor: default;
-	background: rgba(255, 255, 255, 0.95);
 	border-radius: 8px;
 	padding: 6px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-	border: 1px solid #e0e3e8;
+	border: 1px dotted #e0e3e8;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
