@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="style/style.css">
 <link rel="stylesheet" href="style/gui.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="js/components.js"></script>
 <script src="js/download.js"></script>
 <script src="js/serializer.js"></script>
 <script src="js/core.js"></script>
@@ -46,27 +47,7 @@
 		</div>
 	</div>
 	<div class="mid-layout" id="MidLayout">
-		<div class="mid-panel mid-left" id="LeftPanel"><div id="properies">
-			<div class="title">Главное</div>
-			<div data-name="Button" class="element" onclick="return select_element_menu(this);"><img src="img/TBitBtn.png"><span>Кнопка</span></div>
-			<div data-name="Label" class="element" onclick="return select_element_menu(this);"><img src="img/TLabel.png"><span>Текст</span></div>
-			<div data-name="Edit" class="element" onclick="return select_element_menu(this);"><img src="img/TEdit.png"><span>Однострочное поле</span></div>
-			<div data-name="Memo" class="element" onclick="return select_element_menu(this);"><img src="img/TMemo.png"><span>Многострочное поле</span></div>
-			<div data-name="Image" class="element" onclick="return select_element_menu(this);"><img src="img/TImage.png"><span>Изображение</span></div>
-			<div data-name="Shape" class="element" onclick="return select_element_menu(this);"><img src="img/TShape.png"><span>Фигура</span></div>
-			<div data-name="ProgressBar" class="element" onclick="return select_element_menu(this);"><img src="img/TProgressBar.png"><span>Прогресс</span></div>
-			<div class="title">Дополнительно</div>
-			<div data-name="ScrollBar" class="element" onclick="return select_element_menu(this);"><img src="img/TScrollBar.png"><span>Панель прокрутки</span></div>
-			<div data-name="TrackBar" class="element" onclick="return select_element_menu(this);"><img src="img/TTrackBar.png"><span>Ползунок</span></div>
-			<div class="title">Система</div>
-			<div data-name="Timer" class="element" onclick="return select_element_menu(this);"><img src="img/TFuncTimer.png"><span>Таймер</span></div>
-			<div data-name="DataVar" class="element" onclick="return select_element_menu(this);"><img src="img/TDataVar.png"><span>Данные</span></div>
-			<div data-name="Function" class="element" onclick="return select_element_menu(this);"><img src="img/TFunction.png"><span>Функция</span></div>
-			<div class="title">Диалоги</div>
-			<div data-name="SampleDialog" class="element" onclick="return select_element_menu(this);"><img src="img/TSampleDialog.png"><span>Простой диалог</span></div>
-			<div class="title">Интернет</div>
-			<div data-name="Download" class="element" onclick="return select_element_menu(this);"><img src="img/TDownload.png"><span>Загрузчик файлов</span></div>
-		</div></div>
+		<div class="mid-panel mid-left" id="LeftPanel"><div id="properies"></div></div>
 		<div class="panel-splitter" data-side="left"></div>
 		<div class="mid-panel mid-center" id="CenterPanel"><div id="main"><div id="window_background" onmousedown="return false;"><div id="window" oncontextmenu="return false;"></div></div></div></div>
 		<div class="panel-splitter" data-side="right"></div>

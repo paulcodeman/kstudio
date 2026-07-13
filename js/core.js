@@ -20,8 +20,7 @@ var list_element_select = null;
 var window_stack = [], count_stack = 0;
 var element_stack = [];
 var count_element_add = {};
-var list_element_system = ['Timer', 'DataVar', 'Function', 'Download', 'SampleDialog'];
-var class_gui_list_elements = ['button_element_gui', 'shape_element_gui', 'label_element_gui', 'image_element_gui'];
+// list_element_system and class_gui_list_elements are now in components.js
 var cmd_event_name = ['data-event-click', 'data-event-dblclick'];
 var GLOBAL_INIT_ELEMENT = [], GLOBAL_INIT_COUNT = 0;
 var cmd_sensor = false;
@@ -216,7 +215,10 @@ function hide_atr_element(o) {
 function past_gui_window(win, type, atr, name_type) {
 	if (list_element_system.indexOf(name_type) != -1) {
 		var element = createELM('TABLE');
-		var img_url = list_element_select.children[0].children[0].children[0].children[0].children[0].src;
+		var img_url = '';
+		for (var ci = 0; ci < COMPONENTS.length; ci++) {
+			if (COMPONENTS[ci].name == name_type) { img_url = COMPONENTS[ci].icon; break; }
+		}
 		element.className = 'simple_object_code';
 		element.style.left = Math.round(event.offsetX / grid_distance) * grid_distance;
 		element.style.top = Math.round(event.offsetY / grid_distance) * grid_distance;
@@ -454,6 +456,31 @@ function scan_window_components() {
 		if (name) comps.push(name);
 	}
 	return comps;
+}
+
+function render_palette() {
+	var container = getID('properies');
+	if (!container) return;
+	container.innerHTML = '';
+	for (var i = 0; i < COMPONENTS.length; i++) {
+		if (i == 0 || COMPONENTS[i].group != COMPONENTS[i-1].group) {
+			var title = createELM('div');
+			title.className = 'title';
+			title.innerText = COMPONENTS[i].group;
+			container.appendChild(title);
+		}
+		var el = createELM('div');
+		el.className = 'element';
+		el.setAttribute('data-name', COMPONENTS[i].name);
+		el.onclick = function () { select_element_menu(this); return false; };
+		var img = createELM('img');
+		img.src = COMPONENTS[i].icon;
+		el.appendChild(img);
+		var span = createELM('span');
+		span.innerText = COMPONENTS[i].caption;
+		el.appendChild(span);
+		container.appendChild(el);
+	}
 }
 
 function update_window_select() {
@@ -775,6 +802,7 @@ function init_panel_resizers() {
 
 window.onload = function () {
 	init_panel_resizers();
+	render_palette();
 	win = getID('window_background');
 	addwinelm = getID('window');
 	select_element_rect = getID('select_elements_rect');
@@ -809,12 +837,11 @@ window.onload = function () {
 	addwinelm.onmousedown = function (event) {
 		if (list_element_select != null) {
 			var type = list_element_select.getAttribute('data-name');
-			if (type == 'Button') { past_gui_window(this, 'button_element_gui', '', type); return true; }
-			if (type == 'Shape') { past_gui_window(this, 'shape_element_gui', '', type); return true; }
-			if (type == 'Label') { past_gui_window(this, 'label_element_gui', '', type); return true; }
-			if (type == 'Image') { past_gui_window(this, 'image_element_gui', '', type); return true; }
-			if (type == 'Timer' || type == 'Function' || type == 'DataVar' || type == 'SampleDialog' || type == 'Download') {
-				past_gui_window(this, 0, '', type); return true;
+			for (var ci = 0; ci < COMPONENTS.length; ci++) {
+				if (COMPONENTS[ci].name == type) {
+					past_gui_window(this, COMPONENTS[ci].typeClass || 0, '', type);
+					return true;
+				}
 			}
 		}
 		if (!global_lock_event) {
