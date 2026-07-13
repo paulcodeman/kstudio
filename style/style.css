@@ -467,10 +467,44 @@ div.attr table td.title_pod {
 
 div.panel {
 	background: #fff;
-	padding: 8px 12px;
+	padding: 6px 12px;
 	font-size: 14px;
 	width: 100%;
 	border-bottom: 1px solid #e0e3e8;
+}
+div.panel table { width: 100%; }
+div.panel td { vertical-align: middle; white-space: nowrap; }
+td.tool-group { white-space: nowrap; }
+td.tool-group > * { display: inline-block; vertical-align: middle; margin: 0 2px; }
+td.tool-group .button {
+	width: auto;
+	display: inline-block;
+	line-height: 28px;
+	padding: 0 12px;
+	font-size: 12px;
+}
+td.tool-group a.button {
+	text-decoration: none;
+	color: #1a1a2e;
+	line-height: 28px;
+	padding: 0 12px;
+	display: inline-block;
+	font-weight: 500;
+}
+td.tool-group a.button:hover {
+	color: #4f6ef7;
+}
+td.tool-sep {
+	width: 0;
+	padding: 0 6px;
+	border-left: 1px solid #e0e3e8;
+	background: transparent;
+}
+label.tool-label {
+	font-size: 12px;
+	color: #6b7280;
+	margin-right: 2px;
+	font-weight: 500;
 }
 
 table {

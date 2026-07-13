@@ -13,26 +13,28 @@
 	<div class="panel" id="TopPanel">
 		<table>
 			<tr>
-				<td><div class="button" onmousedown="compile(1);">Компилировать и запустить</div></td>
-				<td><div class="button" onmousedown="compile(2);">Компилировать и скачать</div></td>
-				<td><a href="" onmousedown="downloadfile(to_source_project(),this);" download="project.kcm">Скачать проект</a></td>
-				<td>
+				<td class="tool-group">
+					<div class="button" onmousedown="compile(1);" title="Скомпилировать и запустить">▶ Запустить</div>
+					<div class="button" onmousedown="compile(2);" title="Скомпилировать и скачать .exe">↓ Скачать</div>
+				</td>
+				<td class="tool-sep"></td>
+				<td class="tool-group">
+					<a href="" onmousedown="downloadfile(to_source_project(),this);" download="project.kcm" class="button" title="Сохранить проект .kcm">💾 Проект</a>
+				</td>
+				<td class="tool-sep"></td>
+				<td class="tool-group">
+					<label class="tool-label">Окно:</label>
 					<select class="list_window" id="list_window_add"></select>
 				</td>
-				<td>
-					Сетка:
+				<td class="tool-sep"></td>
+				<td class="tool-group">
+					<label class="tool-label">Сетка:</label>
 					<select class="list_window" onchange="change_setka_option(this);">
 						<option>Без сетки</option>
 						<option selected>5 px</option>
 						<option>10 px</option>
 						<option>15 px</option>
 					</select>
-				</td>
-				<td>
-					Показывать сетку:
-				</td>
-				<td>
-					<input onchange="alert(this.value);" class="chckbox" type="checkbox" checked>
 				</td>
 			</tr>
 		</table>
