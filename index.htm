@@ -8,7 +8,7 @@
 <script src="js/serializer.js"></script>
 <script src="js/core.js"></script>
 <script src="js/compiler.js"></script>
-<body onmousedown="element_list.style.display='none';" onmousemove="mouse.getX(event);mouse.getY(event);" onkeydown="window.ee = event;CmdKeyDown(event);">
+<body onmousedown="if(element_list)element_list.style.display='none';" onmousemove="mouse.getX(event);mouse.getY(event);" onkeydown="window.ee = event;CmdKeyDown(event);">
 	<div id="list_add_event" class="list_event"></div>
 	<div class="panel" id="TopPanel">
 		<div class="toolbar">

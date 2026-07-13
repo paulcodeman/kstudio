@@ -5,6 +5,8 @@ const WINDOW_PROPS = [
 	{key: 'color', label: 'Цвет фона', type: 'color', target: 'style'}
 ];
 
+const WINDOW_EVENTS = ['create', 'close', 'closequery', 'active', 'deactive', 'show', 'hide', 'resize', 'paint', 'execute', 'keydown', 'keypress', 'keyup', 'mouseenter', 'mouseleave'];
+
 const PROPS = [
 	{key: 'data-name', label: 'Имя', type: 'text', target: 'attr', group: 'Главное'},
 	{key: 'data-caption', label: 'Заголовок', type: 'text', target: 'attr', group: 'Главное'},

@@ -42,7 +42,8 @@ function get_component_def(el) {
 
 function get_component_events(el) {
 	const def = get_component_def(el);
-	return def && def.events ? def.events : ['click', 'dblclick'];
+	if (def) return def.events || WINDOW_EVENTS;
+	return WINDOW_EVENTS;
 }
 
 let GLOBAL_INIT_ELEMENT = [], GLOBAL_INIT_COUNT = 0;
@@ -187,6 +188,21 @@ function select_element_added(o) {
 	RrefreshPOS(o); TrefreshPOS(o); RTrefreshPOS(o);
 	update_component_tree();
 	return false;
+}
+
+function update_events_tab_visibility() {
+	const events = select_element ? get_component_events(select_element) : WINDOW_EVENTS;
+	const hasEvents = events && events.length > 0;
+	const label = document.querySelector('label[for="vkl2"]');
+	const radio = getID('vkl2');
+	const content = document.querySelector('.conteiner > div:nth-of-type(2)');
+	if (!label || !radio || !content) return;
+	label.style.display = hasEvents ? '' : 'none';
+	radio.style.display = hasEvents ? '' : 'none';
+	content.style.display = hasEvents ? '' : 'none';
+	if (!hasEvents && radio.checked) {
+		getID('vkl1').checked = true;
+	}
 }
 
 function func_define_select() {
@@ -345,6 +361,7 @@ function render_props(el) {
 		container.appendChild(label);
 		container.appendChild(val);
 	}
+	update_events_tab_visibility();
 }
 
 function apply_prop(input) {
