@@ -521,6 +521,12 @@ div#component_tree {
 	font-weight: 600;
 	border-bottom: 1px solid #eef0f4;
 }
+.tree-toggle {
+	display: inline-block;
+	width: 14px;
+	font-size: 10px;
+	color: #888;
+}
 .tree-win:hover {
 	background: #f0f2f7;
 }
@@ -541,16 +547,7 @@ div#component_tree {
 	background: #e8ecf8;
 	color: #4f6ef7;
 }
-.tree-add {
-	padding: 4px 8px;
-	cursor: pointer;
-	color: #4f6ef7;
-	font-weight: 600;
-	border-top: 1px solid #eef0f4;
-}
-.tree-add:hover {
-	background: #f0f2f7;
-}
+
 
 input.check_atr {
 	width: 16px;

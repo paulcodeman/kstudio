@@ -366,6 +366,7 @@ function switch_window(index) {
 	select_element = null;
 	hide_atr_element(win);
 	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+	tree_expanded[index] = true;
 	update_component_tree();
 }
 
@@ -399,6 +400,8 @@ function scan_window_components() {
 	return comps;
 }
 
+var tree_expanded = {};
+
 function update_component_tree() {
 	var tree = getID('component_tree');
 	if (!tree) return;
@@ -407,12 +410,18 @@ function update_component_tree() {
 		var data = window_data[i];
 		var winName = data ? data.name : ('Window_' + (i + 1));
 		var isActiveWin = (i == current_win_index);
+		var expanded = tree_expanded[i] !== false;
 
 		var winItem = createELM('div');
 		winItem.className = 'tree-win' + (isActiveWin ? ' tree-selected' : '');
-		winItem.textContent = winName;
-		winItem.onclick = function (idx) { return function () { switch_window(idx); }; }(i);
+		winItem.innerHTML = '<span class="tree-toggle">' + (expanded ? '\u25BC' : '\u25B6') + '</span>' + winName;
+		winItem.onclick = function (idx) { return function () {
+			tree_expanded[idx] = tree_expanded[idx] === false ? true : false;
+			update_component_tree();
+		}; }(i);
 		tree.appendChild(winItem);
+
+		if (!expanded) continue;
 
 		var comps = data ? (data.components || []) : [];
 		if (isActiveWin) {
@@ -423,9 +432,10 @@ function update_component_tree() {
 		for (var j = 0; j < comps.length; j++) {
 			var compItem = createELM('div');
 			compItem.className = 'tree-comp' + (comps[j] == selCompName ? ' tree-selected' : '');
-			compItem.textContent = '  \u2514 ' + comps[j];
+			compItem.innerHTML = '\u2514 ' + comps[j];
 			compItem.onclick = (function (winIdx, compName) {
-				return function () {
+				return function (e) {
+					e.stopPropagation();
 					if (winIdx != current_win_index) switch_window(winIdx);
 					var children = addwinelm.children;
 					for (var k = 0; k < children.length; k++) {
@@ -441,11 +451,6 @@ function update_component_tree() {
 			tree.appendChild(compItem);
 		}
 	}
-	var addBtn = createELM('div');
-	addBtn.className = 'tree-add';
-	addBtn.textContent = '+ Добавить окно';
-	addBtn.onclick = function () { add_new_window(); };
-	tree.appendChild(addBtn);
 }
 
 function create_size_rect_change() {
@@ -781,6 +786,7 @@ window.onload = function () {
 	current_win_index = 0;
 	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = 'Window_1';
 
+	tree_expanded[0] = true;
 	update_component_tree();
 	load_help_stat(data_help_status);
 };
