@@ -79,3 +79,67 @@ function source_convert_elements(w_obj) {
 function to_source_project() {
 	return win.outerHTML;
 }
+
+function get_project_json() {
+	save_window_state();
+	var data = {
+		version: 1,
+		windows: [],
+		initElements: GLOBAL_INIT_ELEMENT
+	};
+	for (var i = 0; i < count_stack; i++) {
+		var wd = window_data[i];
+		if (wd) data.windows.push(wd);
+	}
+	return JSON.stringify(data, null, '\t');
+}
+
+function export_project() {
+	save_window_state();
+	var json = get_project_json();
+	var blob = new Blob([json], { type: 'application/json' });
+	var url = URL.createObjectURL(blob);
+	var a = document.createElement('a');
+	a.href = url;
+	a.download = 'project.kcm';
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+}
+
+function import_project(input) {
+	var file = input.files[0];
+	if (!file) return;
+	var reader = new FileReader();
+	reader.onload = function (e) {
+		try {
+			var data = JSON.parse(e.target.result);
+		} catch (err) {
+			alert('Ошибка: неверный формат файла');
+			return;
+		}
+		if (!data.windows || !data.windows.length) {
+			alert('Ошибка: файл не содержит данных проекта');
+			return;
+		}
+		count_stack = 0;
+		current_win_index = 0;
+		GLOBAL_INIT_ELEMENT = data.initElements || [];
+		GLOBAL_INIT_COUNT = GLOBAL_INIT_ELEMENT.length;
+		window_data = [];
+		window_stack = [];
+		for (var i = 0; i < data.windows.length; i++) {
+			window_data[i] = data.windows[i];
+			window_stack[i] = null;
+			count_stack++;
+		}
+		current_win_index = -1;
+		switch_window(0);
+		select_element = null;
+		hide_atr_element(win);
+		update_component_tree();
+	};
+	reader.readAsText(file);
+	input.value = '';
+}

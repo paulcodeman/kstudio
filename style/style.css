@@ -588,6 +588,11 @@ select.list_atr {
 .tool-group a.button:hover {
 	color: #4f6ef7;
 }
+.tool-group .button i,
+.tool-group a.button i {
+	margin-right: 4px;
+	font-size: 12px;
+}
 .tool-sep {
 	width: 0;
 	height: 20px;

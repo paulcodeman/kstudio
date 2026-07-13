@@ -2,6 +2,7 @@
 <meta charset="UTF-8">
 <link rel="stylesheet" href="style/style.css">
 <link rel="stylesheet" href="style/gui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="js/download.js"></script>
 <script src="js/serializer.js"></script>
 <script src="js/core.js"></script>
@@ -14,12 +15,18 @@
 	<div class="panel" id="TopPanel">
 		<div class="toolbar">
 			<div class="tool-group">
-				<div class="button" onmousedown="compile(1);" title="Скомпилировать и запустить">▶ Запустить</div>
-				<div class="button" onmousedown="compile(2);" title="Скомпилировать и скачать .exe">↓ Скачать</div>
+				<div class="button" onmousedown="compile(1);" title="Скомпилировать и запустить"><i class="fa-solid fa-play"></i> Запустить</div>
+				<div class="button" onmousedown="compile(2);" title="Скомпилировать и скачать .exe"><i class="fa-solid fa-download"></i> Скачать</div>
 			</div>
 			<div class="tool-sep"></div>
 			<div class="tool-group">
-				<a href="" onmousedown="downloadfile(to_source_project(),this);" download="project.kcm" title="Сохранить проект .kcm">💾 Проект</a>
+				<a href="" onmousedown="downloadfile(to_source_project(),this);" download="project.kcm" title="Сохранить проект .kcm"><i class="fa-regular fa-floppy-disk"></i> Проект</a>
+			</div>
+			<div class="tool-sep"></div>
+			<div class="tool-group">
+				<div class="button" onmousedown="export_project();" title="Экспорт проекта"><i class="fa-solid fa-file-export"></i> Экспорт</div>
+				<div class="button" onmousedown="document.getElementById('import_input').click();" title="Импорт проекта"><i class="fa-solid fa-file-import"></i> Импорт</div>
+				<input type="file" id="import_input" accept=".kcm" style="display:none" onchange="import_project(this);">
 			</div>
 			<div class="tool-sep"></div>
 			<div class="tool-group">
