@@ -337,10 +337,10 @@ function render_props(el) {
 		} else if (p.type === 'color') {
 			const toHex = function (v) {
 				const m = v && v.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
-				if (m) return '#' + ((1 << 24) + (parseInt(m[1]) << 16) + (parseInt(m[2]) << 8) + parseInt(m[3])).toString(16).slice(1);
-				if (v && /^#[0-9a-f]{6}$/i.test(v)) return v.toLowerCase();
-				if (v && /^#[0-9a-f]{3}$/i.test(v)) return '#' + v[1] + v[1] + v[2] + v[2] + v[3] + v[3];
-				return '#ffffff';
+				if (m) return '#' + ((1 << 24) + (parseInt(m[1]) << 16) + (parseInt(m[2]) << 8) + parseInt(m[3])).toString(16).slice(1).toUpperCase();
+				if (v && /^#[0-9a-f]{6}$/i.test(v)) return v.slice(0, 7).toUpperCase();
+				if (v && /^#[0-9a-f]{3}$/i.test(v)) return ('#' + v[1] + v[1] + v[2] + v[2] + v[3] + v[3]).toUpperCase();
+				return '#FFFFFF';
 			};
 			const hexVal = toHex(value);
 
@@ -354,6 +354,7 @@ function render_props(el) {
 			textInput.value = hexVal;
 			textInput.style.flex = '1';
 			textInput.style.minWidth = '0';
+			textInput.style.textTransform = 'uppercase';
 
 			const colorInput = createELM('input');
 			colorInput.type = 'color';
@@ -367,13 +368,24 @@ function render_props(el) {
 			colorInput.style.cursor = 'pointer';
 			colorInput.style.background = 'none';
 
+			let lastValid = hexVal;
 			textInput.oninput = function () {
-				const h = toHex(this.value);
+				const raw = this.value;
+				const upper = raw.toUpperCase();
+				if (upper !== raw) this.value = upper;
+				const h = toHex(upper);
 				colorInput.value = h;
-				if (h !== '#ffffff' || this.value === '#ffffff') apply_prop(this);
+				if (h === '#FFFFFF' && upper !== '#FFFFFF') {
+					this.value = lastValid;
+				} else {
+					lastValid = h;
+					apply_prop(this);
+				}
 			};
 			colorInput.oninput = function () {
-				textInput.value = this.value;
+				const h = this.value.toUpperCase();
+				textInput.value = h;
+				lastValid = h;
 				apply_prop(this);
 			};
 			textInput.setAttribute('data-prop-key', p.key);
