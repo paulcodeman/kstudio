@@ -25,16 +25,11 @@ function load_project_source(code) {
 	window_stack[count_stack++] = win;
 	window_data[0] = {
 		html: addwinelm.innerHTML,
-		name: win.getAttribute('data-name') || ('Window_1'),
-		caption: win.getAttribute('data-caption') || 'Окно',
-		width: win.style.width,
-		height: win.style.height,
-		bg: win.style.background,
-		hide_prop: win.getAttribute('data-hide-prop') || '',
-		align: null,
+		attrs: { 'data-name': win.getAttribute('data-name') || 'Window_1', 'data-caption': win.getAttribute('data-caption') || 'Окно', 'data-hide-prop': win.getAttribute('data-hide-prop') || '', 'data-align': '' },
+		style: { width: win.style.width, height: win.style.height, background: win.style.background },
 		components: []
 	};
-	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = window_data[0].name;
+	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = window_data[0].attrs['data-name'];
 	select_element = null;
 	select_element_added(win);
 	update_component_tree();
@@ -131,6 +126,28 @@ function import_project(input) {
 		window_stack = [];
 		for (var i = 0; i < data.windows.length; i++) {
 			window_data[i] = data.windows[i];
+			if (typeof window_data[i] == 'object' && !window_data[i].attrs) {
+				// Backward compat with old JSON format
+				window_data[i].html = window_data[i].html || '';
+				window_data[i].attrs = {
+					'data-name': window_data[i].name || ('Window_' + (i + 1)),
+					'data-caption': window_data[i].caption || '',
+					'data-hide-prop': window_data[i].hide_prop || '',
+					'data-align': window_data[i].align || ''
+				};
+				window_data[i].style = {
+					width: window_data[i].width || '300px',
+					height: window_data[i].height || '230px',
+					background: window_data[i].bg || '#f8f9fb'
+				};
+				delete window_data[i].name;
+				delete window_data[i].caption;
+				delete window_data[i].width;
+				delete window_data[i].height;
+				delete window_data[i].bg;
+				delete window_data[i].hide_prop;
+				delete window_data[i].align;
+			}
 			window_stack[i] = null;
 			count_stack++;
 		}

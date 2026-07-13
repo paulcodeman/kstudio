@@ -64,11 +64,22 @@ function convert_elements(w_obj) {
 
 function compile_window_from_data(data) {
 	addwinelm.innerHTML = data.html || '';
-	win.setAttribute('data-name', data.name);
-	win.setAttribute('data-caption', data.caption || '');
-	win.style.width = data.width || '300px';
-	win.style.height = data.height || '230px';
-	win.style.background = data.bg || '#f8f9fb';
+	if (data.attrs) {
+		for (var key in data.attrs) {
+			if (data.attrs[key]) win.setAttribute(key, data.attrs[key]);
+			else win.removeAttribute(key);
+		}
+	} else {
+		win.setAttribute('data-name', data.name || 'Window');
+		win.setAttribute('data-caption', data.caption || '');
+		win.setAttribute('data-hide-prop', data.hide_prop || '');
+		if (data.align) win.setAttribute('data-align', data.align);
+		else win.removeAttribute('data-align');
+	}
+	var s = data.style || {};
+	win.style.width = (s.width || data.width || '300px');
+	win.style.height = (s.height || data.height || '230px');
+	win.style.background = (s.background || data.bg || '#f8f9fb');
 	addwinelm.style.width = parseInt(win.style.width) - 2;
 	addwinelm.style.height = parseInt(win.style.height) - 2;
 	set_element_defunc(addwinelm);
@@ -96,15 +107,18 @@ function compile(cmd) {
 		if (!data) continue;
 
 		compile_window_from_data(data);
-		var name = data.name;
-		var tmp;
+		var name = data.attrs ? (data.attrs['data-name'] || 'Window') : (data.name || 'Window');
+		var s = data.style || {};
+		var w = parseInt(s.width || data.width || '300') - 2;
+		var h = parseInt(s.height || data.height || '230') - 2;
+		var cap = data.attrs ? (data.attrs['data-caption'] || '') : (data.caption || '');
+		var tmp = data.attrs ? (data.attrs['data-align'] || '') : (data.align || '');
 
 		main_code += name + '.prepare();';
-		main_code += name + '.width(' + (parseInt(data.width) - 2) + ');';
-		main_code += name + '.height(' + (parseInt(data.height) - 2) + ');';
-		main_code += name + '.caption("' + (data.caption || '') + '");';
+		main_code += name + '.width(' + w + ');';
+		main_code += name + '.height(' + h + ');';
+		main_code += name + '.caption("' + cap + '");';
 		main_code += name + '.color(0x' + eval(window.getComputedStyle(win).backgroundColor) + ');';
-		tmp = data.align;
 		if (tmp == '1') main_code += name + '.StartPosition(' + tmp + ');';
 		main_code += convert_elements(win);
 		main_code += name + '.create();';

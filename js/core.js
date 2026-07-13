@@ -270,10 +270,15 @@ function past_gui_window(win, type, atr, name_type) {
 	update_component_tree();
 }
 
+function win_name(data) {
+	if (!data) return '';
+	return (data.attrs && data.attrs['data-name']) || data.name || '';
+}
+
 function is_name_taken(newName, skipElement) {
 	for (var i = 0; i < count_stack; i++) {
 		var data = window_data[i];
-		if (data && data.name == newName && data != skipElement) return true;
+		if (data && win_name(data) == newName && data != skipElement) return true;
 		var comps = (i == current_win_index) ? scan_window_components() : (data ? (data.components || []) : []);
 		for (var j = 0; j < comps.length; j++) {
 			if (comps[j] == newName) return true;
@@ -292,7 +297,10 @@ function change_value_element(name, o) {
 		else {
 			if (name == 'data-name') {
 				if (is_name_taken(o.value, window_data[current_win_index])) { alert('Имя "' + o.value + '" уже используется'); o.value = win.getAttribute(name); return; }
-				if (window_data[current_win_index]) window_data[current_win_index].name = o.value;
+				if (window_data[current_win_index]) {
+					window_data[current_win_index] = upgrade_window_data(window_data[current_win_index]);
+					window_data[current_win_index].attrs['data-name'] = o.value;
+				}
 			}
 			win.setAttribute(name, o.value);
 		}
@@ -337,31 +345,55 @@ var current_win_index = 0;
 
 function save_window_state() {
 	if (current_win_index < 0) return;
+	var attrs = {};
+	for (var i = 0; i < win.attributes.length; i++) {
+		var a = win.attributes[i];
+		if (a.name.indexOf('data-') === 0) attrs[a.name] = a.value;
+	}
 	window_data[current_win_index] = {
 		html: addwinelm.innerHTML,
-		name: win.getAttribute('data-name'),
-		caption: win.getAttribute('data-caption'),
-		width: win.style.width,
-		height: win.style.height,
-		bg: win.style.background,
-		hide_prop: win.getAttribute('data-hide-prop'),
-		align: win.getAttribute('data-align'),
+		attrs: attrs,
+		style: {
+			width: win.style.width,
+			height: win.style.height,
+			background: win.style.background
+		},
 		components: scan_window_components()
+	};
+}
+
+function upgrade_window_data(data) {
+	if (data.attrs) return data;
+	return {
+		html: data.html || '',
+		attrs: {
+			'data-name': data.name || 'Window',
+			'data-caption': data.caption || '',
+			'data-hide-prop': data.hide_prop || '',
+			'data-align': data.align || ''
+		},
+		style: {
+			width: data.width || '300px',
+			height: data.height || '230px',
+			background: data.bg || '#f8f9fb'
+		},
+		components: data.components || []
 	};
 }
 
 function load_window_data(index) {
 	var data = window_data[index];
 	if (data) {
+		data = window_data[index] = upgrade_window_data(data);
 		addwinelm.innerHTML = data.html || '';
-		win.setAttribute('data-name', data.name);
-		win.setAttribute('data-caption', data.caption || '');
-		win.style.width = data.width || '300px';
-		win.style.height = data.height || '230px';
-		win.style.background = data.bg || '#f8f9fb';
-		win.setAttribute('data-hide-prop', data.hide_prop || '');
-		if (data.align) win.setAttribute('data-align', data.align);
-		else win.removeAttribute('data-align');
+		for (var key in data.attrs) {
+			if (data.attrs[key]) win.setAttribute(key, data.attrs[key]);
+			else win.removeAttribute(key);
+		}
+		var s = data.style || {};
+		win.style.width = s.width || '300px';
+		win.style.height = s.height || '230px';
+		win.style.background = s.background || '#f8f9fb';
 	} else {
 		addwinelm.innerHTML = '';
 		win.setAttribute('data-name', 'Window_' + (index + 1));
@@ -369,8 +401,6 @@ function load_window_data(index) {
 		win.style.width = '300px';
 		win.style.height = '230px';
 		win.style.background = '#f8f9fb';
-		win.setAttribute('data-hide-prop', '');
-		win.removeAttribute('data-align');
 	}
 	addwinelm.style.width = parseInt(win.style.width) - 2;
 	addwinelm.style.height = parseInt(win.style.height) - 2;
@@ -394,7 +424,7 @@ function add_new_window(name) {
 	if (is_name_taken(name)) { alert('Имя "' + name + '" уже используется'); add_new_window(); return; }
 	var index = count_stack;
 	window_stack[index] = null;
-	window_data[current_win_index] = window_data[current_win_index] || {
+	window_data[current_win_index] = window_data[current_win_index] || upgrade_window_data({
 		html: addwinelm.innerHTML,
 		name: win.getAttribute('data-name'),
 		caption: win.getAttribute('data-caption'),
@@ -404,8 +434,13 @@ function add_new_window(name) {
 		hide_prop: win.getAttribute('data-hide-prop'),
 		align: win.getAttribute('data-align'),
 		components: scan_window_components()
+	});
+	window_data[index] = {
+		html: '',
+		attrs: { 'data-name': name, 'data-caption': '', 'data-hide-prop': '', 'data-align': '' },
+		style: { width: '300px', height: '230px', background: '#f8f9fb' },
+		components: []
 	};
-	window_data[index] = { name: name, caption: '', width: '300px', height: '230px', bg: '#f8f9fb', hide_prop: '', components: [] };
 	count_stack++;
 	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = name;
 	switch_window(index);
@@ -429,7 +464,7 @@ function update_window_select() {
 		var data = window_data[i];
 		var opt = createELM('option');
 		opt.value = i;
-		opt.text = data ? data.name : ('Window_' + (i + 1));
+		opt.text = data ? (win_name(data) || ('Window_' + (i + 1))) : ('Window_' + (i + 1));
 		sel.add(opt);
 	}
 	sel.value = '' + current_win_index;
@@ -457,7 +492,7 @@ function update_component_tree() {
 	var selectedValue = null;
 	for (var i = 0; i < count_stack; i++) {
 		var data = window_data[i];
-		var winName = data ? data.name : ('Window_' + (i + 1));
+		var winName = data ? (win_name(data) || ('Window_' + (i + 1))) : ('Window_' + (i + 1));
 		var comps = data ? (data.components || []) : [];
 		if (i == current_win_index) {
 			comps = scan_window_components();
@@ -825,13 +860,8 @@ window.onload = function () {
 	window_stack[0] = win;
 	window_data[0] = {
 		html: addwinelm.innerHTML,
-		name: 'Window_1',
-		caption: 'Окно',
-		width: win.style.width,
-		height: win.style.height,
-		bg: win.style.background,
-		hide_prop: '',
-		align: null,
+		attrs: { 'data-name': 'Window_1', 'data-caption': 'Окно', 'data-hide-prop': '', 'data-align': '' },
+		style: { width: win.style.width, height: win.style.height, background: win.style.background },
 		components: []
 	};
 	count_stack = 1;
