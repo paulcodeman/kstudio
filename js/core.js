@@ -399,7 +399,26 @@ function scan_window_components() {
 	return comps;
 }
 
+function update_window_select() {
+	var sel = getID('list_window_add');
+	if (!sel) return;
+	sel.innerHTML = '';
+	for (var i = 0; i < count_stack; i++) {
+		var data = window_data[i];
+		var opt = createELM('option');
+		opt.value = i;
+		opt.text = data ? data.name : ('Window_' + (i + 1));
+		sel.add(opt);
+	}
+	sel.value = '' + current_win_index;
+	sel.onchange = function () {
+		var idx = parseInt(this.value);
+		if (idx != current_win_index) switch_window(idx);
+	};
+}
+
 function update_component_tree() {
+	update_window_select();
 	var sel = getID('component_tree');
 	if (!sel) return;
 	sel.innerHTML = '';
