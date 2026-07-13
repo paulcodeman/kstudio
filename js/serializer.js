@@ -3,9 +3,9 @@ function convert_dom_to_count(o) {
 }
 
 function convert_dom_to_element(window_object, str) {
-	var data = JSON.parse(str);
+	const data = JSON.parse(str);
 	window_object.innerHTML += data[0];
-	var r = window_object.lastChild;
+	const r = window_object.lastChild;
 	r.style.cssText = data[1];
 	return r;
 }
@@ -18,7 +18,7 @@ function load_project_source(code) {
 
 	document.getElementById('main').innerHTML = code;
 	win = document.getElementById('window_background');
-	var tmp = addwinelm.onmousedown;
+	const tmp = addwinelm.onmousedown;
 	addwinelm = document.getElementById('window');
 	addwinelm.onmousedown = tmp;
 	set_element_defunc(addwinelm);
@@ -36,20 +36,18 @@ function load_project_source(code) {
 }
 
 function load_project(src) {
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", src, true);
+	const xhr = new XMLHttpRequest();
+	xhr.open('POST', src, true);
 	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	xhr.send('');
-	xhr.onreadystatechange = function () {
-		if (xhr.readyState == 4) {
-			return load_project_source(xhr.responseText);
-		}
+	xhr.onreadystatechange = () => {
+		if (xhr.readyState === 4) load_project_source(xhr.responseText);
 	};
 }
 
 function set_element_defunc(window_object) {
-	var list = window_object.children;
-	for (var key in list) {
+	const list = window_object.children;
+	for (const key in list) {
 		if (list[key].onmousedown === undefined) {
 			list[key].onmousedown = function () { select_element_added(this); global_lock_event = true; };
 		}
@@ -57,14 +55,14 @@ function set_element_defunc(window_object) {
 }
 
 function source_convert_elements(w_obj) {
-	var w = w_obj.children[0];
-	var list = w.children;
-	var count = list.length;
-	var code = [];
-	var code_count = 0;
+	const w = w_obj.children[0];
+	const list = w.children;
+	let count = list.length;
+	const code = [];
+	let code_count = 0;
 	while (count) {
-		var obj = list[--count];
-		if (class_gui_list_elements.indexOf(obj.className) != -1) {
+		const obj = list[--count];
+		if (class_gui_list_elements.indexOf(obj.className) !== -1) {
 			code[code_count++] = convert_dom_to_count(obj);
 		}
 	}
@@ -77,13 +75,13 @@ function to_source_project() {
 
 function get_project_json() {
 	save_window_state();
-	var data = {
+	const data = {
 		version: 1,
 		windows: [],
 		initElements: GLOBAL_INIT_ELEMENT
 	};
-	for (var i = 0; i < count_stack; i++) {
-		var wd = window_data[i];
+	for (let i = 0; i < count_stack; i++) {
+		const wd = window_data[i];
 		if (wd) data.windows.push(wd);
 	}
 	return JSON.stringify(data, null, '\t');
@@ -91,10 +89,10 @@ function get_project_json() {
 
 function export_project() {
 	save_window_state();
-	var json = get_project_json();
-	var blob = new Blob([json], { type: 'application/json' });
-	var url = URL.createObjectURL(blob);
-	var a = document.createElement('a');
+	const json = get_project_json();
+	const blob = new Blob([json], { type: 'application/json' });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
 	a.href = url;
 	a.download = 'project.kcm';
 	document.body.appendChild(a);
@@ -104,12 +102,13 @@ function export_project() {
 }
 
 function import_project(input) {
-	var file = input.files[0];
+	const file = input.files[0];
 	if (!file) return;
-	var reader = new FileReader();
+	const reader = new FileReader();
 	reader.onload = function (e) {
+		let data;
 		try {
-			var data = JSON.parse(e.target.result);
+			data = JSON.parse(e.target.result);
 		} catch (err) {
 			alert('Ошибка: неверный формат файла');
 			return;
@@ -124,9 +123,9 @@ function import_project(input) {
 		GLOBAL_INIT_COUNT = GLOBAL_INIT_ELEMENT.length;
 		window_data = [];
 		window_stack = [];
-		for (var i = 0; i < data.windows.length; i++) {
+		for (let i = 0; i < data.windows.length; i++) {
 			window_data[i] = data.windows[i];
-			if (typeof window_data[i] == 'object' && !window_data[i].attrs) {
+			if (typeof window_data[i] === 'object' && !window_data[i].attrs) {
 				// Backward compat with old JSON format
 				window_data[i].html = window_data[i].html || '';
 				window_data[i].attrs = {
