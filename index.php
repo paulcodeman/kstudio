@@ -37,14 +37,12 @@
 			</div>
 		</div>
 	</div>
-	<div>
-		<table cellspacing=0 cellpadding=0 class="global">
-			<tr>
-				<td id="LeftPanel"><?php include 'element.php'; ?></td>
-				<td><?php include 'main.php'; ?></td>
-				<td><?php include 'attr.php'; ?></td>
-			</tr>
-		</table>
+	<div class="mid-layout" id="MidLayout">
+		<div class="mid-panel mid-left" id="LeftPanel"><?php include 'element.php'; ?></div>
+		<div class="panel-splitter" data-side="left"></div>
+		<div class="mid-panel mid-center" id="CenterPanel"><?php include 'main.php'; ?></div>
+		<div class="panel-splitter" data-side="right"></div>
+		<div class="mid-panel mid-right" id="RightPanel"><?php include 'attr.php'; ?></div>
 	</div>
 	<div class="statbar" id="text_status_bar"></div>
 

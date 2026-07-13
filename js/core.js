@@ -577,7 +577,72 @@ function CmdKeyDown(event) {
 	}
 }
 
+function init_panel_resizers() {
+	var splitters = document.querySelectorAll('.panel-splitter');
+	var dragData = null;
+
+	function onMouseMove(e) {
+		if (!dragData) return;
+		var dx = e.clientX - dragData.startX;
+		var panel = dragData.panel;
+		var w = dragData.startWidth + dx;
+		w = Math.max(dragData.minWidth, Math.min(w, dragData.maxWidth));
+		panel.style.width = w + 'px';
+	}
+
+	function onMouseUp() {
+		if (!dragData) return;
+		document.removeEventListener('mousemove', onMouseMove);
+		document.removeEventListener('mouseup', onMouseUp);
+		dragData.splitter.classList.remove('active');
+		document.body.style.cursor = '';
+		document.body.style.userSelect = '';
+		try {
+			localStorage.setItem('kstudio_panel_' + dragData.side, dragData.panel.style.width);
+		} catch (e) {}
+		dragData = null;
+	}
+
+	splitters.forEach(function (splitter) {
+		splitter.addEventListener('mousedown', function (e) {
+			var side = splitter.getAttribute('data-side');
+			var panel = side === 'left'
+				? splitter.previousElementSibling
+				: splitter.nextElementSibling;
+			if (!panel || !panel.classList.contains('mid-panel')) return;
+			e.preventDefault();
+			var rect = panel.getBoundingClientRect();
+			dragData = {
+				startX: e.clientX,
+				startWidth: rect.width,
+				minWidth: 120,
+				maxWidth: 500,
+				panel: panel,
+				splitter: splitter,
+				side: side
+			};
+			splitter.classList.add('active');
+			document.body.style.cursor = 'col-resize';
+			document.body.style.userSelect = 'none';
+			document.addEventListener('mousemove', onMouseMove);
+			document.addEventListener('mouseup', onMouseUp);
+		});
+	});
+
+	var leftW = localStorage.getItem('kstudio_panel_left');
+	var rightW = localStorage.getItem('kstudio_panel_right');
+	if (leftW) {
+		var lp = document.querySelector('.mid-left');
+		if (lp) lp.style.width = leftW;
+	}
+	if (rightW) {
+		var rp = document.querySelector('.mid-right');
+		if (rp) rp.style.width = rightW;
+	}
+}
+
 window.onload = function () {
+	init_panel_resizers();
 	win = getID('window_background');
 	addwinelm = getID('window');
 	select_element_rect = getID('select_elements_rect');
