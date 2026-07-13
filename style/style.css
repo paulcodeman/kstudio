@@ -363,6 +363,8 @@ select.list_window:focus {
 	transform: translateX(2px);
 }
 #properies .element img {
+	width: 24px;
+	height: 24px;
 	display: block;
 	flex: none;
 }
