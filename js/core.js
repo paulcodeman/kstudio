@@ -460,13 +460,8 @@ function update_component_tree() {
 			grp.appendChild(opt);
 		}
 	}
-	var addOpt = createELM('option');
-	addOpt.value = 'add';
-	addOpt.text = '+ Добавить окно';
-	sel.add(addOpt);
 	if (selectedValue) sel.value = selectedValue;
 	sel.onchange = function () {
-		if (this.value == 'add') { add_new_window(); return; }
 		var val = this.value.split('|');
 		var winIdx = parseInt(val[0]);
 		var compName = val[1];
