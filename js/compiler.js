@@ -11,7 +11,6 @@ function convert_elements(w_obj) {
 	var count = list.length;
 	img_list_count = 0;
 	img_list_load = [];
-	var i = 0;
 	var obj;
 	var code = '';
 	var name;
@@ -63,37 +62,56 @@ function convert_elements(w_obj) {
 	return code;
 }
 
+function compile_window_from_data(data) {
+	addwinelm.innerHTML = data.html || '';
+	win.setAttribute('name', data.name);
+	win.setAttribute('caption', data.caption || '');
+	win.style.width = data.width || '300px';
+	win.style.height = data.height || '230px';
+	win.style.background = data.bg || '#e6e9ef';
+	addwinelm.style.width = parseInt(win.style.width) - 2;
+	addwinelm.style.height = parseInt(win.style.height) - 2;
+	set_element_defunc(addwinelm);
+}
+
 function compile(cmd) {
 	c_code = [];
 	c_count = 0;
-
 	gui_list_init = [];
 	gui_list_count = 0;
 
 	var main_code = '';
-	var name;
 	var count = count_stack;
 	c_code[c_count++] = 'window ' + GLOBAL_INIT_ELEMENT.join(',') + ';';
 	var save_gui_init_position = c_count;
 	c_code[c_count++] = '';
 	var save_img_init_position = c_count;
 	c_code[c_count++] = '';
-	var tmp;
-	while (count--) {
-		var obj = window_stack[count];
-		name = obj.getAttribute('name');
+
+	var saved_index = current_win_index;
+	var saved_html = addwinelm.innerHTML;
+
+	for (var i = 0; i < count; i++) {
+		var data = window_data[i];
+		if (!data) continue;
+
+		compile_window_from_data(data);
+		var name = data.name;
+		var tmp;
 
 		main_code += name + '.prepare();';
-		main_code += name + '.width(' + (obj.offsetWidth - 2) + ');';
-		main_code += name + '.height(' + (obj.offsetHeight - 2) + ');';
-		main_code += name + '.caption("' + obj.getAttribute('caption') + '");';
-		main_code += name + '.color(0x' + eval(window.getComputedStyle(obj).backgroundColor) + ');';
-		tmp = obj.getAttribute('align');
+		main_code += name + '.width(' + (parseInt(data.width) - 2) + ');';
+		main_code += name + '.height(' + (parseInt(data.height) - 2) + ');';
+		main_code += name + '.caption("' + (data.caption || '') + '");';
+		main_code += name + '.color(0x' + eval(window.getComputedStyle(win).backgroundColor) + ');';
+		tmp = data.align;
 		if (tmp == '1') main_code += name + '.StartPosition(' + tmp + ');';
-		main_code += convert_elements(obj);
-
+		main_code += convert_elements(win);
 		main_code += name + '.create();';
 	}
+
+	addwinelm.innerHTML = saved_html;
+	compile_window_from_data(window_data[saved_index]);
 
 	if (gui_list_count) c_code[save_gui_init_position] = 'gui ' + gui_list_init.join(',') + ';';
 	if (img_list_count) {

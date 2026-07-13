@@ -306,26 +306,109 @@ function set_text_stat_bar(txt) {
 	if (el) el.innerText = txt;
 }
 
-function create_window() {
-	window_stack[count_stack++] = win;
-	var name = 'Window_' + count_stack;
-	win.setAttribute('name', name);
+var window_data = {};
+var current_win_index = 0;
 
-	getID('main').style.width = window.innerWidth - 420;
-	getID('main').style.height = window.innerHeight - 60;
+function save_window_state() {
+	if (current_win_index < 0) return;
+	window_data[current_win_index] = {
+		html: addwinelm.innerHTML,
+		name: win.getAttribute('name'),
+		caption: win.getAttribute('caption'),
+		width: win.style.width,
+		height: win.style.height,
+		bg: win.style.background,
+		hide_prop: win.getAttribute('hide_prop'),
+		align: win.getAttribute('align')
+	};
+}
 
-	addwinelm.style.width = win.offsetWidth - 2;
-	addwinelm.style.height = win.offsetHeight - 2;
+function load_window_data(index) {
+	var data = window_data[index];
+	if (data) {
+		addwinelm.innerHTML = data.html || '';
+		win.setAttribute('name', data.name);
+		win.setAttribute('caption', data.caption || '');
+		win.style.width = data.width || '300px';
+		win.style.height = data.height || '230px';
+		win.style.background = data.bg || '#e6e9ef';
+		win.setAttribute('hide_prop', data.hide_prop || '');
+		if (data.align) win.setAttribute('align', data.align);
+		else win.removeAttribute('align');
+	} else {
+		addwinelm.innerHTML = '';
+		win.setAttribute('name', 'Window_' + (index + 1));
+		win.setAttribute('caption', 'Окно');
+		win.style.width = '300px';
+		win.style.height = '230px';
+		win.style.background = '#e6e9ef';
+		win.setAttribute('hide_prop', '');
+		win.removeAttribute('align');
+	}
+	addwinelm.style.width = parseInt(win.style.width) - 2;
+	addwinelm.style.height = parseInt(win.style.height) - 2;
+	set_element_defunc(addwinelm);
+}
 
-	win.setAttribute('hide_prop', '');
-	win.setAttribute('caption', 'Окно');
-	win.setAttribute('count_stack_window', count_stack);
+function switch_window(index) {
+	if (index == current_win_index) return;
+	save_window_state();
+	current_win_index = index;
+	load_window_data(index);
+	select_element = null;
 	hide_atr_element(win);
-	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = win.getAttribute('name');
-	var x = document.createElement("option");
-	x.text = name;
+	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+	load_attribute_list_event();
+	update_window_list();
+}
+
+function add_new_window() {
+	var index = count_stack;
+	window_stack[index] = null;
+	window_data[index] = null;
+	window_data[current_win_index] = window_data[current_win_index] || {
+		html: addwinelm.innerHTML,
+		name: win.getAttribute('name'),
+		caption: win.getAttribute('caption'),
+		width: win.style.width,
+		height: win.style.height,
+		bg: win.style.background,
+		hide_prop: win.getAttribute('hide_prop'),
+		align: win.getAttribute('align')
+	};
+	count_stack++;
+	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = 'Window_' + (index + 1);
+	switch_window(index);
+}
+
+function update_window_list() {
 	var list = getID('list_window_add');
-	if (list) list.add(x);
+	if (!list) return;
+	list.innerHTML = '';
+	for (var i = 0; i < count_stack; i++) {
+		var opt = createELM('option');
+		opt.value = i;
+		opt.text = window_data[i] ? window_data[i].name : ('Window_' + (i + 1));
+		list.add(opt);
+	}
+	var addOpt = createELM('option');
+	addOpt.value = -1;
+	addOpt.text = '+ Добавить окно';
+	list.add(addOpt);
+	list.selectedIndex = current_win_index;
+}
+
+function init_window_dropdown() {
+	var list = getID('list_window_add');
+	if (!list) return;
+	list.onchange = function () {
+		var val = parseInt(this.value);
+		if (val == -1) {
+			add_new_window();
+		} else {
+			switch_window(val);
+		}
+	};
 }
 
 function create_size_rect_change() {
@@ -558,7 +641,32 @@ window.onload = function () {
 		};
 	}
 
-	create_window();
+	getID('main').style.width = window.innerWidth - 420;
+	getID('main').style.height = window.innerHeight - 60;
+
+	win.setAttribute('name', 'Window_1');
+	win.setAttribute('caption', 'Окно');
+	win.setAttribute('hide_prop', '');
+	addwinelm.style.width = win.offsetWidth - 2;
+	addwinelm.style.height = win.offsetHeight - 2;
+
+	window_stack[0] = win;
+	window_data[0] = {
+		html: addwinelm.innerHTML,
+		name: 'Window_1',
+		caption: 'Окно',
+		width: win.style.width,
+		height: win.style.height,
+		bg: win.style.background,
+		hide_prop: '',
+		align: null
+	};
+	count_stack = 1;
+	current_win_index = 0;
+	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = 'Window_1';
+
+	init_window_dropdown();
+	update_window_list();
 	load_help_stat(data_help_status);
 };
 
