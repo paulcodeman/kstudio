@@ -11,33 +11,31 @@
 		<table onmousedown="add_event_list(1);"><tr><td class="img"><image src="img/ondblclick.png"></td><td class="title">2х Клик</td></tr></table>
 	</div>
 	<div class="panel" id="TopPanel">
-		<table>
-			<tr>
-				<td class="tool-group">
-					<div class="button" onmousedown="compile(1);" title="Скомпилировать и запустить">▶ Запустить</div>
-					<div class="button" onmousedown="compile(2);" title="Скомпилировать и скачать .exe">↓ Скачать</div>
-				</td>
-				<td class="tool-sep"></td>
-				<td class="tool-group">
-					<a href="" onmousedown="downloadfile(to_source_project(),this);" download="project.kcm" class="button" title="Сохранить проект .kcm">💾 Проект</a>
-				</td>
-				<td class="tool-sep"></td>
-				<td class="tool-group">
-					<label class="tool-label">Окно:</label>
-					<select class="list_window" id="list_window_add"></select>
-				</td>
-				<td class="tool-sep"></td>
-				<td class="tool-group">
-					<label class="tool-label">Сетка:</label>
-					<select class="list_window" onchange="change_setka_option(this);">
-						<option>Без сетки</option>
-						<option selected>5 px</option>
-						<option>10 px</option>
-						<option>15 px</option>
-					</select>
-				</td>
-			</tr>
-		</table>
+		<div class="toolbar">
+			<div class="tool-group">
+				<div class="button" onmousedown="compile(1);" title="Скомпилировать и запустить">▶ Запустить</div>
+				<div class="button" onmousedown="compile(2);" title="Скомпилировать и скачать .exe">↓ Скачать</div>
+			</div>
+			<div class="tool-sep"></div>
+			<div class="tool-group">
+				<a href="" onmousedown="downloadfile(to_source_project(),this);" download="project.kcm" class="button" title="Сохранить проект .kcm">💾 Проект</a>
+			</div>
+			<div class="tool-sep"></div>
+			<div class="tool-group">
+				<label class="tool-label">Окно:</label>
+				<select class="list_window" id="list_window_add"></select>
+			</div>
+			<div class="tool-sep"></div>
+			<div class="tool-group">
+				<label class="tool-label">Сетка:</label>
+				<select class="list_window" onchange="change_setka_option(this);">
+					<option>Без сетки</option>
+					<option selected>5 px</option>
+					<option>10 px</option>
+					<option>15 px</option>
+				</select>
+			</div>
+		</div>
 	</div>
 	<div>
 		<table cellspacing=0 cellpadding=0 class="global">

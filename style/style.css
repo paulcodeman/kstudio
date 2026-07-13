@@ -472,18 +472,25 @@ div.panel {
 	width: 100%;
 	border-bottom: 1px solid #e0e3e8;
 }
-div.panel table { width: 100%; }
-div.panel td { vertical-align: middle; white-space: nowrap; }
-td.tool-group { white-space: nowrap; }
-td.tool-group > * { display: inline-block; vertical-align: middle; margin: 0 2px; }
-td.tool-group .button {
+.toolbar {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	gap: 0;
+}
+.tool-group {
+	white-space: nowrap;
+	display: contents;
+}
+.tool-group > * { display: inline-block; vertical-align: middle; margin: 0 2px; }
+.tool-group .button {
 	width: auto;
 	display: inline-block;
 	line-height: 28px;
 	padding: 0 12px;
 	font-size: 12px;
 }
-td.tool-group a.button {
+.tool-group a.button {
 	text-decoration: none;
 	color: #1a1a2e;
 	line-height: 28px;
@@ -491,11 +498,12 @@ td.tool-group a.button {
 	display: inline-block;
 	font-weight: 500;
 }
-td.tool-group a.button:hover {
+.tool-group a.button:hover {
 	color: #4f6ef7;
 }
-td.tool-sep {
+.tool-sep {
 	width: 0;
+	height: 20px;
 	padding: 0 6px;
 	border-left: 1px solid #e0e3e8;
 	background: transparent;
