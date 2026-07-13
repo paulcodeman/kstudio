@@ -369,7 +369,9 @@ function switch_window(index) {
 	update_component_tree();
 }
 
-function add_new_window() {
+function add_new_window(name) {
+	if (!name) name = prompt('Введите название окна:', 'Window_' + (count_stack + 1));
+	if (!name) return;
 	var index = count_stack;
 	window_stack[index] = null;
 	window_data[index] = null;
@@ -385,8 +387,10 @@ function add_new_window() {
 		components: scan_window_components()
 	};
 	count_stack++;
-	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = 'Window_' + (index + 1);
+	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = name;
 	switch_window(index);
+	win.setAttribute('data-name', name);
+	if (window_data[index]) window_data[index].name = name;
 }
 
 function scan_window_components() {
@@ -411,9 +415,14 @@ function update_window_select() {
 		sel.add(opt);
 	}
 	sel.value = '' + current_win_index;
+	var addOpt = createELM('option');
+	addOpt.value = '-1';
+	addOpt.text = '+ Добавить окно';
+	sel.add(addOpt);
 	sel.onchange = function () {
 		var idx = parseInt(this.value);
-		if (idx != current_win_index) switch_window(idx);
+		if (idx == -1) { add_new_window(); }
+		else if (idx != current_win_index) switch_window(idx);
 	};
 }
 
@@ -451,8 +460,13 @@ function update_component_tree() {
 			grp.appendChild(opt);
 		}
 	}
+	var addOpt = createELM('option');
+	addOpt.value = 'add';
+	addOpt.text = '+ Добавить окно';
+	sel.add(addOpt);
 	if (selectedValue) sel.value = selectedValue;
 	sel.onchange = function () {
+		if (this.value == 'add') { add_new_window(); return; }
 		var val = this.value.split('|');
 		var winIdx = parseInt(val[0]);
 		var compName = val[1];
