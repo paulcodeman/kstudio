@@ -4,6 +4,30 @@ let img_list_load = {};
 let img_list_count = 0;
 let add_init_event_func = '';
 
+const PROP_METHODS = {
+	left:         { m: 'left',        f: 'int' },
+	top:          { m: 'top',         f: 'int' },
+	width:        { m: 'width',       f: 'int' },
+	height:       { m: 'height',      f: 'int' },
+	color:        { m: 'color',       f: 'hexcolor' },
+	image:        { m: 'image',       f: 'imgsrc' },
+};
+
+function resolve_compiler_props(def) {
+	if (!def || !def.props) return [];
+	const resolved = [];
+	for (let i = 0; i < def.props.length; i++) {
+		const p = def.props[i];
+		if (typeof p === 'string') {
+			const found = get_prop_def(p);
+			if (found) resolved.push(found);
+		} else {
+			resolved.push(p);
+		}
+	}
+	return resolved;
+}
+
 function convert_elements(w_obj) {
 	const w = w_obj.children[0];
 	const list = w.children;
@@ -12,53 +36,86 @@ function convert_elements(w_obj) {
 	img_list_load = [];
 	let code = '';
 	const name_window = w_obj.getAttribute('data-name');
+
 	while (count) {
 		const obj = list[--count];
-		const cmd = class_gui_list_elements.indexOf(obj.className);
+		const def = get_component_def(obj);
+		if (!def) continue;
+		const cmd = class_gui_list_elements.indexOf(def.typeClass);
+		if (cmd === -1) continue;
 
-		if (cmd !== -1) {
-			const name = obj.getAttribute('data-name');
-			gui_list_init[gui_list_count++] = name;
-			code += name_window + '.adds(#' + name + ',' + cmd + ');';
-			let tmp = obj.style.left;
-			if (tmp !== '') code += name + '.left(' + parseInt(obj.offsetLeft) + ');';
+		const name = obj.getAttribute('data-name');
+		gui_list_init[gui_list_count++] = name;
+		code += name_window + '.adds(#' + name + ',' + cmd + ');';
 
-			const events = get_component_events(obj);
-			for (let ei = 0; ei < events.length; ei++) {
-				const evName = events[ei];
-				const evAttr = event_attr_name(evName);
-				const evCode = obj.getAttribute(evAttr);
-				if (evCode !== null) {
-					const funcSuffix = evName.replace(/-/g, '_');
-					code += name + '.' + evName + '(#' + name + '__ptr_func__' + funcSuffix + '_);';
-					add_init_event_func += 'void ' + name + '__ptr_func__' + funcSuffix + '_(dword key,x,y){' + decodeURIComponent(evCode) + '}';
-				}
+		const hasImage = def.props.indexOf('image') !== -1;
+		const props = resolve_compiler_props(def);
+
+		for (const prop of props) {
+			if (prop.key === 'data-name') continue;
+			const map = PROP_METHODS[prop.key];
+			if (!map) continue;
+
+			let val;
+			if (prop.key === 'width') {
+				if (!hasImage && obj.style.width === '') continue;
+				val = '' + parseInt(obj.offsetWidth);
+			} else if (prop.key === 'height') {
+				if (!hasImage && obj.style.height === '') continue;
+				val = '' + parseInt(obj.offsetHeight);
+			} else if (prop.key === 'color') {
+				val = (obj.className === 'label_element_gui' && obj.style.color) ? obj.style.color : obj.style.background;
+			} else if (prop.key === 'left') {
+				if (obj.style.left === '') continue;
+				val = '' + parseInt(obj.offsetLeft);
+			} else if (prop.key === 'top') {
+				if (obj.style.top === '') continue;
+				val = '' + parseInt(obj.offsetTop);
+			} else if (prop.target === 'attr') {
+				val = obj.getAttribute(prop.key) || '';
+			} else if (prop.target === 'src') {
+				val = obj.src || '';
+			} else {
+				val = obj.style[prop.key] || '';
 			}
+			if (!val) continue;
 
-			tmp = obj.style.top;
-			if (tmp !== '') code += name + '.top(' + parseInt(obj.offsetTop) + ');';
-			if (obj.className === 'image_element_gui') {
-				code += name + '.width(' + parseInt(obj.offsetWidth) + ');';
-				code += name + '.height(' + parseInt(obj.offsetHeight) + ');';
-				tmp = obj.src;
-				if (tmp !== 'img/TImage.png' && tmp !== '') {
+			if (prop.key === 'image') {
+				if (val !== 'img/TImage.png' && val !== '') {
 					code += name + '.image(#' + name + '_img_src_data_);';
-					img_list_load[name + '_img_src_data_'] = tmp;
+					img_list_load[name + '_img_src_data_'] = val;
 					img_list_count = 1;
 				}
-			} else {
-				tmp = obj.style.width;
-				if (tmp !== '') code += name + '.width(' + parseInt(obj.offsetWidth) + ');';
-				tmp = obj.style.height;
-				if (tmp !== '') code += name + '.height(' + parseInt(obj.offsetHeight) + ');';
+				continue;
 			}
-			if (obj.className === 'label_element_gui') tmp = obj.style.color; else tmp = obj.style.background;
-			if (tmp !== '') code += name + '.color(0x' + eval(tmp) + ');';
 
-			tmp = obj.style.borderColor;
-			if (tmp !== '') code += name + '.bordercolor(' + tmp + ');';
-			tmp = obj.innerText;
-			if (tmp !== '') code += name + '.caption("' + tmp + '");';
+			if (map.f === 'int') {
+				code += name + '.' + map.m + '(' + parseInt(val) + ');';
+			} else if (map.f === 'string') {
+				code += name + '.' + map.m + '("' + val + '");';
+			} else if (map.f === 'hexcolor') {
+				code += name + '.color(0x' + eval(val) + ');';
+			} else if (map.f === 'raw') {
+				code += name + '.' + map.m + '(' + val + ');';
+			}
+		}
+
+		const bc = obj.style.borderColor;
+		if (bc !== '') code += name + '.bordercolor(' + bc + ');';
+
+		const text = obj.innerText;
+		if (text !== '') code += name + '.caption("' + text + '");';
+
+		const events = get_component_events(obj);
+		for (let ei = 0; ei < events.length; ei++) {
+			const evName = events[ei];
+			const evAttr = event_attr_name(evName);
+			const evCode = obj.getAttribute(evAttr);
+			if (evCode !== null) {
+				const funcSuffix = evName.replace(/-/g, '_');
+				code += name + '.' + evName + '(#' + name + '__ptr_func__' + funcSuffix + '_);';
+				add_init_event_func += 'void ' + name + '__ptr_func__' + funcSuffix + '_(dword key,x,y){' + decodeURIComponent(evCode) + '}';
+			}
 		}
 	}
 	return code;
