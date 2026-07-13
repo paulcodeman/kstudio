@@ -475,6 +475,7 @@ div.panel {
 .toolbar {
 	display: grid;
 	grid-auto-flow: column;
+	justify-content: start;
 	align-items: center;
 	gap: 0;
 }
