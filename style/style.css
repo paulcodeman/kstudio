@@ -552,6 +552,7 @@ select.list_window:focus {
 	display: grid;
 	grid-template-columns: auto 1fr;
 	align-items: center;
+	gap: .5rem;
 }
 
 .title_atr {
@@ -701,4 +702,8 @@ td {
 .size:hover {
 	transform: scale(1.25);
 	box-shadow: 0 3px 8px rgba(79, 110, 247, 0.25);
+}
+
+#component_tree {
+	margin:.5rem 0;
 }
