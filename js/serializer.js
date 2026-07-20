@@ -49,7 +49,7 @@ function set_element_defunc(window_object) {
 	const list = window_object.children;
 	for (const key in list) {
 		if (list[key].onmousedown === undefined) {
-			list[key].onmousedown = function () { select_element_added(this); global_lock_event = true; };
+			list[key].onmousedown = function (e) { select_element_added(this); startDrag(e, this); };
 		}
 	}
 }

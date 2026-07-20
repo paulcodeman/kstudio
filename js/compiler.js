@@ -19,8 +19,8 @@ function applyWindowData(data) {
 	win.style.width = s.width || '300px';
 	win.style.height = s.height || '230px';
 	win.style.background = s.background || '#ffffff';
-	addwinelm.style.width = parseInt(win.style.width) - 2;
-	addwinelm.style.height = parseInt(win.style.height) - 2;
+	addwinelm.style.width = (parseInt(win.style.width) - 2) + 'px';
+	addwinelm.style.height = (parseInt(win.style.height) - 2) + 'px';
 }
 
 const EVENT_ARGS = {

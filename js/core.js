@@ -11,6 +11,7 @@ const data_help_status = [
 let win, addwinelm, select_element = null;
 let select_element_rect, select_element_rect_timer = null, sel_rect_x, sel_rect_y;
 let win_x, win_y, win_w, win_h, r_size, int_ptr = null, t_size, rt_size;
+let dragData = null, resizeData = null;
 let element_add_event, element_list;
 let element_list_event, tmp_event_data = [];
 let list_eval_select = null;
@@ -99,8 +100,8 @@ function RrefreshPOS(o) {
 	refresh_prop_input('width', tmp - 2);
 	refresh_prop_input('left', o.offsetLeft);
 	const r = o.getBoundingClientRect();
-	r_size.style.left = r.left + r.width - r_size.offsetWidth / 2;
-	r_size.style.top = r.top + r.height / 2 - r_size.offsetHeight / 2;
+	r_size.style.left = (r.left + r.width - r_size.offsetWidth / 2) + 'px';
+	r_size.style.top = (r.top + r.height / 2 - r_size.offsetHeight / 2) + 'px';
 }
 
 function TrefreshPOS(o) {
@@ -108,44 +109,88 @@ function TrefreshPOS(o) {
 	refresh_prop_input('height', tmp - 2);
 	refresh_prop_input('top', o.offsetTop);
 	const r = o.getBoundingClientRect();
-	t_size.style.left = r.left + r.width / 2 - t_size.offsetWidth / 2;
-	t_size.style.top = r.top + tmp - t_size.offsetHeight / 2;
+	t_size.style.left = (r.left + r.width / 2 - t_size.offsetWidth / 2) + 'px';
+	t_size.style.top = (r.top + tmp - t_size.offsetHeight / 2) + 'px';
 }
 
 function RTrefreshPOS(o) {
 	const r = o.getBoundingClientRect();
-	rt_size.style.left = r.left + r.width - rt_size.offsetWidth / 2;
-	rt_size.style.top = r.top + r.height - rt_size.offsetHeight / 2;
+	rt_size.style.left = (r.left + r.width - rt_size.offsetWidth / 2) + 'px';
+	rt_size.style.top = (r.top + r.height - rt_size.offsetHeight / 2) + 'px';
 }
 
-function newRightPosition(x) {
-	const r = addwinelm.getBoundingClientRect();
-	let tmp = x - r.left;
-	if (tmp < 0) tmp = 0;
-	if (select_element === null) {
-		addwinelm.style.width = win.style.width = Math.round(tmp / grid_distance) * grid_distance;
-		RrefreshPOS(win); TrefreshPOS(win); RTrefreshPOS(win);
-	} else {
-		tmp = Math.round(tmp / grid_distance) * grid_distance;
-		select_element.style.width = tmp - select_element.offsetLeft;
-		if (tmp > addwinelm.offsetWidth) select_element.style.width = addwinelm.offsetWidth - select_element.offsetLeft - 2;
-		RrefreshPOS(select_element); TrefreshPOS(select_element); RTrefreshPOS(select_element);
+function startResize(e, type) {
+	const el = select_element || win;
+	const rect = el.getBoundingClientRect();
+	const containerRect = addwinelm.getBoundingClientRect();
+	resizeData = {
+		el, type,
+		startX: e.clientX,
+		startY: e.clientY,
+		startLeft: rect.left - containerRect.left,
+		startTop: rect.top - containerRect.top,
+		startWidth: rect.width,
+		startHeight: rect.height
+	};
+	document.addEventListener('mousemove', onResizeMove);
+	document.addEventListener('mouseup', onResizeEnd);
+	if (cmd_sensor) {
+		document.addEventListener('touchmove', onResizeMove, { passive: false });
+		document.addEventListener('touchend', onResizeEnd);
+		document.addEventListener('touchcancel', onResizeEnd);
 	}
+	e.preventDefault();
+	e.stopPropagation();
 }
 
-function newTopPosition(y) {
-	const r = addwinelm.getBoundingClientRect();
-	let tmp = y - r.top;
-	if (tmp < 0) tmp = 0;
-	if (select_element === null) {
-		addwinelm.style.height = win.style.height = Math.round(tmp / grid_distance) * grid_distance;
-		RrefreshPOS(win); TrefreshPOS(win); RTrefreshPOS(win);
-	} else {
-		tmp = Math.round(tmp / grid_distance) * grid_distance;
-		select_element.style.height = tmp - select_element.offsetTop;
-		if (tmp > addwinelm.offsetHeight) select_element.style.height = addwinelm.offsetHeight - select_element.offsetTop - 2;
-		RrefreshPOS(select_element); TrefreshPOS(select_element); RTrefreshPOS(select_element);
+function onResizeMove(e) {
+	if (!resizeData) return;
+	const cx = e.touches ? e.touches[0].clientX : e.clientX;
+	const cy = e.touches ? e.touches[0].clientY : e.clientY;
+	const dx = cx - resizeData.startX;
+	const dy = cy - resizeData.startY;
+	const containerRect = addwinelm.getBoundingClientRect();
+	let w = resizeData.startWidth, h = resizeData.startHeight;
+	const el = resizeData.el;
+	const isWin = (el === win);
+
+	if (resizeData.type === 'right' || resizeData.type === 'corner') {
+		w = Math.round((resizeData.startWidth + dx) / grid_distance) * grid_distance;
+		if (isWin) {
+			w = Math.max(20, Math.min(w, containerRect.width + containerRect.left));
+		} else {
+			w = Math.max(20, Math.min(w, containerRect.width - resizeData.startLeft));
+		}
 	}
+	if (resizeData.type === 'top' || resizeData.type === 'corner') {
+		h = Math.round((resizeData.startHeight + dy) / grid_distance) * grid_distance;
+		if (isWin) {
+			h = Math.max(20, Math.min(h, containerRect.height + containerRect.top));
+		} else {
+			h = Math.max(20, Math.min(h, containerRect.height - resizeData.startTop));
+		}
+	}
+	if (isWin) {
+		win.style.width = w + 'px';
+		win.style.height = h + 'px';
+		addwinelm.style.width = w - 2 + 'px';
+		addwinelm.style.height = h - 2 + 'px';
+	} else {
+		el.style.width = w + 'px';
+		el.style.height = h + 'px';
+	}
+	RrefreshPOS(el); TrefreshPOS(el); RTrefreshPOS(el);
+	e.preventDefault();
+}
+
+function onResizeEnd() {
+	if (!resizeData) return;
+	document.removeEventListener('mousemove', onResizeMove);
+	document.removeEventListener('mouseup', onResizeEnd);
+	document.removeEventListener('touchmove', onResizeMove);
+	document.removeEventListener('touchend', onResizeEnd);
+	document.removeEventListener('touchcancel', onResizeEnd);
+	resizeData = null;
 }
 
 function deleteElement(elem) {
@@ -159,32 +204,58 @@ function select_element_menu(o) {
 	return false;
 }
 
-function MoveSelectedElement() {
-	let tmp = Math.round((mouse.x - save_x) / grid_distance) * grid_distance;
-	if (tmp < 0) tmp = 0;
-	else if (tmp + select_element.offsetWidth > addwinelm.offsetWidth) tmp = addwinelm.offsetWidth - select_element.offsetWidth;
-	select_element.style.left = tmp;
+function startDrag(e, el) {
+	select_element = el;
+	render_props(el);
+	const rect = el.getBoundingClientRect();
+	const containerRect = addwinelm.getBoundingClientRect();
+	dragData = {
+		el,
+		startX: e.clientX,
+		startY: e.clientY,
+		startLeft: rect.left - containerRect.left,
+		startTop: rect.top - containerRect.top
+	};
+	document.addEventListener('mousemove', onDragMove);
+	document.addEventListener('mouseup', onDragEnd);
+	if (cmd_sensor) {
+		document.addEventListener('touchmove', onDragMove, { passive: false });
+		document.addEventListener('touchend', onDragEnd);
+		document.addEventListener('touchcancel', onDragEnd);
+	}
+	e.preventDefault();
+	global_lock_event = true;
+}
 
-	tmp = Math.round((mouse.y - save_y) / grid_distance) * grid_distance;
-	if (tmp < 0) tmp = 0;
-	else if (tmp + select_element.offsetHeight > addwinelm.offsetHeight) tmp = addwinelm.offsetHeight - select_element.offsetHeight;
-	select_element.style.top = tmp;
+function onDragMove(e) {
+	if (!dragData) return;
+	const cx = e.touches ? e.touches[0].clientX : e.clientX;
+	const cy = e.touches ? e.touches[0].clientY : e.clientY;
+	const containerRect = addwinelm.getBoundingClientRect();
+	let left = Math.round((dragData.startLeft + (cx - dragData.startX)) / grid_distance) * grid_distance;
+	let top = Math.round((dragData.startTop + (cy - dragData.startY)) / grid_distance) * grid_distance;
+	left = Math.max(0, Math.min(left, containerRect.width - dragData.el.offsetWidth));
+	top = Math.max(0, Math.min(top, containerRect.height - dragData.el.offsetHeight));
+	dragData.el.style.left = left + 'px';
+	dragData.el.style.top = top + 'px';
+	RrefreshPOS(dragData.el); TrefreshPOS(dragData.el); RTrefreshPOS(dragData.el);
+	e.preventDefault();
+}
 
-	RrefreshPOS(select_element); TrefreshPOS(select_element); RTrefreshPOS(select_element);
+function onDragEnd() {
+	if (!dragData) return;
+	document.removeEventListener('mousemove', onDragMove);
+	document.removeEventListener('mouseup', onDragEnd);
+	document.removeEventListener('touchmove', onDragMove);
+	document.removeEventListener('touchend', onDragEnd);
+	document.removeEventListener('touchcancel', onDragEnd);
+	dragData = null;
 }
 
 function select_element_added(o) {
 	select_element = o;
 	render_props(o);
-	if (int_ptr === null) {
-		save_x = mouse.x - parseInt(o.style.left);
-		save_y = mouse.y - parseInt(o.style.top);
-		int_ptr = window.setInterval(MoveSelectedElement, grid_distance);
-		load_attribute_list_event();
-	} else {
-		save_x -= parseInt(o.style.left);
-		save_y -= parseInt(o.style.top);
-	}
+	load_attribute_list_event();
 	RrefreshPOS(o); TrefreshPOS(o); RTrefreshPOS(o);
 	update_component_tree();
 	return false;
@@ -205,9 +276,9 @@ function update_events_tab_visibility() {
 	}
 }
 
-function func_define_select() {
+function func_define_select(e) {
 	select_element_added(this);
-	global_lock_event = true;
+	startDrag(e, this);
 }
 
 function getElementComputedStyle(elem, prop) {
@@ -477,13 +548,13 @@ function past_gui_window(win, name_type) {
 		element = createELM('DIV');
 		element.className = comp.typeClass || '';
 	}
-	element.style.left = Math.round(event.offsetX / grid_distance) * grid_distance;
-	element.style.top = Math.round(event.offsetY / grid_distance) * grid_distance;
+	element.style.left = Math.round(event.offsetX / grid_distance) * grid_distance + 'px';
+	element.style.top = Math.round(event.offsetY / grid_distance) * grid_distance + 'px';
 
 	if (count_element_add[name_type] === undefined) count_element_add[name_type] = 0;
 	const name = name_type + '_' + (++count_element_add[name_type]);
 	element.setAttribute('data-name', name);
-	element.onmousedown = comp.system ? function () { select_element_added(this); global_lock_event = true; } : func_define_select;
+	element.onmousedown = comp.system ? function (e) { select_element_added(this); global_lock_event = true; } : func_define_select;
 	if (cmd_sensor) element.ontouchstart = element.onmousedown;
 
 	if (comp.system) {
@@ -635,8 +706,8 @@ function load_window_data(index) {
 		win.style.height = '230px';
 		win.style.background = '#ffffff';
 	}
-	addwinelm.style.width = parseInt(win.style.width) - 2;
-	addwinelm.style.height = parseInt(win.style.height) - 2;
+	addwinelm.style.width = (parseInt(win.style.width) - 2) + 'px';
+	addwinelm.style.height = (parseInt(win.style.height) - 2) + 'px';
 	set_element_defunc(addwinelm);
 }
 
@@ -820,41 +891,42 @@ function create_size_rect_change() {
 	r_size = createELM('DIV');
 	r_size.className = 'size';
 	r_size.style.cursor = 'ew-resize';
-	r_size.onmousedown = function () {
-		int_ptr = window.setInterval(() => newRightPosition(mouse.x), grid_distance);
-		return false;
-	};
+	r_size.onmousedown = function (e) { startResize(e, 'right'); };
 	if (cmd_sensor) r_size.ontouchstart = r_size.onmousedown;
 	elmADD(r_size);
 
 	t_size = createELM('DIV');
 	t_size.className = 'size';
 	t_size.style.cursor = 'ns-resize';
-	t_size.onmousedown = function () {
-		int_ptr = window.setInterval(() => newTopPosition(mouse.y), grid_distance);
-		return false;
-	};
+	t_size.onmousedown = function (e) { startResize(e, 'top'); };
 	if (cmd_sensor) t_size.ontouchstart = t_size.onmousedown;
 	elmADD(t_size);
 
 	rt_size = createELM('DIV');
 	rt_size.className = 'size';
 	rt_size.style.cursor = 'nwse-resize';
-	rt_size.onmousedown = function () {
-		int_ptr = window.setInterval(() => { newRightPosition(mouse.x); newTopPosition(mouse.y); }, grid_distance);
-		return false;
-	};
+	rt_size.onmousedown = function (e) { startResize(e, 'corner'); };
 	if (cmd_sensor) rt_size.ontouchstart = rt_size.onmousedown;
 	elmADD(rt_size);
+
+	if (!win) return;
+	const r = win.getBoundingClientRect();
+	const hw = r_size.offsetWidth / 2, hh = r_size.offsetHeight / 2;
+	r_size.style.left = (r.left + r.width - hw) + 'px';
+	r_size.style.top = (r.top + r.height / 2 - hh) + 'px';
+	t_size.style.left = (r.left + r.width / 2 - hw) + 'px';
+	t_size.style.top = (r.top + r.height - hh) + 'px';
+	rt_size.style.left = (r.left + r.width - hw) + 'px';
+	rt_size.style.top = (r.top + r.height - hh) + 'px';
 }
 
 function changer_rect_select() {
 	let x = mouse.x - sel_rect_x;
 	let y = mouse.y - sel_rect_y;
-	if (x < 0) { select_element_rect.style.left = sel_rect_x + x; x = -x; }
-	if (y < 0) { select_element_rect.style.top = sel_rect_y + y; y = -y; }
-	select_element_rect.style.width = x;
-	select_element_rect.style.height = y;
+	if (x < 0) { select_element_rect.style.left = (sel_rect_x + x) + 'px'; x = -x; }
+	if (y < 0) { select_element_rect.style.top = (sel_rect_y + y) + 'px'; y = -y; }
+	select_element_rect.style.width = x + 'px';
+	select_element_rect.style.height = y + 'px';
 }
 
 function delete_select_element() {
@@ -1022,7 +1094,7 @@ function click_edit_code() {
 function CmdKeyDown(event) {
 	if (select_element !== null) {
 		if (event.keyCode === 38) {
-			select_element.style.top = parseInt(select_element.style.top) - grid_distance;
+			select_element.style.top = (parseInt(select_element.style.top) - grid_distance) + 'px';
 			RrefreshPOS(select_element); TrefreshPOS(select_element); RTrefreshPOS(select_element);
 		}
 	}
@@ -1098,21 +1170,28 @@ function init_panel_resizers() {
 }
 
 window.onload = function () {
-	init_panel_resizers();
-	render_palette();
-	set_palette_view(localStorage.getItem('kstudio_palette_view') || 'list');
+	try {
+		init_panel_resizers();
+		render_palette();
+		set_palette_view(localStorage.getItem('kstudio_palette_view') || 'list');
+	} catch (e) { console.error('init error:', e); }
+
 	win = getID('window_background');
 	addwinelm = getID('window');
 	select_element_rect = getID('select_elements_rect');
 	element_add_event = getID('add_event');
 	element_list = getID('list_add_event');
 	element_list_event = getID('list_event');
-	win_x = getID('LeftPanel').offsetWidth;
-	win_y = getID('TopPanel').offsetHeight;
+	if (win) {
+		win_x = getID('LeftPanel') ? getID('LeftPanel').offsetWidth : 0;
+		win_y = getID('TopPanel') ? getID('TopPanel').offsetHeight : 0;
+	}
 
 	create_size_rect_change();
 
-	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+	if (win) {
+		try { TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win); } catch (e) { console.error('refreshPOS error:', e); }
+	}
 
 	addwinelm.onmousedown = function (event) {
 		if (list_element_select !== null) {
@@ -1128,8 +1207,10 @@ window.onload = function () {
 			update_component_tree();
 			const ey = event && event.pageY ? event.pageY : (event && event.clientY ? event.clientY : mouse.y);
 			const ex = event && event.pageX ? event.pageX : (event && event.clientX ? event.clientX : mouse.x);
-			sel_rect_y = select_element_rect.style.top = ey;
-			sel_rect_x = select_element_rect.style.left = ex;
+			sel_rect_y = ey;
+			sel_rect_x = ex;
+			select_element_rect.style.top = ey + 'px';
+			select_element_rect.style.left = ex + 'px';
 			select_element_rect.style.display = 'block';
 			select_element_rect_timer = setInterval(changer_rect_select, 50);
 			return true;
@@ -1161,9 +1242,9 @@ window.onload = function () {
 			});
 			const ex = e && e.pageX ? e.pageX : (e && e.clientX ? e.clientX : mouse.x);
 			const ey = e && e.pageY ? e.pageY : (e && e.clientY ? e.clientY : mouse.y);
-			element_list.style.top = ey;
+			element_list.style.top = ey + 'px';
 			element_list.style.display = html ? 'block' : 'none';
-			element_list.style.left = ex - element_list.offsetWidth / 2;
+			element_list.style.left = (ex - element_list.offsetWidth / 2) + 'px';
 		};
 	}
 
@@ -1193,14 +1274,18 @@ window.onload = function () {
 window.onresize = () => {};
 
 window.onmouseup = () => {
+	if (dragData) onDragEnd();
+	if (resizeData) onResizeEnd();
 	clearInterval(int_ptr);
 	int_ptr = null;
+	clearInterval(select_element_rect_timer);
+	select_element_rect_timer = null;
 	global_lock_event = false;
 	if (select_element_rect) {
 		select_element_rect.style.display = 'none';
-		select_element_rect.style.width = select_element_rect.style.height = 0;
+		select_element_rect.style.width = '0px';
+		select_element_rect.style.height = '0px';
 	}
-	clearInterval(select_element_rect_timer);
 };
 
 window.onmousedown = () => {
@@ -1209,7 +1294,11 @@ window.onmousedown = () => {
 		list_element_select = null;
 	}
 };
-if (cmd_sensor) window.ontouchstart = window.onmousedown;
+if (cmd_sensor) {
+	window.ontouchstart = window.onmousedown;
+	window.ontouchend = window.onmouseup;
+	window.ontouchcancel = window.onmouseup;
+}
 
 window.onkeydown = function (e) {
 	const ev = window.event || e;
