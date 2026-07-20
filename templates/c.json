@@ -1,0 +1,46 @@
+{
+	"name": "C",
+	"extension": ".c",
+	"templates": {
+		"header": "#include <gui.h>\n\nint main(int argc, char *argv[]){\n\tinit_gui();\n",
+
+		"guiDecl": "/* components: {{COMPONENTS}} */",
+
+		"imageDecl": "/* images: {{IMAGES}} */",
+		"imageItem": "{{NAME}} = load_image(\"{{PATH}}\")",
+
+		"mainOpen": "",
+		"mainClose": "\n\treturn 0;\n}",
+		"newline": "\n",
+
+		"windowPrepare": "\twin_t {{NAME}} = create_window();",
+		"windowWidth": "\tset_width({{NAME}}, {{VALUE}});",
+		"windowHeight": "\tset_height({{NAME}}, {{VALUE}});",
+		"windowCaption": "\tset_caption({{NAME}}, \"{{VALUE}}\");",
+		"windowColor": "\tset_bgcolor({{NAME}}, 0x{{VALUE}});",
+		"windowAlign": "\tcenter_window({{NAME}});",
+		"windowCreate": "\tshow_window({{NAME}});",
+
+		"componentAdd": "\tctrl_t {{NAME}} = create_control({{TYPE}}, {{PARENT}});",
+		"propInt": "\tset_int({{NAME}}, \"{{METHOD}}\", {{VALUE}});",
+		"propString": "\tset_text({{NAME}}, \"{{VALUE}}\");",
+		"propHex": "\tset_color({{NAME}}, 0x{{VALUE}});",
+		"borderColor": "\tset_border_color({{NAME}}, {{VALUE}});",
+		"propCaption": "\tset_text({{NAME}}, \"{{VALUE}}\");",
+		"propImage": "\tset_image({{NAME}}, {{DATA_NAME}});",
+		"imageDataName": "img_{{NAME}}",
+
+		"eventBind": "\tset_handler({{NAME}}, \"{{EVENT}}\", {{HANDLER}});",
+		"handlerName": "on_{{NAME}}_{{ID}}",
+		"handlerDef": "void {{HANDLER}}(ctrl_t h, int x, int y, int key){\n\t{{CODE}}\n}",
+
+		"propertyFormats": {
+			"left":   { "method": "left",   "tpl": "propInt" },
+			"top":    { "method": "top",    "tpl": "propInt" },
+			"width":  { "method": "width",  "tpl": "propInt" },
+			"height": { "method": "height", "tpl": "propInt" },
+			"color":  { "method": "color",  "tpl": "propHex" },
+			"image":  { "method": "image",  "tpl": "" }
+		}
+	}
+}

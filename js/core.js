@@ -993,12 +993,29 @@ function save_edit_code() {
 	}
 }
 
+function event_args(eventName) {
+	switch (eventName) {
+		case 'click': case 'dblclick': return 'dword x, dword y, dword buttons [MOUSE_LEFT=1, MOUSE_RIGHT=2, MOUSE_MIDDLE=4]';
+		case 'mousemove': case 'mouseenter': case 'mouseleave': return 'dword x, dword y';
+		case 'mousedown': case 'mouseup': return 'dword x, dword y, dword buttons [MOUSE_LEFT=1, MOUSE_RIGHT=2, MOUSE_MIDDLE=4]';
+		case 'mousewheel': return 'dword delta';
+		case 'keydown': case 'keypress': case 'keyup': return 'dword keycode, dword scancode';
+		case 'resize': return 'dword w, dword h';
+		case 'timer': return 'dword timer_id';
+		default: return '';
+	}
+}
+
 function click_edit_code() {
 	if (list_eval_select === null) return;
 	const el = select_element || win;
-	const attrName = list_eval_select.id || event_attr_name(list_eval_select.getAttribute('data-sel-event'));
+	const compName = el.getAttribute('data-name') || 'Component';
+	const eventName = list_eval_select.getAttribute('data-sel-event') || 'event';
+	const attrName = list_eval_select.id || event_attr_name(eventName);
 	const tmp = el.getAttribute(attrName);
+	const args = event_args(eventName);
 	getID('code_edit_rect').value = tmp ? decodeURIComponent(tmp) : '';
+	getID('code_edit_title').innerText = 'void ' + compName + '_' + eventName + '(' + args + ')';
 	getID('window_edit_code').style.display = 'flex';
 }
 

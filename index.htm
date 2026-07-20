@@ -13,24 +13,33 @@
 	<div class="panel" id="TopPanel">
 		<div class="toolbar">
 			<div class="tool-group">
-				<div class="button" onmousedown="compile(1);" title="Скомпилировать и запустить"><i class="fa-solid fa-play"></i> Запустить</div>
-				<div class="button" onmousedown="compile(2);" title="Скомпилировать и скачать .exe"><i class="fa-solid fa-download"></i> Скачать</div>
-				<div class="button" onmousedown="showGeneratedCode();" title="Посмотреть скомпилированный код"><i class="fa-solid fa-code"></i> Код</div>
+				<div class="button btn-run" onmousedown="compile(1);" title="Скомпилировать и запустить (F9)"><i class="fa-solid fa-play"></i> Запустить</div>
+				<div class="button btn-build" onmousedown="compile(2);" title="Скомпилировать и скачать .kex"><i class="fa-solid fa-download"></i> Скачать</div>
+				<div class="button btn-code" onmousedown="showGeneratedCode();" title="Посмотреть сгенерированный код (F12)"><i class="fa-solid fa-code"></i> Код</div>
 			</div>
 			<div class="tool-sep"></div>
 			<div class="tool-group">
-				<div class="button" onmousedown="export_project();" title="Экспорт проекта"><i class="fa-solid fa-file-export"></i> Экспорт</div>
+				<label class="tool-label"><i class="fa-solid fa-globe"></i> Язык:</label>
+				<select class="list_window" id="lang_selector" onchange="changeLanguage(this.value);">
+					<option value="cmm">C-- (KolibriOS)</option>
+					<option value="c">C (пример)</option>
+					<option value="js">JavaScript (пример)</option>
+				</select>
+			</div>
+			<div class="tool-sep"></div>
+			<div class="tool-group">
+				<div class="button" onmousedown="export_project();" title="Экспорт проекта (.kcm)"><i class="fa-solid fa-file-export"></i> Экспорт</div>
 				<div class="button" onmousedown="document.getElementById('import_input').click();" title="Импорт проекта"><i class="fa-solid fa-file-import"></i> Импорт</div>
 				<input type="file" id="import_input" accept=".kcm" style="display:none" onchange="import_project(this);">
 			</div>
 			<div class="tool-sep"></div>
 			<div class="tool-group">
-				<label class="tool-label">Окно:</label>
+				<label class="tool-label"><i class="fa-solid fa-display"></i> Окно:</label>
 				<select class="list_window" id="list_window_add"></select>
 			</div>
 			<div class="tool-sep"></div>
 			<div class="tool-group">
-				<label class="tool-label">Сетка:</label>
+				<label class="tool-label"><i class="fa-solid fa-border-all"></i> Сетка:</label>
 				<select class="list_window" onchange="change_setka_option(this);">
 					<option>Без сетки</option>
 					<option selected>5 px</option>
@@ -38,12 +47,20 @@
 					<option>15 px</option>
 				</select>
 			</div>
+			<div class="tool-sep"></div>
+			<div class="tool-group">
+				<label class="tool-label"><i class="fa-solid fa-gear"></i> Компилятор:</label>
+				<select class="list_window" id="compiler_select" title="Путь к компилятору">
+					<option value="C:\cmm">C:\cmm (c--.exe)</option>
+					<option value="C:\cmm\c--.exe">C:\cmm\c--.exe</option>
+				</select>
+			</div>
 		</div>
 	</div>
 	<div class="mid-layout" id="MidLayout">
 		<div class="mid-panel mid-left" id="LeftPanel">
 			<div class="palette-header">
-				<span>Компоненты</span>
+				<span><i class="fa-solid fa-cube"></i> Компоненты</span>
 				<span id="palette_view_btn" class="palette-view-btn" onclick="toggle_palette_view()" title="Вид"><i class="fa-solid fa-table-cells"></i></span>
 			</div>
 			<div id="properties"></div>
@@ -52,10 +69,10 @@
 		<div class="mid-panel mid-center" id="CenterPanel"><div id="main"><div id="window_background" onmousedown="return false;"><div id="window" oncontextmenu="return false;"></div></div></div></div>
 		<div class="panel-splitter" data-side="right"></div>
 		<div class="mid-panel mid-right" id="RightPanel"><div class="container">
-			<input type="radio" name="odin" checked="checked" id="vkl1"><label for="vkl1" onmousedown="return false;">Свойства</label>
-			<input type="radio" name="odin" id="vkl2"><label for="vkl2" onmousedown="return false;">События</label>
+			<input type="radio" name="odin" checked="checked" id="vkl1"><label for="vkl1" onmousedown="return false;"><i class="fa-solid fa-list"></i> Свойства</label>
+			<input type="radio" name="odin" id="vkl2"><label for="vkl2" onmousedown="return false;"><i class="fa-solid fa-bolt"></i> События</label>
 			<div>
-				<div class="glob_title">Компоненты</div>
+				<div class="glob_title"><i class="fa-solid fa-sitemap"></i> Компоненты</div>
 				<div class="title"><select class="list" id="component_tree"></select></div>
 				<div class="attr">
 					<div id="attribute_element"></div>
@@ -63,11 +80,11 @@
 			</div>
 			<div>
 				<div class="attr events-panel">
-					<div class="button" id="add_event" onmousedown="return false;"><image src="img/add_list.PNG">Добавить событие</div>
+					<div class="button" id="add_event" onmousedown="return false;"><i class="fa-solid fa-plus"></i> Добавить событие</div>
 					<div class="event-actions">
-						<div onmousedown="return false;" onclick="delete_event_list();" class="button"><image id="delete_event" src="img/delete.PNG"></div>
-						<div onmousedown="return false;" class="button"><image id="replace_event" src="img/replace_event.PNG"></div>
-						<div onmousedown="return false;" onclick="click_edit_code();" class="button grow" id="edit_event"><image id="img_replace_event" src="img/edit_event.PNG">Редактировать</div>
+						<div onmousedown="return false;" onclick="delete_event_list();" class="button" title="Удалить"><i class="fa-solid fa-trash"></i></div>
+						<div onmousedown="return false;" class="button" title="Заменить"><i class="fa-solid fa-arrows-rotate"></i></div>
+						<div onmousedown="return false;" onclick="click_edit_code();" class="button grow" id="edit_event"><i class="fa-solid fa-pen"></i> Редактировать</div>
 					</div>
 					<div id="event_cont">
 						<table id="list_event"></table>
@@ -76,14 +93,19 @@
 			</div>
 		</div></div>
 	</div>
-	<div class="statbar" id="text_status_bar"></div>
+	<div class="statbar" id="text_status_bar">
+		<span id="status_compiler">Компилятор: C:\cmm\c--.exe</span>
+		<span id="status_os">Цель: KolibriOS</span>
+	</div>
 
 	<div id="window_edit_code" class="EditCode">
 		<div class="code-editor-body">
-			<div class="code_title">void onClick(byte key){</div>
+			<div class="code_title" id="code_edit_title">void ComponentName_event()</div>
+			<div class="code_body_mark">{</div>
 			<div class="body_code_container">
-				<textarea id="code_edit_rect"></textarea>
+				<textarea id="code_edit_rect" placeholder="// ваш код"></textarea>
 			</div>
+			<div class="code_body_mark">}</div>
 		</div>
 		<div class="table_button_edit_code"><button onclick="save_edit_code();">Ок</button><button onclick="cancel_edit_code();">Отмена</button></div>
 	</div>

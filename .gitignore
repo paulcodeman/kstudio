@@ -4,3 +4,9 @@ Thumbs.db
 *.log
 code/setting
 _legacy/
+build/lib/*
+!build/lib/.gitkeep
+build/src/*.com
+build/src/*.kex
+build/src/*.err
+build/error.log

@@ -70,10 +70,24 @@ body {
 	height: 24px;
 	background: #fafbfc;
 	border-top: 1px solid #e0e3e8;
-	padding-left: 12px;
+	padding: 0 12px;
 	font-size: 12px;
 	line-height: 24px;
 	color: #6b7280;
+	display: flex;
+	gap: 24px;
+}
+.statbar span {
+	white-space: nowrap;
+}
+.statbar span#status_compiler {
+	font-family: "SF Mono", "Fira Code", "Cascadia Code", "JetBrains Mono", monospace;
+	font-size: 11px;
+}
+.statbar span#status_os {
+	margin-left: auto;
+	color: #4f6ef7;
+	font-weight: 500;
 }
 
 input {
@@ -211,11 +225,19 @@ input[type="color"]:focus::-webkit-color-swatch {
 .EditCode .code_title {
 	font-size: 13px;
 	font-weight: 600;
-	padding: 10px 16px;
+	padding: 10px 16px 4px 16px;
 	color: #4f6ef7;
 	font-family: "SF Mono", "Fira Code", "Cascadia Code", "JetBrains Mono", monospace;
-	border-bottom: 1px solid #e0e3e8;
 	flex: none;
+}
+.EditCode .code_body_mark {
+	font-size: 13px;
+	font-weight: 400;
+	padding: 0 16px;
+	color: #6b7a8f;
+	font-family: "SF Mono", "Fira Code", "Cascadia Code", "JetBrains Mono", monospace;
+	flex: none;
+	user-select: none;
 }
 .table_button_edit_code {
 	flex: none;
@@ -658,6 +680,31 @@ select.list_atr {
 .tool-group a.button i {
 	margin-right: 4px;
 	font-size: 12px;
+}
+
+.btn-run {
+	background: #22c55e !important;
+	border-color: #16a34a !important;
+	color: #fff !important;
+}
+.btn-run:hover {
+	background: #16a34a !important;
+}
+.btn-build {
+	background: #4f6ef7 !important;
+	border-color: #3d5ce5 !important;
+	color: #fff !important;
+}
+.btn-build:hover {
+	background: #3d5ce5 !important;
+}
+.btn-code {
+	background: #f59e0b !important;
+	border-color: #d97706 !important;
+	color: #fff !important;
+}
+.btn-code:hover {
+	background: #d97706 !important;
 }
 .tool-sep {
 	width: 0;
