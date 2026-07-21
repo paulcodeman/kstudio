@@ -47,13 +47,11 @@ function load_project(src) {
 
 function set_element_defunc(window_object) {
 	const list = window_object.children;
-	for (const key in list) {
-		if (list[key].onmousedown === undefined) {
-			list[key].onmousedown = function (e) { select_element_added_single(this); startDrag(e, this); };
-		}
-		if (list[key].oncontextmenu === undefined) {
-			list[key].oncontextmenu = function (e) { show_component_context_menu(e, this); return false; };
-		}
+	for (let i = 0; i < list.length; i++) {
+		const child = list[i];
+		if (child.nodeType !== 1) continue;
+		child.onmousedown = func_define_select;
+		child.oncontextmenu = function (e) { show_component_context_menu(e, this); return false; };
 	}
 }
 

@@ -341,6 +341,7 @@ function update_events_tab_visibility() {
 }
 
 function func_define_select(e) {
+	e.stopPropagation();
 	if (selected_elements_array.length > 0) {
 		const clicked = this;
 		const isInSelection = select_element === clicked || selected_elements_array.some(function (item) { return item.el === clicked; });
@@ -463,14 +464,15 @@ function render_props(el) {
 			continue;
 		}
 		const value = get_prop_value(el, p);
-		const label = createELM('div');
+		const label = createELM('label');
 		label.className = 'title_atr';
+		label.htmlFor = 'prop_' + p.key.replace(/\s/g, '_');
 		label.innerText = p.label;
 		const val = createELM('div');
 		val.className = 'prop-val';
 		let input;
 		if (p.type === 'select') {
-			input = createELM('select'); input.className = 'list_atr';
+			input = createELM('select'); input.className = 'list_atr'; input.name = p.key; input.id = 'prop_' + p.key.replace(/\s/g, '_');
 			for (let j = 0; j < p.options.length; j++) {
 				const opt = createELM('option'); opt.value = p.options[j].v; opt.text = p.options[j].l;
 				if ('' + opt.value === '' + value) opt.selected = true;
@@ -478,6 +480,7 @@ function render_props(el) {
 			}
 			input.onchange = function () { apply_prop(this); };
 		} else if (p.type === 'color') {
+			label.htmlFor = 'prop_' + p.key.replace(/\s/g, '_') + '_hex';
 			const toHex = function (v) {
 				const m = v && v.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
 				if (m) return '#' + ((1 << 24) + (parseInt(m[1]) << 16) + (parseInt(m[2]) << 8) + parseInt(m[3])).toString(16).slice(1).toUpperCase();
@@ -494,6 +497,8 @@ function render_props(el) {
 
 			const textInput = createELM('input');
 			textInput.type = 'text';
+			textInput.name = p.key + '_hex';
+			textInput.id = 'prop_' + p.key.replace(/\s/g, '_') + '_hex';
 			textInput.value = hexVal;
 			textInput.style.flex = '1';
 			textInput.style.minWidth = '0';
@@ -501,6 +506,8 @@ function render_props(el) {
 
 			const colorInput = createELM('input');
 			colorInput.type = 'color';
+			colorInput.name = p.key + '_color';
+			colorInput.id = 'prop_' + p.key.replace(/\s/g, '_') + '_color';
 			colorInput.value = hexVal;
 			colorInput.style.width = '28px';
 			colorInput.style.height = '28px';
@@ -543,11 +550,11 @@ function render_props(el) {
 			colorWrap.appendChild(colorInput);
 			input = colorWrap;
 		} else if (p.type === 'number') {
-			input = createELM('input'); input.type = 'number'; input.value = value;
+			input = createELM('input'); input.type = 'number'; input.name = p.key; input.id = 'prop_' + p.key.replace(/\s/g, '_'); input.value = value;
 			input.onmouseup = function () { this.select(); };
 			input.oninput = function () { apply_prop(this); };
 		} else {
-			input = createELM('input'); input.value = value;
+			input = createELM('input'); input.name = p.key; input.id = 'prop_' + p.key.replace(/\s/g, '_'); input.value = value;
 			input.onmouseup = function () { this.select(); };
 			input.oninput = function () { apply_prop(this); };
 		}
@@ -626,7 +633,7 @@ function past_gui_window(win, name_type) {
 	if (count_element_add[name_type] === undefined) count_element_add[name_type] = 0;
 	const name = name_type + '_' + (++count_element_add[name_type]);
 	element.setAttribute('data-name', name);
-	element.onmousedown = comp.system ? function (e) { select_element_added_single(this); global_lock_event = true; } : func_define_select;
+	element.onmousedown = func_define_select;
 	if (cmd_sensor) element.ontouchstart = element.onmousedown;
 	element.oncontextmenu = function (e) { show_component_context_menu(e, this); return false; };
 
