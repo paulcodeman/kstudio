@@ -1006,7 +1006,7 @@ function context_edit_code() {
 			const tmp = el.getAttribute(attrName);
 			const args = event_args(eventName);
 			getID('code-textarea').value = tmp ? decodeURIComponent(tmp) : '';
-			getID('code-editor-title').innerText = 'void ' + compName + '_' + eventName + '(' + args + ')';
+	getID('code-editor-title').innerText = 'void ' + compName + '_' + eventName + '(' + args + ') {';
 			getID('code-editor').style.display = 'flex';
 			S.element_list.style.display = 'none';
 		};
@@ -1287,7 +1287,7 @@ function click_edit_code() {
 	const tmp = el.getAttribute(attrName);
 	const args = event_args(eventName);
 	getID('code-textarea').value = tmp ? decodeURIComponent(tmp) : '';
-	getID('code-editor-title').innerText = 'void ' + compName + '_' + eventName + '(' + args + ')';
+	getID('code-editor-title').innerText = 'void ' + compName + '_' + eventName + '(' + args + ') {';
 	getID('code-editor').style.display = 'flex';
 }
 
