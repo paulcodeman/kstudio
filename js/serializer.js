@@ -166,6 +166,9 @@ function switch_window(index) {
 		S.addwinelm.style.height = (parseInt(S.win.style.height) - 2) + 'px';
 	}
 	set_element_defunc(S.addwinelm);
+	S.select_element = null;
+	render_props(S.win);
+	load_attribute_list_event();
 	update_component_tree();
 	if (S.win) {
 		RrefreshPOS(S.win); TrefreshPOS(S.win); RTrefreshPOS(S.win);
