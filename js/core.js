@@ -1150,6 +1150,46 @@ function delete_event_list() {
 	el.setAttribute('data_list_event', cmd);
 }
 
+function replace_event_list(eventName) {
+	if (list_eval_select === null) return;
+	const el = select_element || win;
+	const oldEventName = list_eval_select.getAttribute('data-sel-event');
+	if (!oldEventName || oldEventName === eventName) return;
+	if (tmp_event_data.indexOf(eventName) >= 0) return;
+
+	const oldAttr = event_attr_name(oldEventName);
+	const code = el.getAttribute(oldAttr);
+
+	const events = get_component_events(el);
+	const oldX = events.indexOf(oldEventName);
+	const data_list_event_atr = el.getAttribute('data_list_event');
+	let cmd = data_list_event_atr !== '' ? parseInt(data_list_event_atr) : 0;
+	cmd &= 0xFFFFFFFF ^ (1 << oldX);
+	el.removeAttribute(oldAttr);
+
+	const newX = events.indexOf(eventName);
+	cmd |= 1 << newX;
+	el.setAttribute('data_list_event', '' + cmd);
+
+	if (code) el.setAttribute(event_attr_name(eventName), code);
+
+	load_attribute_list_event();
+
+	const newId = event_attr_name(eventName);
+	const items = element_list_event.children;
+	for (let i = 0; i < items.length; i++) {
+		const td = items[i].querySelector('td');
+		if (td && (td.id === newId || td.getAttribute('data-sel-event') === eventName)) {
+			if (list_eval_select !== null) list_eval_select.classList.remove('select');
+			list_eval_select = td;
+			list_eval_select.classList.add('select');
+			break;
+		}
+	}
+
+	element_list.style.display = 'none';
+}
+
 function add_event_list(eventName) {
 	if (tmp_event_data.indexOf(eventName) >= 0) return false;
 	const el = select_element || win;
@@ -1180,9 +1220,9 @@ function add_event_list(eventName) {
 
 	b.className = 'default';
 	b.onmousedown = function () {
-		if (list_eval_select !== null) list_eval_select.className = 'default';
+		if (list_eval_select !== null) list_eval_select.classList.remove('select');
 		list_eval_select = this;
-		this.className = 'select';
+		this.classList.add('select');
 	};
 	a.appendChild(b);
 	element_list_event.appendChild(a);
@@ -1218,9 +1258,9 @@ function load_attribute_list_event() {
 			tmp_event_data[tmp_event_data.length] = eventName;
 			b.className = 'default';
 			b.onmousedown = function () {
-				if (list_eval_select !== null) list_eval_select.className = 'default';
+				if (list_eval_select !== null) list_eval_select.classList.remove('select');
 				list_eval_select = this;
-				this.className = 'select';
+				this.classList.add('select');
 			};
 			a.appendChild(b);
 			element_list_event.appendChild(a);
@@ -1417,6 +1457,35 @@ window.onload = function () {
 			Array.from(element_list.children).forEach(item => {
 				item.onmousedown = function () {
 					add_event_list(this.getAttribute('data-event'));
+				};
+			});
+			const ex = e && e.pageX ? e.pageX : (e && e.clientX ? e.clientX : mouse.x);
+			const ey = e && e.pageY ? e.pageY : (e && e.clientY ? e.clientY : mouse.y);
+			element_list.style.top = ey + 'px';
+			element_list.style.display = html ? 'block' : 'none';
+			element_list.style.left = (ex - element_list.offsetWidth / 2) + 'px';
+		};
+	}
+	if (getID('replace_event')) {
+		getID('replace_event').onclick = function (e) {
+			if (list_eval_select === null) return;
+			const el = select_element || win;
+			const events = get_component_events(el);
+			const oldName = list_eval_select.getAttribute('data-sel-event');
+			if (!events.length || !oldName) return;
+			let html = '';
+			for (let i = 0; i < events.length; i++) {
+				const ev = events[i];
+				if (ev === oldName || tmp_event_data.indexOf(ev) >= 0) continue;
+				const edef = get_event_def(ev);
+				const icon = edef && edef.icon ? '<img src="' + edef.icon + '">' : '';
+				html += '<div class="event-item" data-event="' + ev + '">' +
+					icon + '<span class="title">' + ((edef && edef.label) || ev) + '</span></div>';
+			}
+			element_list.innerHTML = html;
+			Array.from(element_list.children).forEach(item => {
+				item.onmousedown = function () {
+					replace_event_list(this.getAttribute('data-event'));
 				};
 			});
 			const ex = e && e.pageX ? e.pageX : (e && e.clientX ? e.clientX : mouse.x);
