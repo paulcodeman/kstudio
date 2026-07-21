@@ -1087,6 +1087,8 @@ function show_component_context_menu(e, el) {
 		select_element_added_single(clicked);
 	}
 	context_menu_component.innerHTML =
+		'<div class="event-item" data-action="bring-to-front"><i class="fa-solid fa-arrow-up-wide-short"></i><span class="title">На передний фон</span></div>' +
+		'<div class="event-item" data-action="send-to-back"><i class="fa-solid fa-arrow-down-wide-short"></i><span class="title">На задний фон</span></div>' +
 		'<div class="event-item" data-action="copy"><i class="fa-solid fa-copy"></i><span class="title">Копировать</span></div>' +
 		'<div class="event-item" data-action="delete"><i class="fa-solid fa-trash"></i><span class="title">Удалить</span></div>';
 	Array.from(context_menu_component.children).forEach(function (item) {
@@ -1096,6 +1098,10 @@ function show_component_context_menu(e, el) {
 				copy_element_object = select_element;
 			} else if (action === 'delete') {
 				delete_select_element();
+			} else if (action === 'bring-to-front') {
+				bring_to_front();
+			} else if (action === 'send-to-back') {
+				send_to_back();
 			}
 			context_menu_component.style.display = 'none';
 		};
@@ -1113,6 +1119,40 @@ function delete_select_element() {
 		render_props(win);
 		update_component_tree();
 	}
+}
+
+function bring_to_front() {
+	const parent = addwinelm;
+	const arr = selected_elements_array.slice();
+	const hasPrimary = selected_elements_array.some(function (item) { return item.el === select_element; });
+	if (select_element && !hasPrimary) arr.push({ el: select_element });
+	arr.sort((a, b) => {
+		const ai = Array.from(parent.children).indexOf(a.el || a);
+		const bi = Array.from(parent.children).indexOf(b.el || b);
+		return ai - bi;
+	});
+	arr.forEach(function (item) {
+		const el = item.el || item;
+		parent.appendChild(el);
+	});
+	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+}
+
+function send_to_back() {
+	const parent = addwinelm;
+	const arr = selected_elements_array.slice();
+	const hasPrimary = selected_elements_array.some(function (item) { return item.el === select_element; });
+	if (select_element && !hasPrimary) arr.push({ el: select_element });
+	arr.sort((a, b) => {
+		const ai = Array.from(parent.children).indexOf(a.el || a);
+		const bi = Array.from(parent.children).indexOf(b.el || b);
+		return ai - bi;
+	});
+	arr.forEach(function (item) {
+		const el = item.el || item;
+		parent.insertBefore(el, parent.firstChild);
+	});
+	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 }
 
 function add_stat_element_help(id, txt) {
