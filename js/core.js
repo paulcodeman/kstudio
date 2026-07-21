@@ -1113,22 +1113,19 @@ function show_component_context_menu(e, el) {
 				if (select_element && items.indexOf(select_element) < 0) items.push(select_element);
 				copy_element_object = items;
 				if (action === 'cut') {
+					clear_selected_elements();
 					items.forEach(function (el) { el.parentNode.removeChild(el); });
 					select_element = null;
-					selected_elements_array = [];
 					TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 					render_props(win);
 					update_component_tree();
 				}
 			} else if (action === 'delete') {
-				selected_elements_array.forEach(function (si) {
-					if (si.el.parentNode) si.el.parentNode.removeChild(si.el);
-				});
+				clear_selected_elements();
 				if (select_element && select_element.parentNode) {
 					select_element.parentNode.removeChild(select_element);
 				}
 				select_element = null;
-				selected_elements_array = [];
 				TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 				render_props(win);
 				update_component_tree();
@@ -1148,14 +1145,11 @@ function show_component_context_menu(e, el) {
 }
 
 function delete_select_element() {
-	selected_elements_array.forEach(function (si) {
-		if (si.el.parentNode) si.el.parentNode.removeChild(si.el);
-	});
+	clear_selected_elements();
 	if (select_element && select_element.parentNode) {
 		select_element.parentNode.removeChild(select_element);
 	}
 	select_element = null;
-	selected_elements_array = [];
 	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 	render_props(win);
 	update_component_tree();
