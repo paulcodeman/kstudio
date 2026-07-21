@@ -10,10 +10,13 @@ const data_help_status = [
 
 let win, addwinelm, select_element = null;
 let select_element_rect, select_element_rect_timer = null, sel_rect_x, sel_rect_y;
+let rect_select_active = false;
+let selected_elements_array = [];
 let win_x, win_y, win_w, win_h, r_size, int_ptr = null, t_size, rt_size;
 let dragData = null, resizeData = null;
 let element_add_event, element_list;
 let element_list_event, tmp_event_data = [];
+let context_menu_component;
 let list_eval_select = null;
 let list_element_select = null;
 let window_stack = [], count_stack = 0;
@@ -227,11 +230,67 @@ function startDrag(e, el) {
 	global_lock_event = true;
 }
 
+function startGroupDrag(e, el) {
+	const containerRect = addwinelm.getBoundingClientRect();
+	const positions = [];
+	function collectElement(item) {
+		const r = item.getBoundingClientRect();
+		positions.push({
+			el: item,
+			startLeft: r.left - containerRect.left,
+			startTop: r.top - containerRect.top,
+			width: r.width,
+			height: r.height
+		});
+	}
+	for (let i = 0; i < selected_elements_array.length; i++) {
+		collectElement(selected_elements_array[i].el);
+	}
+	if (select_element && !positions.some(function (p) { return p.el === select_element; })) {
+		collectElement(select_element);
+	}
+	dragData = {
+		el,
+		isGroup: true,
+		startX: e.clientX,
+		startY: e.clientY,
+		positions
+	};
+	document.addEventListener('mousemove', onDragMove);
+	document.addEventListener('mouseup', onDragEnd);
+	if (cmd_sensor) {
+		document.addEventListener('touchmove', onDragMove, { passive: false });
+		document.addEventListener('touchend', onDragEnd);
+		document.addEventListener('touchcancel', onDragEnd);
+	}
+	e.preventDefault();
+	global_lock_event = true;
+}
+
 function onDragMove(e) {
 	if (!dragData) return;
 	const cx = e.touches ? e.touches[0].clientX : e.clientX;
 	const cy = e.touches ? e.touches[0].clientY : e.clientY;
 	const containerRect = addwinelm.getBoundingClientRect();
+	if (dragData.isGroup) {
+		const dx = cx - dragData.startX;
+		const dy = cy - dragData.startY;
+		for (let i = 0; i < dragData.positions.length; i++) {
+			const p = dragData.positions[i];
+			let left = Math.round((p.startLeft + dx) / grid_distance) * grid_distance;
+			let top = Math.round((p.startTop + dy) / grid_distance) * grid_distance;
+			left = Math.max(0, Math.min(left, containerRect.width - p.width));
+			top = Math.max(0, Math.min(top, containerRect.height - p.height));
+			p.el.style.left = left + 'px';
+			p.el.style.top = top + 'px';
+		}
+		if (select_element) {
+			RrefreshPOS(select_element); TrefreshPOS(select_element); RTrefreshPOS(select_element);
+		}
+		update_selection_dots();
+		e.preventDefault();
+		return;
+	}
 	let left = Math.round((dragData.startLeft + (cx - dragData.startX)) / grid_distance) * grid_distance;
 	let top = Math.round((dragData.startTop + (cy - dragData.startY)) / grid_distance) * grid_distance;
 	left = Math.max(0, Math.min(left, containerRect.width - dragData.el.offsetWidth));
@@ -261,6 +320,11 @@ function select_element_added(o) {
 	return false;
 }
 
+function select_element_added_single(o) {
+	clear_selected_elements();
+	select_element_added(o);
+}
+
 function update_events_tab_visibility() {
 	const events = select_element ? get_component_events(select_element) : WINDOW_EVENTS;
 	const hasEvents = events && events.length > 0;
@@ -277,7 +341,15 @@ function update_events_tab_visibility() {
 }
 
 function func_define_select(e) {
-	select_element_added(this);
+	if (selected_elements_array.length > 0) {
+		const clicked = this;
+		const isInSelection = select_element === clicked || selected_elements_array.some(function (item) { return item.el === clicked; });
+		if (isInSelection) {
+			startGroupDrag(e, clicked);
+			return;
+		}
+	}
+	select_element_added_single(this);
 	startDrag(e, this);
 }
 
@@ -554,8 +626,9 @@ function past_gui_window(win, name_type) {
 	if (count_element_add[name_type] === undefined) count_element_add[name_type] = 0;
 	const name = name_type + '_' + (++count_element_add[name_type]);
 	element.setAttribute('data-name', name);
-	element.onmousedown = comp.system ? function (e) { select_element_added(this); global_lock_event = true; } : func_define_select;
+	element.onmousedown = comp.system ? function (e) { select_element_added_single(this); global_lock_event = true; } : func_define_select;
 	if (cmd_sensor) element.ontouchstart = element.onmousedown;
+	element.oncontextmenu = function (e) { show_component_context_menu(e, this); return false; };
 
 	if (comp.system) {
 		const img = createELM('IMG');
@@ -570,7 +643,7 @@ function past_gui_window(win, name_type) {
 	}
 
 	win.appendChild(element);
-	select_element_added(element);
+	select_element_added_single(element);
 	update_component_tree();
 }
 
@@ -875,7 +948,7 @@ function update_component_tree() {
 			const children = addwinelm.children;
 			for (let k = 0; k < children.length; k++) {
 				if (children[k].getAttribute('data-name') === compName) {
-					select_element_added(children[k]);
+					select_element_added_single(children[k]);
 					global_lock_event = true;
 					break;
 				}
@@ -927,6 +1000,102 @@ function changer_rect_select() {
 	if (y < 0) { select_element_rect.style.top = (sel_rect_y + y) + 'px'; y = -y; }
 	select_element_rect.style.width = x + 'px';
 	select_element_rect.style.height = y + 'px';
+}
+
+function rectsIntersect(r1, r2) {
+	return !(r2.left > r1.right || r2.right < r1.left || r2.top > r1.bottom || r2.bottom < r1.top);
+}
+
+function clear_selected_elements() {
+	for (let i = 0; i < selected_elements_array.length; i++) {
+		const item = selected_elements_array[i];
+		if (item.dots) {
+			for (let j = 0; j < item.dots.length; j++) {
+				if (item.dots[j].parentNode) {
+					item.dots[j].parentNode.removeChild(item.dots[j]);
+				}
+			}
+		}
+	}
+	selected_elements_array = [];
+}
+
+function update_selection_dots() {
+	const parentRect = addwinelm.getBoundingClientRect();
+	const half = 5;
+	for (let i = 0; i < selected_elements_array.length; i++) {
+		const item = selected_elements_array[i];
+		const r = item.el.getBoundingClientRect();
+		if (item.dots && item.dots.length === 3) {
+			item.dots[0].style.left = Math.round(r.left - parentRect.left + r.width - half) + 'px';
+			item.dots[0].style.top = Math.round(r.top - parentRect.top + r.height / 2 - half) + 'px';
+			item.dots[1].style.left = Math.round(r.left - parentRect.left + r.width / 2 - half) + 'px';
+			item.dots[1].style.top = Math.round(r.top - parentRect.top + r.height - half) + 'px';
+			item.dots[2].style.left = Math.round(r.left - parentRect.left + r.width - half) + 'px';
+			item.dots[2].style.top = Math.round(r.top - parentRect.top + r.height - half) + 'px';
+		}
+	}
+}
+
+function select_components_in_rect() {
+	clear_selected_elements();
+	const rect = select_element_rect.getBoundingClientRect();
+	const children = addwinelm.children;
+	const parentRect = addwinelm.getBoundingClientRect();
+	let firstFound = null;
+	for (let i = 0; i < children.length; i++) {
+		const child = children[i];
+		if (!child.getAttribute('data-name')) continue;
+		const childRect = child.getBoundingClientRect();
+		if (rectsIntersect(rect, childRect)) {
+			if (!firstFound) { firstFound = child; continue; }
+			const dots = [];
+			for (let j = 0; j < 3; j++) {
+				const dot = createELM('DIV');
+				dot.className = 'selection-dot';
+				addwinelm.appendChild(dot);
+				dots.push(dot);
+			}
+			const r = child.getBoundingClientRect();
+			const dotSize = 10;
+			const half = dotSize / 2;
+			dots[0].style.left = Math.round(r.left - parentRect.left + r.width - half) + 'px';
+			dots[0].style.top = Math.round(r.top - parentRect.top + r.height / 2 - half) + 'px';
+			dots[1].style.left = Math.round(r.left - parentRect.left + r.width / 2 - half) + 'px';
+			dots[1].style.top = Math.round(r.top - parentRect.top + r.height - half) + 'px';
+			dots[2].style.left = Math.round(r.left - parentRect.left + r.width - half) + 'px';
+			dots[2].style.top = Math.round(r.top - parentRect.top + r.height - half) + 'px';
+			selected_elements_array.push({ el: child, dots });
+		}
+	}
+	if (firstFound) {
+		select_element_added(firstFound);
+	}
+}
+
+function show_component_context_menu(e, el) {
+	const clicked = el;
+	const isInSelection = select_element === clicked || selected_elements_array.some(function (item) { return item.el === clicked; });
+	if (!isInSelection) {
+		select_element_added_single(clicked);
+	}
+	context_menu_component.innerHTML =
+		'<div class="event-item" data-action="copy"><i class="fa-solid fa-copy"></i><span class="title">Копировать</span></div>' +
+		'<div class="event-item" data-action="delete"><i class="fa-solid fa-trash"></i><span class="title">Удалить</span></div>';
+	Array.from(context_menu_component.children).forEach(function (item) {
+		item.onmousedown = function () {
+			const action = this.getAttribute('data-action');
+			if (action === 'copy') {
+				copy_element_object = select_element;
+			} else if (action === 'delete') {
+				delete_select_element();
+			}
+			context_menu_component.style.display = 'none';
+		};
+	});
+	context_menu_component.style.top = e.pageY + 'px';
+	context_menu_component.style.display = 'block';
+	context_menu_component.style.left = Math.round(e.pageX - context_menu_component.offsetWidth / 2) + 'px';
 }
 
 function delete_select_element() {
@@ -1182,6 +1351,7 @@ window.onload = function () {
 	element_add_event = getID('add_event');
 	element_list = getID('list_add_event');
 	element_list_event = getID('list_event');
+	context_menu_component = getID('context_menu_component');
 	if (win) {
 		win_x = getID('LeftPanel') ? getID('LeftPanel').offsetWidth : 0;
 		win_y = getID('TopPanel') ? getID('TopPanel').offsetHeight : 0;
@@ -1204,6 +1374,7 @@ window.onload = function () {
 			select_element = null;
 			TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 			render_props(win);
+			clear_selected_elements();
 			update_component_tree();
 			const ey = event && event.pageY ? event.pageY : (event && event.clientY ? event.clientY : mouse.y);
 			const ex = event && event.pageX ? event.pageX : (event && event.clientX ? event.clientX : mouse.x);
@@ -1213,6 +1384,7 @@ window.onload = function () {
 			select_element_rect.style.left = ex + 'px';
 			select_element_rect.style.display = 'block';
 			select_element_rect_timer = setInterval(changer_rect_select, 50);
+			rect_select_active = true;
 			return true;
 		}
 		return false;
@@ -1269,6 +1441,12 @@ window.onload = function () {
 	update_component_tree();
 	render_props(win);
 	load_help_stat(data_help_status);
+
+	document.addEventListener('mousedown', function (e) {
+		if (context_menu_component && context_menu_component.style.display !== 'none' && !context_menu_component.contains(e.target)) {
+			context_menu_component.style.display = 'none';
+		}
+	});
 };
 
 window.onresize = () => {};
@@ -1282,10 +1460,14 @@ window.onmouseup = () => {
 	select_element_rect_timer = null;
 	global_lock_event = false;
 	if (select_element_rect) {
+		if (rect_select_active) {
+			select_components_in_rect();
+		}
 		select_element_rect.style.display = 'none';
 		select_element_rect.style.width = '0px';
 		select_element_rect.style.height = '0px';
 	}
+	rect_select_active = false;
 };
 
 window.onmousedown = () => {

@@ -31,7 +31,7 @@ function load_project_source(code) {
 	};
 	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = window_data[0].attrs['data-name'];
 	select_element = null;
-	select_element_added(win);
+	select_element_added_single(win);
 	update_component_tree();
 }
 
@@ -49,7 +49,10 @@ function set_element_defunc(window_object) {
 	const list = window_object.children;
 	for (const key in list) {
 		if (list[key].onmousedown === undefined) {
-			list[key].onmousedown = function (e) { select_element_added(this); startDrag(e, this); };
+			list[key].onmousedown = function (e) { select_element_added_single(this); startDrag(e, this); };
+		}
+		if (list[key].oncontextmenu === undefined) {
+			list[key].oncontextmenu = function (e) { show_component_context_menu(e, this); return false; };
 		}
 	}
 }
