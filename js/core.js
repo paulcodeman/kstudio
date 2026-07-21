@@ -1241,6 +1241,7 @@ function paste_element() {
 	addwinelm.appendChild(el);
 	select_element_added_single(el);
 	update_component_tree();
+	copy_element_object = null;
 }
 
 function show_window_context_menu(e) {
