@@ -1260,8 +1260,29 @@ function paste_element() {
 		pasted.push(el);
 	});
 	if (pasted.length) {
-		select_element_added_single(pasted[pasted.length - 1]);
-		update_component_tree();
+		clear_selected_elements();
+		const lastEl = pasted[pasted.length - 1];
+		for (let i = 0; i < pasted.length - 1; i++) {
+			const el = pasted[i];
+			const r = el.getBoundingClientRect();
+			const parentRect = addwinelm.getBoundingClientRect();
+			const half = 5;
+			const dots = [];
+			for (let j = 0; j < 3; j++) {
+				const dot = createELM('DIV');
+				dot.className = 'selection-dot';
+				addwinelm.appendChild(dot);
+				dots.push(dot);
+			}
+			dots[0].style.left = Math.round(r.left - parentRect.left + r.width - half) + 'px';
+			dots[0].style.top = Math.round(r.top - parentRect.top + r.height / 2 - half) + 'px';
+			dots[1].style.left = Math.round(r.left - parentRect.left + r.width / 2 - half) + 'px';
+			dots[1].style.top = Math.round(r.top - parentRect.top + r.height - half) + 'px';
+			dots[2].style.left = Math.round(r.left - parentRect.left + r.width - half) + 'px';
+			dots[2].style.top = Math.round(r.top - parentRect.top + r.height - half) + 'px';
+			selected_elements_array.push({ el, dots });
+		}
+		select_element_added(lastEl);
 	}
 	copy_element_object = [];
 }
