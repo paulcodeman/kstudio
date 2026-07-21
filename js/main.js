@@ -266,6 +266,10 @@ function setupToolbar() {
     if (btnRun) btnRun.onclick = () => compile(1);
     if (btnBuild) btnBuild.onclick = () => compile(2);
     if (btnCode) btnCode.onclick = showGeneratedCode;
+    const btnUndo = document.getElementById('btn-undo');
+    const btnRedo = document.getElementById('btn-redo');
+    if (btnUndo) btnUndo.onclick = undo;
+    if (btnRedo) btnRedo.onclick = redo;
     if (btnExport) btnExport.onclick = export_project;
     if (btnImportTrigger && importInput) {
         btnImportTrigger.onclick = () => importInput.click();
