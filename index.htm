@@ -21,6 +21,15 @@
 
 <header aria-label="Main toolbar" class="toolbar" id="toolbar" role="toolbar">
     <div class="toolbar-group">
+        <button aria-label="Undo" class="btn" id="btn-undo" title="Undo (Ctrl+Z)">
+            <i class="fa-solid fa-undo"></i>
+        </button>
+        <button aria-label="Redo" class="btn" id="btn-redo" title="Redo (Ctrl+Shift+Z)">
+            <i class="fa-solid fa-redo"></i>
+        </button>
+    </div>
+    <div aria-hidden="true" class="toolbar-sep"></div>
+    <div class="toolbar-group">
         <button aria-label="Run project (F9)" class="btn btn-run" id="btn-run" title="Run (F9)">
             <i class="fa-solid fa-play"></i> <span>Run</span>
         </button>
@@ -30,24 +39,6 @@
         <button aria-label="View generated code (F12)" class="btn btn-code" id="btn-code"
                 title="View Generated Code (F12)">
             <i class="fa-solid fa-code"></i> <span>Code</span>
-        </button>
-    </div>
-    <div aria-hidden="true" class="toolbar-sep"></div>
-    <div class="toolbar-group">
-        <label aria-label="Language" class="tool-label" for="lang-selector">
-            Lang:
-        </label>
-        <select aria-label="Target language" class="tool-select" id="lang-selector">
-            <option value="cmm">C-- (KolibriOS)</option>
-        </select>
-    </div>
-    <div aria-hidden="true" class="toolbar-sep"></div>
-    <div class="toolbar-group">
-        <button aria-label="Undo" class="btn" id="btn-undo" title="Undo (Ctrl+Z)">
-            <i class="fa-solid fa-undo"></i>
-        </button>
-        <button aria-label="Redo" class="btn" id="btn-redo" title="Redo (Ctrl+Shift+Z)">
-            <i class="fa-solid fa-redo"></i>
         </button>
     </div>
     <div aria-hidden="true" class="toolbar-sep"></div>
@@ -88,6 +79,15 @@
         </label>
         <select aria-label="Compiler path" class="tool-select" id="compiler-selector">
             <option value="C:\cmm">C:\cmm (c--.exe)</option>
+        </select>
+    </div>
+    <div aria-hidden="true" class="toolbar-sep"></div>
+    <div class="toolbar-group">
+        <label aria-label="Language" class="tool-label" for="lang-selector">
+            Lang:
+        </label>
+        <select aria-label="Target language" class="tool-select" id="lang-selector">
+            <option value="cmm">C-- (KolibriOS)</option>
         </select>
     </div>
     <div aria-hidden="true" class="toolbar-sep"></div>
