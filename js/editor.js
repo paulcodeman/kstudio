@@ -1117,9 +1117,7 @@ function load_help_stat(txt) {
 function delete_event_list() {
 	if (S.list_eval_select === null) return false;
 	const el = S.select_element || S.win;
-	const tmp = S.list_eval_select.parentNode;
-	if (tmp === null) return false;
-	deleteElement(S.list_eval_select.parentNode);
+	deleteElement(S.list_eval_select);
 	const eventName = S.list_eval_select.getAttribute('data-sel-event');
 	const events = get_component_events(el);
 	const x = events.indexOf(eventName);
@@ -1160,13 +1158,12 @@ function replace_event_list(eventName) {
 
 	load_attribute_list_event();
 
-	const newId = event_attr_name(eventName);
 	const items = S.element_list_event.children;
 	for (let i = 0; i < items.length; i++) {
-		const td = items[i].querySelector('td');
-		if (td && (td.id === newId || td.getAttribute('data-sel-event') === eventName)) {
+		const item = items[i];
+		if (item.getAttribute('data-sel-event') === eventName || item.id === event_attr_name(eventName)) {
 			if (S.list_eval_select !== null) S.list_eval_select.classList.remove('select');
-			S.list_eval_select = td;
+			S.list_eval_select = item;
 			S.list_eval_select.classList.add('select');
 			break;
 		}
@@ -1185,32 +1182,30 @@ function add_event_list(eventName) {
 
 	S.tmp_event_data.push(eventName);
 
-	const a = createELM('TR');
-	const b = createELM('TD');
-	b.setAttribute('data-sel-event', eventName);
+	const item = createELM('DIV');
+	item.className = 'event-item';
+	item.setAttribute('data-sel-event', eventName);
 	const edef = get_event_def(eventName);
 	if (edef && edef.icon) {
 		const iconImg = createELM('IMG');
 		iconImg.src = edef.icon;
 		iconImg.style.cssText = 'vertical-align:middle;margin-right:4px;width:16px;height:16px;';
-		b.appendChild(iconImg);
+		item.appendChild(iconImg);
 	}
-	b.appendChild(document.createTextNode((edef && edef.label) || eventName));
-	b.id = event_attr_name(eventName);
+	item.appendChild(document.createTextNode((edef && edef.label) || eventName));
+	item.id = event_attr_name(eventName);
 
 	const data_list_event_atr = el.getAttribute('data_list_event');
 	let cmd = data_list_event_atr !== '' ? parseInt(data_list_event_atr) : 0;
 	cmd |= 1 << x;
 	el.setAttribute('data_list_event', '' + cmd);
 
-	b.className = 'default';
-	b.onmousedown = function () {
+	item.onmousedown = function () {
 		if (S.list_eval_select !== null) S.list_eval_select.classList.remove('select');
 		S.list_eval_select = this;
 		this.classList.add('select');
 	};
-	a.appendChild(b);
-	S.element_list_event.appendChild(a);
+	S.element_list_event.appendChild(item);
 	S.element_list.style.display = 'none';
 }
 
@@ -1228,27 +1223,28 @@ function load_attribute_list_event() {
 	for (let x = 0; x < events.length; x++) {
 		if (cmd & (1 << x)) {
 			const eventName = events[x];
-			const a = createELM('TR');
-			const b = createELM('TD');
+			const item = createELM('DIV');
+			item.className = 'event-item';
 			const edef = get_event_def(eventName);
 			if (edef && edef.icon) {
 				const iconImg = createELM('IMG');
 				iconImg.src = edef.icon;
 				iconImg.style.cssText = 'vertical-align:middle;margin-right:4px;width:16px;height:16px;';
-				b.appendChild(iconImg);
+				item.appendChild(iconImg);
 			}
-			b.appendChild(document.createTextNode((edef && edef.label) || eventName));
-			b.id = event_attr_name(eventName);
-			b.setAttribute('data-sel-event', eventName);
+			item.appendChild(document.createTextNode((edef && edef.label) || eventName));
+			item.id = event_attr_name(eventName);
+			item.setAttribute('data-sel-event', eventName);
 			S.tmp_event_data.push(eventName);
-			b.className = 'default';
-			b.onmousedown = function () {
+			item.onmousedown = function () {
 				if (S.list_eval_select !== null) S.list_eval_select.classList.remove('select');
 				S.list_eval_select = this;
 				this.classList.add('select');
 			};
-			a.appendChild(b);
-			S.element_list_event.appendChild(a);
+			item.ondblclick = function () {
+				click_edit_code();
+			};
+			S.element_list_event.appendChild(item);
 		}
 	}
 }

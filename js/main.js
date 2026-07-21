@@ -22,7 +22,7 @@ function init() {
 	S.select_element_rect = document.getElementById('selection-rect');
 	S.element_add_event = document.getElementById('btn-add-event');
 	S.element_list = document.getElementById('event-menu');
-	S.element_list_event = document.querySelector('#event-list tbody');
+	S.element_list_event = document.getElementById('event-list-items');
 	S.context_menu_component = document.getElementById('context-menu');
 
 	if (S.win) {

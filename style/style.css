@@ -793,13 +793,13 @@ body { position: relative; }
 	background: var(--color-input-bg);
 }
 
-.event-table {
-	width: 100%;
-	border-collapse: collapse;
+.event-list-items {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 }
-.event-table thead { display: none; }
 
-.event-table td {
+.event-list-items .event-item {
 	border: 1px solid var(--color-border);
 	border-radius: var(--radius-md);
 	width: 100%;
@@ -808,12 +808,13 @@ body { position: relative; }
 	padding: 6px 12px;
 	cursor: pointer;
 	transition: all var(--transition-fast);
+	box-sizing: border-box;
 }
-.event-table td:hover {
+.event-list-items .event-item:hover {
 	background: var(--color-surface);
 	border-color: var(--color-border-light);
 }
-.event-table td.select {
+.event-list-items .event-item.select {
 	border-color: var(--color-primary);
 	background: var(--color-primary-bg);
 	color: var(--color-text);
