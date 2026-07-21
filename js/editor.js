@@ -658,25 +658,6 @@ function save_window_state() {
     };
 }
 
-function upgrade_window_data(data) {
-    if (data.attrs) return data;
-    return {
-        html: data.html || '',
-        attrs: {
-            'data-name': data.name || 'Window',
-            'data-caption': data.caption || '',
-            'data-hide-prop': data.hide_prop || '',
-            'data-align': data.align || ''
-        },
-        style: {
-            width: data.width || '300px',
-            height: data.height || '230px',
-            background: data.bg || '#ffffff'
-        },
-        components: data.components || []
-    };
-}
-
 function scan_window_components() {
     const comps = [];
     const list = S.addwinelm.children;
