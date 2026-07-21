@@ -1,6 +1,6 @@
 let c_code = [];
 let c_count = 0;
-let grid_distance = 5;
+let grid_distance = 8;
 
 const data_help_status = [
 	['add_event', 'Добавить событие для исполнения отрывка кода.'],
@@ -1706,6 +1706,8 @@ window.onload = function () {
 	win.style.background = '#ffffff';
 	addwinelm.style.width = win.offsetWidth - 2;
 	addwinelm.style.height = win.offsetHeight - 2;
+
+	if (getID('grid_select')) change_setka_option(getID('grid_select'));
 
 	window_stack[0] = win;
 	window_data[0] = {
