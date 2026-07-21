@@ -1,39 +1,32 @@
 {
-	"name": "CMM",
-	"extension": ".c",
-	"templates": {
-		"header": "#define MEMSIZE 4096*10\n\n#include \"../lib/kstudio/kstudio.h\"\n\nwindow {{WINDOWS}};\ndword _btn_id = 100;\n\nvoid draw_window();",
-
-		"guiDecl": "",
-
-		"imageDecl": "dword {{IMAGES}};",
-		"imageItem": "{{NAME}}=@img\"{{PATH}}\"",
-
-		"mainOpen": "void main(){\n\t@SetEventMask(EVM_REDRAW+EVM_KEY+EVM_BUTTON);",
-		"mainClose": "}",
-		"newline": "\n",
-
-		"windowPrepare": "{{NAME}}.left=100;\n\t{{NAME}}.top=50;\n\t{{NAME}}.width={{VALUE_PX}};\n\t{{NAME}}.height={{VALUE_PX}};\n\t{{NAME}}.background={{COLOR}};\n\t{{NAME}}.caption=\"{{CAPTION}}\";",
-		"windowWidth": "{{NAME}}.width={{VALUE}};",
-		"windowHeight": "{{NAME}}.height={{VALUE}};",
-		"windowCaption": "{{NAME}}.caption=\"{{VALUE}}\";",
-		"windowColor": "{{NAME}}.background={{VALUE}};",
-		"windowAlign": "",
-		"windowCreate": "\t{{NAME}}.ondraw=#draw_window;\n\t{{NAME}}.create();",
-
-		"componentAdd": "",
-		"propInt": "",
-		"propString": "",
-		"propHex": "",
-		"borderColor": "",
-		"propCaption": "",
-		"propImage": "",
-		"imageDataName": "{{NAME}}_img_src_data_",
-
-		"eventBind": "",
-		"handlerName": "{{NAME}}{{ID}}_",
-		"handlerDef": "void {{HANDLER}}(dword key,x,y){ {{CODE}} }",
-
-		"propertyFormats": {}
-	}
+  "name": "CMM",
+  "extension": ".c",
+  "templates": {
+    "header": "#define MEMSIZE 4096*10\n\n#include \"../lib/kstudio/kstudio.h\"\n\nwindow {{WINDOWS}};\ndword _btn_id = 100;\n\nvoid draw_window();",
+    "guiDecl": "",
+    "imageDecl": "dword {{IMAGES}};",
+    "imageItem": "{{NAME}}=@img\"{{PATH}}\"",
+    "mainOpen": "void main(){\n\t@SetEventMask(EVM_REDRAW+EVM_KEY+EVM_BUTTON);",
+    "mainClose": "}",
+    "newline": "\n",
+    "windowPrepare": "{{NAME}}.left=100;\n\t{{NAME}}.top=50;\n\t{{NAME}}.width={{VALUE_PX}};\n\t{{NAME}}.height={{VALUE_PX}};\n\t{{NAME}}.background={{COLOR}};\n\t{{NAME}}.caption=\"{{CAPTION}}\";",
+    "windowWidth": "{{NAME}}.width={{VALUE}};",
+    "windowHeight": "{{NAME}}.height={{VALUE}};",
+    "windowCaption": "{{NAME}}.caption=\"{{VALUE}}\";",
+    "windowColor": "{{NAME}}.background={{VALUE}};",
+    "windowAlign": "",
+    "windowCreate": "\t{{NAME}}.ondraw=#draw_window;\n\t{{NAME}}.create();",
+    "componentAdd": "",
+    "propInt": "",
+    "propString": "",
+    "propHex": "",
+    "borderColor": "",
+    "propCaption": "",
+    "propImage": "",
+    "imageDataName": "{{NAME}}_img_src_data_",
+    "eventBind": "",
+    "handlerName": "{{NAME}}{{ID}}_",
+    "handlerDef": "void {{HANDLER}}(dword key,x,y){ {{CODE}} }",
+    "propertyFormats": {}
+  }
 }

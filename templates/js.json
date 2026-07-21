@@ -1,48 +1,57 @@
 {
-	"name": "JavaScript",
-	"extension": ".js",
-	"templates": {
-		"header": "// KStudio generated UI\nconst $ = (id) => document.getElementById(id);\n\n",
-
-		"guiDecl": "// Components: {{COMPONENTS}}",
-
-		"imageDecl": "// Images: {{IMAGES}}",
-		"imageItem": "const {{NAME}} = new Image(); {{NAME}}.src = \"{{PATH}}\"",
-
-		"mainOpen": "window.addEventListener('load', function(){\n",
-		"mainClose": "\n});",
-		"newline": "\n",
-
-		"windowPrepare": "let {{NAME}} = document.createElement('div');\n{{NAME}}.id = '{{NAME}}';",
-
-		"windowWidth": "{{NAME}}.style.width = '{{VALUE}}px';",
-		"windowHeight": "{{NAME}}.style.height = '{{VALUE}}px';",
-		"windowCaption": "$('{{NAME}}_title').innerText = '{{VALUE}}';",
-		"windowColor": "{{NAME}}.style.background = '#{{VALUE}}';",
-		"windowAlign": "{{NAME}}.style.margin = '0 auto';",
-		"windowCreate": "document.body.appendChild({{NAME}});",
-
-		"componentAdd": "let {{NAME}} = document.createElement('div');\n{{PARENT}}.appendChild({{NAME}});\n{{NAME}}.className = 'ctrl ctrl_{{TYPE}}';",
-
-		"propInt": "{{NAME}}.style.{{METHOD}} = '{{VALUE}}px';",
-		"propString": "{{NAME}}.{{METHOD}} = '{{VALUE}}';",
-		"propHex": "{{NAME}}.style.background = '#{{VALUE}}';",
-		"borderColor": "{{NAME}}.style.borderColor = '{{VALUE}}';",
-		"propCaption": "{{NAME}}.innerText = '{{VALUE}}';",
-		"propImage": "{{NAME}}.style.backgroundImage = 'url(' + {{DATA_NAME}}.src + ')';",
-		"imageDataName": "img_{{NAME}}",
-
-		"eventBind": "{{NAME}}.addEventListener('{{EVENT}}', {{HANDLER}});",
-		"handlerName": "handler_{{NAME}}_{{ID}}",
-		"handlerDef": "function {{HANDLER}}(ev) {\n\t{{CODE}}\n}",
-
-		"propertyFormats": {
-			"left":   { "method": "left",   "tpl": "propInt" },
-			"top":    { "method": "top",    "tpl": "propInt" },
-			"width":  { "method": "width",  "tpl": "propInt" },
-			"height": { "method": "height", "tpl": "propInt" },
-			"color":  { "method": "color",  "tpl": "propHex" },
-			"image":  { "method": "image",  "tpl": "" }
-		}
-	}
+  "name": "JavaScript",
+  "extension": ".js",
+  "templates": {
+    "header": "// KStudio generated UI\nconst $ = (id) => document.getElementById(id);\n\n",
+    "guiDecl": "// Components: {{COMPONENTS}}",
+    "imageDecl": "// Images: {{IMAGES}}",
+    "imageItem": "const {{NAME}} = new Image(); {{NAME}}.src = \"{{PATH}}\"",
+    "mainOpen": "window.addEventListener('load', function(){\n",
+    "mainClose": "\n});",
+    "newline": "\n",
+    "windowPrepare": "let {{NAME}} = document.createElement('div');\n{{NAME}}.id = '{{NAME}}';",
+    "windowWidth": "{{NAME}}.style.width = '{{VALUE}}px';",
+    "windowHeight": "{{NAME}}.style.height = '{{VALUE}}px';",
+    "windowCaption": "$('{{NAME}}_title').innerText = '{{VALUE}}';",
+    "windowColor": "{{NAME}}.style.background = '#{{VALUE}}';",
+    "windowAlign": "{{NAME}}.style.margin = '0 auto';",
+    "windowCreate": "document.body.appendChild({{NAME}});",
+    "componentAdd": "let {{NAME}} = document.createElement('div');\n{{PARENT}}.appendChild({{NAME}});\n{{NAME}}.className = 'ctrl ctrl_{{TYPE}}';",
+    "propInt": "{{NAME}}.style.{{METHOD}} = '{{VALUE}}px';",
+    "propString": "{{NAME}}.{{METHOD}} = '{{VALUE}}';",
+    "propHex": "{{NAME}}.style.background = '#{{VALUE}}';",
+    "borderColor": "{{NAME}}.style.borderColor = '{{VALUE}}';",
+    "propCaption": "{{NAME}}.innerText = '{{VALUE}}';",
+    "propImage": "{{NAME}}.style.backgroundImage = 'url(' + {{DATA_NAME}}.src + ')';",
+    "imageDataName": "img_{{NAME}}",
+    "eventBind": "{{NAME}}.addEventListener('{{EVENT}}', {{HANDLER}});",
+    "handlerName": "handler_{{NAME}}_{{ID}}",
+    "handlerDef": "function {{HANDLER}}(ev) {\n\t{{CODE}}\n}",
+    "propertyFormats": {
+      "left": {
+        "method": "left",
+        "tpl": "propInt"
+      },
+      "top": {
+        "method": "top",
+        "tpl": "propInt"
+      },
+      "width": {
+        "method": "width",
+        "tpl": "propInt"
+      },
+      "height": {
+        "method": "height",
+        "tpl": "propInt"
+      },
+      "color": {
+        "method": "color",
+        "tpl": "propHex"
+      },
+      "image": {
+        "method": "image",
+        "tpl": ""
+      }
+    }
+  }
 }

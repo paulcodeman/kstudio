@@ -1,209 +1,214 @@
 ﻿<!DOCTYPE html>
-<html lang="ru" data-theme="light">
+<html data-theme="light" lang="ru">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>KStudio - Visual IDE for KolibriOS</title>
-	<link rel="stylesheet" href="style/style.css">
-	<link rel="stylesheet" href="style/gui.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-	<script src="js/state.js"></script>
-	<script src="js/components.js"></script>
-	<script src="js/editor.js"></script>
-	<script src="js/compiler.js"></script>
-	<script src="js/serializer.js"></script>
-	<script src="js/main.js"></script>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>KStudio - Visual IDE for KolibriOS</title>
+    <link href="style/style.css" rel="stylesheet">
+    <link href="style/gui.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <script src="js/state.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/editor.js"></script>
+    <script src="js/compiler.js"></script>
+    <script src="js/serializer.js"></script>
+    <script src="js/main.js"></script>
 </head>
 <body>
-	<div id="event-menu" class="event-menu" role="menu" aria-label="Events menu"></div>
-	<div id="context-menu" class="context-menu" role="menu" aria-label="Context menu"></div>
-	<div id="selection-rect" class="selection-rect" aria-hidden="true"></div>
+<div aria-label="Events menu" class="event-menu" id="event-menu" role="menu"></div>
+<div aria-label="Context menu" class="context-menu" id="context-menu" role="menu"></div>
+<div aria-hidden="true" class="selection-rect" id="selection-rect"></div>
 
-	<header id="toolbar" class="toolbar" role="toolbar" aria-label="Main toolbar">
-		<div class="toolbar-group">
-			<button class="btn" id="btn-theme" title="Toggle theme" aria-label="Toggle theme">
-				<i class="fa-solid fa-sun"></i>
-			</button>
-		</div>
-		<div class="toolbar-sep" aria-hidden="true"></div>
-		<div class="toolbar-group">
-			<button class="btn btn-run" id="btn-run" title="Run (F9)" aria-label="Run project (F9)">
-				<i class="fa-solid fa-play"></i> <span>Run</span>
-			</button>
-			<button class="btn btn-build" id="btn-build" title="Build .kex (F10)" aria-label="Build executable (F10)">
-				<i class="fa-solid fa-download"></i> <span>Build</span>
-			</button>
-			<button class="btn btn-code" id="btn-code" title="View Generated Code (F12)" aria-label="View generated code (F12)">
-				<i class="fa-solid fa-code"></i> <span>Code</span>
-			</button>
-		</div>
-		<div class="toolbar-sep" aria-hidden="true"></div>
-		<div class="toolbar-group">
-			<label for="lang-selector" class="tool-label" aria-label="Language">
-				<i class="fa-solid fa-globe"></i> Lang:
-			</label>
-			<select id="lang-selector" class="tool-select" aria-label="Target language">
-				<option value="cmm">C-- (KolibriOS)</option>
-				<option value="c">C (Generic)</option>
-				<option value="js">JavaScript (Web)</option>
-			</select>
-		</div>
-		<div class="toolbar-sep" aria-hidden="true"></div>
-		<div class="toolbar-group">
-			<button class="btn" id="btn-export" title="Export Project (.kcm)" aria-label="Export project">
-				<i class="fa-solid fa-file-export"></i> <span>Export</span>
-			</button>
-			<button class="btn" id="btn-import-trigger" title="Import Project" aria-label="Import project">
-				<i class="fa-solid fa-file-import"></i> <span>Import</span>
-			</button>
-			<input type="file" id="import-input" accept=".kcm" hidden aria-hidden="true">
-		</div>
-		<div class="toolbar-sep" aria-hidden="true"></div>
-		<div class="toolbar-group">
-			<label for="window-selector" class="tool-label" aria-label="Window">
-				<i class="fa-solid fa-display"></i> Window:
-			</label>
-			<select id="window-selector" class="tool-select" aria-label="Select window"></select>
-		</div>
-		<div class="toolbar-sep" aria-hidden="true"></div>
-		<div class="toolbar-group">
-			<label for="grid-selector" class="tool-label" aria-label="Grid size">
-				<i class="fa-solid fa-border-all"></i> Grid:
-			</label>
-			<select id="grid-selector" class="tool-select" aria-label="Grid size">
-				<option value="0">No Grid</option>
-				<option value="4">4px - Fine</option>
-				<option value="8" selected>8px - Normal</option>
-				<option value="10">10px</option>
-				<option value="16">16px - Coarse</option>
-				<option value="20">20px - Very Coarse</option>
-			</select>
-		</div>
-		<div class="toolbar-sep" aria-hidden="true"></div>
-		<div class="toolbar-group">
-			<label for="compiler-selector" class="tool-label" aria-label="Compiler">
-				<i class="fa-solid fa-gear"></i> Compiler:
-			</label>
-			<select id="compiler-selector" class="tool-select" aria-label="Compiler path">
-				<option value="C:\cmm">C:\cmm (c--.exe)</option>
-				<option value="C:\cmm\c--.exe" selected>C:\cmm\c--.exe</option>
-			</select>
-		</div>
-	</header>
+<header aria-label="Main toolbar" class="toolbar" id="toolbar" role="toolbar">
+    <div class="toolbar-group">
+        <button aria-label="Run project (F9)" class="btn btn-run" id="btn-run" title="Run (F9)">
+            <i class="fa-solid fa-play"></i> <span>Run</span>
+        </button>
+        <button aria-label="Build executable (F10)" class="btn btn-build" id="btn-build" title="Build .kex (F10)">
+            <i class="fa-solid fa-download"></i> <span>Build</span>
+        </button>
+        <button aria-label="View generated code (F12)" class="btn btn-code" id="btn-code"
+                title="View Generated Code (F12)">
+            <i class="fa-solid fa-code"></i> <span>Code</span>
+        </button>
+    </div>
+    <div aria-hidden="true" class="toolbar-sep"></div>
+    <div class="toolbar-group">
+        <label aria-label="Language" class="tool-label" for="lang-selector">
+            Lang:
+        </label>
+        <select aria-label="Target language" class="tool-select" id="lang-selector">
+            <option value="cmm">C-- (KolibriOS)</option>
+        </select>
+    </div>
+    <div aria-hidden="true" class="toolbar-sep"></div>
+    <div class="toolbar-group">
+        <button aria-label="Export project" class="btn" id="btn-export" title="Export Project (.kcm)">
+            <i class="fa-solid fa-file-export"></i> <span>Export</span>
+        </button>
+        <button aria-label="Import project" class="btn" id="btn-import-trigger" title="Import Project">
+            <i class="fa-solid fa-file-import"></i> <span>Import</span>
+        </button>
+        <input accept=".kcm" aria-hidden="true" hidden id="import-input" type="file">
+    </div>
+    <div aria-hidden="true" class="toolbar-sep"></div>
+    <div class="toolbar-group">
+        <label aria-label="Window" class="tool-label" for="window-selector">
+            <i class="fa-solid fa-display"></i> Window:
+        </label>
+        <select aria-label="Select window" class="tool-select" id="window-selector"></select>
+    </div>
+    <div aria-hidden="true" class="toolbar-sep"></div>
+    <div class="toolbar-group">
+        <label aria-label="Grid size" class="tool-label" for="grid-selector">
+            <i class="fa-solid fa-border-all"></i> Grid:
+        </label>
+        <select aria-label="Grid size" class="tool-select" id="grid-selector">
+            <option value="0">No Grid</option>
+            <option value="4">4px - Fine</option>
+            <option selected value="8">8px - Normal</option>
+            <option value="10">10px</option>
+            <option value="16">16px - Coarse</option>
+            <option value="20">20px - Very Coarse</option>
+        </select>
+    </div>
+    <div aria-hidden="true" class="toolbar-sep"></div>
+    <div class="toolbar-group">
+        <label aria-label="Compiler" class="tool-label" for="compiler-selector">
+            <i class="fa-solid fa-gear"></i> Compiler:
+        </label>
+        <select aria-label="Compiler path" class="tool-select" id="compiler-selector">
+            <option value="C:\cmm">C:\cmm (c--.exe)</option>
+        </select>
+    </div>
+    <div aria-hidden="true" class="toolbar-sep"></div>
+    <div class="toolbar-group">
+        <button aria-label="Toggle theme" class="btn" id="btn-theme" title="Toggle theme">
+            <i class="fa-solid fa-sun"></i>
+        </button>
+    </div>
+</header>
 
-	<main id="main-layout" class="main-layout" role="main">
-		<aside id="left-panel" class="side-panel side-left" role="complementary" aria-label="Components palette">
-			<div class="panel-header">
-				<h2><i class="fa-solid fa-cube"></i> Components</h2>
-				<button class="icon-btn" id="palette-view-btn" title="Toggle view" aria-label="Toggle palette view">
-					<i class="fa-solid fa-table-cells"></i>
-				</button>
-			</div>
-			<div id="properties-panel" class="properties-panel" role="region" aria-label="Component properties"></div>
-		</aside>
+<main class="main-layout" id="main-layout" role="main">
+    <aside aria-label="Components palette" class="side-panel side-left" id="left-panel" role="complementary">
+        <div class="panel-header">
+            <h2><i class="fa-solid fa-cube"></i> Components</h2>
+            <button aria-label="Toggle palette view" class="icon-btn" id="palette-view-btn" title="Toggle view">
+                <i class="fa-solid fa-table-cells"></i>
+            </button>
+        </div>
+        <div aria-label="Component properties" class="properties-panel" id="properties-panel" role="region"></div>
+    </aside>
 
-		<div class="splitter" data-side="left" role="separator" aria-orientation="vertical" aria-label="Resize left panel" tabindex="0"></div>
+    <div aria-label="Resize left panel" aria-orientation="vertical" class="splitter" data-side="left" role="separator"
+         tabindex="0"></div>
 
-		<section id="center-panel" class="center-panel" role="region" aria-label="Design canvas">
-			<div id="canvas-container" class="canvas-container">
-				<div id="window-background" class="window-background" role="application" aria-label="Design canvas">
-					<div id="window-canvas" class="window-canvas" role="graphics-document" aria-label="Form designer"></div>
-				</div>
-			</div>
-		</section>
+    <section aria-label="Design canvas" class="center-panel" id="center-panel" role="region">
+        <div class="canvas-container" id="canvas-container">
+            <div aria-label="Design canvas" class="window-background" id="window-background" role="application">
+                <div aria-label="Form designer" class="window-canvas" id="window-canvas" role="graphics-document"></div>
+            </div>
+        </div>
+    </section>
 
-		<div class="splitter" data-side="right" role="separator" aria-orientation="vertical" aria-label="Resize right panel" tabindex="0"></div>
+    <div aria-label="Resize right panel" aria-orientation="vertical" class="splitter" data-side="right" role="separator"
+         tabindex="0"></div>
 
-		<aside id="right-panel" class="side-panel side-right" role="complementary" aria-label="Properties and events">
-			<div class="tab-bar" role="tablist" aria-label="Panels">
-				<input type="radio" name="panel-tab" id="tab-components" checked hidden>
-				<label for="tab-components" role="tab" aria-selected="true" aria-controls="panel-components">
-					<i class="fa-solid fa-list"></i> Components
-				</label>
-				<input type="radio" name="panel-tab" id="tab-events" hidden>
-				<label for="tab-events" role="tab" aria-selected="false" aria-controls="panel-events">
-					<i class="fa-solid fa-bolt"></i> Events
-				</label>
-			</div>
+    <aside aria-label="Properties and events" class="side-panel side-right" id="right-panel" role="complementary">
+        <div aria-label="Panels" class="tab-bar" role="tablist">
+            <input checked hidden id="tab-components" name="panel-tab" type="radio">
+            <label aria-controls="panel-components" aria-selected="true" for="tab-components" role="tab">
+                <i class="fa-solid fa-list"></i> Components
+            </label>
+            <input hidden id="tab-events" name="panel-tab" type="radio">
+            <label aria-controls="panel-events" aria-selected="false" for="tab-events" role="tab">
+                <i class="fa-solid fa-bolt"></i> Events
+            </label>
+        </div>
 
-			<div class="tab-panel active" id="panel-components" role="tabpanel" aria-labelledby="tab-components">
-				<div class="panel-section">
-					<h3 class="section-title"><i class="fa-solid fa-sitemap"></i> Component Tree</h3>
-					<select id="component-tree" class="form-select" aria-label="Component tree"></select>
-				</div>
-				<div class="panel-section">
-					<div id="attribute-panel" class="attributes-panel" role="region" aria-label="Attributes"></div>
-				</div>
-			</div>
+        <div aria-labelledby="tab-components" class="tab-panel active" id="panel-components" role="tabpanel">
+            <div class="panel-section">
+                <h3 class="section-title"><i class="fa-solid fa-sitemap"></i> Component Tree</h3>
+                <select aria-label="Component tree" class="form-select" id="component-tree"></select>
+            </div>
+            <div class="panel-section">
+                <div aria-label="Attributes" class="attributes-panel" id="attribute-panel" role="region"></div>
+            </div>
+        </div>
 
-			<div class="tab-panel" id="panel-events" role="tabpanel" aria-labelledby="tab-events" hidden>
-				<div class="events-panel">
-					<div class="events-header">
-						<button class="btn btn-primary" id="btn-add-event" aria-label="Add event">
-							<i class="fa-solid fa-plus"></i> Add Event
-						</button>
-						<div class="event-actions">
-							<button class="btn btn-icon" id="btn-delete-event" title="Delete event" aria-label="Delete event">
-								<i class="fa-solid fa-trash"></i>
-							</button>
-							<button class="btn btn-icon" id="btn-replace-event" title="Replace event" aria-label="Replace event">
-								<i class="fa-solid fa-arrows-rotate"></i>
-							</button>
-							<button class="btn btn-primary btn-grow" id="btn-edit-code" title="Edit code" aria-label="Edit event code">
-								<i class="fa-solid fa-pen"></i> Edit Code
-							</button>
-						</div>
-					</div>
-					<div id="event-list-container" class="event-list-container">
-						<div id="event-list-items" class="event-list-items" role="list" aria-label="Event handlers"></div>
-					</div>
-				</div>
-			</div>
-		</aside>
-	</main>
+        <div aria-labelledby="tab-events" class="tab-panel" hidden id="panel-events" role="tabpanel">
+            <div class="events-panel">
+                <div class="events-header">
+                    <button aria-label="Add event" class="btn btn-primary" id="btn-add-event">
+                        <i class="fa-solid fa-plus"></i> Add Event
+                    </button>
+                    <div class="event-actions">
+                        <button aria-label="Delete event" class="btn btn-icon" id="btn-delete-event"
+                                title="Delete event">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <button aria-label="Replace event" class="btn btn-icon" id="btn-replace-event"
+                                title="Replace event">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                        </button>
+                        <button aria-label="Edit event code" class="btn btn-primary btn-grow" id="btn-edit-code"
+                                title="Edit code">
+                            <i class="fa-solid fa-pen"></i> Edit Code
+                        </button>
+                    </div>
+                </div>
+                <div class="event-list-container" id="event-list-container">
+                    <div aria-label="Event handlers" class="event-list-items" id="event-list-items" role="list"></div>
+                </div>
+            </div>
+        </div>
+    </aside>
+</main>
 
-	<footer id="status-bar" class="status-bar" role="status" aria-live="polite">
-		<span id="status-compiler">Compiler: C:\cmm\c--.exe</span>
-		<span id="status-os">OS: KolibriOS</span>
-	</footer>
+<footer aria-live="polite" class="status-bar" id="status-bar" role="status">
+    <span id="status-compiler">Compiler: C:\cmm\c--.exe</span>
+    <span id="status-os">OS: KolibriOS</span>
+</footer>
 
-	<div id="code-editor" class="modal code-editor" role="dialog" aria-modal="true" aria-labelledby="code-editor-title" hidden>
-		<div class="modal-content">
-			<div class="editor-header">
-				<h3 id="code-editor-title">void ComponentName_event() {</h3>
-			</div>
-			<div class="editor-body">
-				<textarea id="code-textarea" placeholder="// Your code here"></textarea>
-			</div>
-			<div class="editor-braces">}</div>
-			<div class="editor-footer">
-				<button class="btn btn-primary" id="btn-save-code">OK</button>
-				<button class="btn" id="btn-cancel-code">Cancel</button>
-			</div>
-		</div>
-	</div>
+<div aria-labelledby="code-editor-title" aria-modal="true" class="modal code-editor" hidden id="code-editor"
+     role="dialog">
+    <div class="modal-content">
+        <div class="editor-header">
+            <h3 id="code-editor-title">void ComponentName_event() {</h3>
+        </div>
+        <div class="editor-body">
+            <textarea id="code-textarea" placeholder="// Your code here"></textarea>
+        </div>
+        <div class="editor-braces">}</div>
+        <div class="editor-footer">
+            <button class="btn btn-primary" id="btn-save-code">OK</button>
+            <button class="btn" id="btn-cancel-code">Cancel</button>
+        </div>
+    </div>
+</div>
 
-	<div id="code-viewer" class="modal code-viewer" role="dialog" aria-modal="true" aria-labelledby="code-viewer-title" hidden>
-		<textarea id="view-code-text" readonly aria-label="Generated code" spellcheck="false"></textarea>
-		<div class="modal-footer">
-			<button class="btn" id="btn-close-viewer">Close</button>
-		</div>
-	</div>
+<div aria-labelledby="code-viewer-title" aria-modal="true" class="modal code-viewer" hidden id="code-viewer"
+     role="dialog">
+    <textarea aria-label="Generated code" id="view-code-text" readonly spellcheck="false"></textarea>
+    <div class="modal-footer">
+        <button class="btn" id="btn-close-viewer">Close</button>
+    </div>
+</div>
 
-	<template id="event-menu-item-template">
-		<div class="event-menu-item" role="menuitem" tabindex="-1">
-			<img class="event-icon" src="" alt="" aria-hidden="true">
-			<span class="event-title"></span>
-		</div>
-	</template>
-	<template id="context-menu-item-template">
-		<div class="context-menu-item" role="menuitem" tabindex="-1">
-			<i class="context-icon" aria-hidden="true"></i>
-			<span class="context-title"></span>
-		</div>
-	</template>
-	<template id="context-menu-separator-template">
-		<div class="context-separator" role="separator"></div>
-	</template>
+<template id="event-menu-item-template">
+    <div class="event-menu-item" role="menuitem" tabindex="-1">
+        <img alt="" aria-hidden="true" class="event-icon" src="">
+        <span class="event-title"></span>
+    </div>
+</template>
+<template id="context-menu-item-template">
+    <div class="context-menu-item" role="menuitem" tabindex="-1">
+        <i aria-hidden="true" class="context-icon"></i>
+        <span class="context-title"></span>
+    </div>
+</template>
+<template id="context-menu-separator-template">
+    <div class="context-separator" role="separator"></div>
+</template>
 </body>
 </html>
