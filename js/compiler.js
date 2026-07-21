@@ -1,29 +1,3 @@
-function rgbToHex(rgb) {
-	if (!rgb) return 'FFFFFF';
-	if (rgb[0] === '#') return rgb.slice(1).toUpperCase();
-	const m = rgb.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
-	if (m) {
-		return ((1 << 24) + (parseInt(m[1]) << 16) + (parseInt(m[2]) << 8) + parseInt(m[3])).toString(16).slice(1).toUpperCase();
-	}
-	return 'FFFFFF';
-}
-
-function applyWindowData(data) {
-	if (!data) return;
-	addwinelm.innerHTML = data.html || '';
-	for (const key in data.attrs) {
-		if (data.attrs[key]) win.setAttribute(key, data.attrs[key]);
-		else win.removeAttribute(key);
-	}
-	const s = data.style || {};
-	win.style.width = s.width || '300px';
-	win.style.height = s.height || '230px';
-	win.style.background = s.background || '#ffffff';
-	addwinelm.style.width = (parseInt(win.style.width) - 2) + 'px';
-	addwinelm.style.height = (parseInt(win.style.height) - 2) + 'px';
-	set_element_defunc(addwinelm);
-}
-
 const EVENT_ARGS = {
 	click: 'dword x, dword y, dword buttons',
 	dblclick: 'dword x, dword y, dword buttons',
@@ -59,10 +33,31 @@ const EVENT_ARGS = {
 	resize: 'dword w, dword h'
 };
 
-function isEventType(eventName) {
-	return eventName === 'click' || eventName === 'timer';
+function rgbToHex(rgb) {
+	if (!rgb) return 'FFFFFF';
+	if (rgb[0] === '#') return rgb.slice(1).toUpperCase();
+	const m = rgb.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+	if (m) {
+		return ((1 << 24) + (parseInt(m[1]) << 16) + (parseInt(m[2]) << 8) + parseInt(m[3])).toString(16).slice(1).toUpperCase();
+	}
+	return 'FFFFFF';
 }
 
+function applyWindowData(data) {
+	if (!data) return;
+	S.addwinelm.innerHTML = data.html || '';
+	for (const key in data.attrs) {
+		if (data.attrs[key]) S.win.setAttribute(key, data.attrs[key]);
+		else S.win.removeAttribute(key);
+	}
+	const s = data.style || {};
+	S.win.style.width = s.width || '300px';
+	S.win.style.height = s.height || '230px';
+	S.win.style.background = s.background || '#ffffff';
+	S.addwinelm.style.width = (parseInt(S.win.style.width) - 2) + 'px';
+	S.addwinelm.style.height = (parseInt(S.win.style.height) - 2) + 'px';
+	set_element_defunc(S.addwinelm);
+}
 
 function argsToString(eventName) {
 	return EVENT_ARGS[eventName] || '';
@@ -129,7 +124,6 @@ function generateWindowCode(i, winData, isMain) {
 	const winH = parseInt(s.height || '230') - 2;
 	const caption = winData.attrs ? (winData.attrs['data-caption'] || '') : (winData.caption || '');
 	const bg = s.background ? rgbToHex(s.background) : 'FFFFFF';
-	const drawFunc = 'draw_' + wName;
 	const formName = 'Form' + (isMain ? '' : ('' + i));
 	const indent = isMain ? '\t' : '\t';
 
@@ -145,9 +139,8 @@ function generateWindowCode(i, winData, isMain) {
 	let hasMouse = false;
 	let btnId = 99;
 
-	// Window-level events
 	if (winData.attrs) {
-		const winEvents = collectEvents(win, wName);
+		const winEvents = collectEvents(S.win, wName);
 		for (const ev of winEvents) {
 			const funcName = ev.name + '_' + ev.event;
 			const args = argsToString(ev.event);
@@ -181,7 +174,7 @@ function generateWindowCode(i, winData, isMain) {
 		}
 	}
 
-	const container = win.children[0];
+	const container = S.addwinelm;
 	const children = container.children;
 
 	for (let j = 0; j < children.length; j++) {
@@ -241,7 +234,7 @@ function generateWindowCode(i, winData, isMain) {
 	if (hasMouse) evMask += ' + EVM_MOUSE';
 
 	let code = '';
-	code += `void ${drawFunc}()\n{\n\tsc.get();\n`;
+	code += `void draw_${wName}()\n{\n\tsc.get();\n`;
 	code += drawCode;
 	code += '}\n\n';
 
@@ -321,7 +314,7 @@ function generateWindowCode(i, winData, isMain) {
 		code += '}\n\n';
 	}
 
-	return { code, formName, drawFunc };
+	return { code, formName };
 }
 
 function generateCode() {
@@ -331,12 +324,13 @@ function generateCode() {
 	let threadCalls = '';
 	let result = '';
 
-	const windowCount = count_stack;
-	const savedIndex = current_win_index;
-	const savedHtml = addwinelm.innerHTML;
+	const windowCount = S.count_stack;
+	const savedIndex = S.current_win_index;
+	const savedHtml = S.addwinelm.innerHTML;
+	const savedData = S.window_data[savedIndex];
 
 	for (let i = 0; i < windowCount; i++) {
-		const data = window_data[i];
+		const data = S.window_data[i];
 		if (!data) continue;
 		applyWindowData(data);
 
@@ -354,7 +348,6 @@ function generateCode() {
 	let header = `#define MEMSIZE 4096*10\n\n#include "gui.h"\n\nproc_info Form;\n`;
 	if (allForms) header += allForms;
 
-	// Inject thread calls into main()
 	const mainIdx = result.indexOf('void main()');
 	if (mainIdx >= 0 && threadCalls) {
 		const braceIdx = result.indexOf('{\n', mainIdx);
@@ -368,8 +361,8 @@ function generateCode() {
 	header += 'dword _click_id, _key_ascii, _key_scancode;\n\n';
 	result = header + result;
 
-	addwinelm.innerHTML = savedHtml;
-	applyWindowData(window_data[savedIndex]);
+	S.addwinelm.innerHTML = savedHtml;
+	if (savedData) applyWindowData(savedData);
 
 	return result;
 }
@@ -382,12 +375,12 @@ function compile(mode) {
 
 function showGeneratedCode() {
 	const code = generateCode();
-	document.getElementById('view_code_text').value = code;
-	document.getElementById('window_view_code').style.display = 'flex';
+	document.getElementById('view-code-text').value = code;
+	document.getElementById('code-viewer').style.display = 'flex';
 }
 
 function closeCodeViewer() {
-	document.getElementById('window_view_code').style.display = 'none';
+	document.getElementById('code-viewer').style.display = 'none';
 }
 
 function sendToCompiler(code) {

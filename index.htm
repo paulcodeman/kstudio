@@ -1,122 +1,215 @@
 ﻿<!DOCTYPE html>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="style/style.css">
-<link rel="stylesheet" href="style/gui.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script src="js/components.js"></script>
-<script src="js/download.js"></script>
-<script src="js/serializer.js"></script>
-<script src="js/core.js"></script>
-<script src="js/compiler.js"></script>
-<body onmousedown="if(element_list)element_list.style.display='none';" onmousemove="mouse.getX(event);mouse.getY(event);" onkeydown="window.ee = event;CmdKeyDown(event);">
-	<div id="list_add_event" class="list_event"></div>
-	<div class="panel" id="TopPanel">
-		<div class="toolbar">
-			<div class="tool-group">
-				<div class="button btn-run" onmousedown="compile(1);" title="Скомпилировать и запустить (F9)"><i class="fa-solid fa-play"></i> Запустить</div>
-				<div class="button btn-build" onmousedown="compile(2);" title="Скомпилировать и скачать .kex"><i class="fa-solid fa-download"></i> Скачать</div>
-				<div class="button btn-code" onmousedown="showGeneratedCode();" title="Посмотреть сгенерированный код (F12)"><i class="fa-solid fa-code"></i> Код</div>
-			</div>
-			<div class="tool-sep"></div>
-			<div class="tool-group">
-				<label class="tool-label"><i class="fa-solid fa-globe"></i> Язык:</label>
-				<select class="list_window" id="lang_selector" onchange="changeLanguage(this.value);">
-					<option value="cmm">C-- (KolibriOS)</option>
-					<option value="c">C (пример)</option>
-					<option value="js">JavaScript (пример)</option>
-				</select>
-			</div>
-			<div class="tool-sep"></div>
-			<div class="tool-group">
-				<div class="button" onmousedown="export_project();" title="Экспорт проекта (.kcm)"><i class="fa-solid fa-file-export"></i> Экспорт</div>
-				<div class="button" onmousedown="document.getElementById('import_input').click();" title="Импорт проекта"><i class="fa-solid fa-file-import"></i> Импорт</div>
-				<input type="file" id="import_input" accept=".kcm" style="display:none" onchange="import_project(this);">
-			</div>
-			<div class="tool-sep"></div>
-			<div class="tool-group">
-				<label class="tool-label"><i class="fa-solid fa-display"></i> Окно:</label>
-				<select class="list_window" id="list_window_add"></select>
-			</div>
-			<div class="tool-sep"></div>
-			<div class="tool-group">
-				<label class="tool-label"><i class="fa-solid fa-border-all"></i> Сетка:</label>
-				<select class="list_window" id="grid_select" onchange="change_setka_option(this);">
-					<option>Без сетки</option>
-					<option>4 px — мелкая</option>
-					<option selected>8 px — средняя</option>
-					<option>10 px</option>
-					<option>16 px — крупная</option>
-					<option>20 px — очень крупная</option>
-				</select>
-			</div>
-			<div class="tool-sep"></div>
-			<div class="tool-group">
-				<label class="tool-label"><i class="fa-solid fa-gear"></i> Компилятор:</label>
-				<select class="list_window" id="compiler_select" title="Путь к компилятору">
-					<option value="C:\cmm">C:\cmm (c--.exe)</option>
-					<option value="C:\cmm\c--.exe">C:\cmm\c--.exe</option>
-				</select>
-			</div>
+<html lang="ru" data-theme="light">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>KStudio - Visual IDE for KolibriOS</title>
+	<link rel="stylesheet" href="style/style.css">
+	<link rel="stylesheet" href="style/gui.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<script src="js/state.js"></script>
+	<script src="js/components.js"></script>
+	<script src="js/editor.js"></script>
+	<script src="js/compiler.js"></script>
+	<script src="js/serializer.js"></script>
+	<script src="js/main.js"></script>
+</head>
+<body>
+	<div id="event-menu" class="event-menu" role="menu" aria-label="Events menu"></div>
+	<div id="context-menu" class="context-menu" role="menu" aria-label="Context menu"></div>
+	<div id="selection-rect" class="selection-rect" aria-hidden="true"></div>
+
+	<header id="toolbar" class="toolbar" role="toolbar" aria-label="Main toolbar">
+		<div class="toolbar-group">
+			<button class="btn" id="btn-theme" title="Toggle theme" aria-label="Toggle theme">
+				<i class="fa-solid fa-sun"></i>
+			</button>
 		</div>
-	</div>
-	<div class="mid-layout" id="MidLayout">
-		<div class="mid-panel mid-left" id="LeftPanel">
-			<div class="palette-header">
-				<span><i class="fa-solid fa-cube"></i> Компоненты</span>
-				<span id="palette_view_btn" class="palette-view-btn" onclick="toggle_palette_view()" title="Вид"><i class="fa-solid fa-table-cells"></i></span>
-			</div>
-			<div id="properties"></div>
+		<div class="toolbar-sep" aria-hidden="true"></div>
+		<div class="toolbar-group">
+			<button class="btn btn-run" id="btn-run" title="Run (F9)" aria-label="Run project (F9)">
+				<i class="fa-solid fa-play"></i> <span>Run</span>
+			</button>
+			<button class="btn btn-build" id="btn-build" title="Build .kex (F10)" aria-label="Build executable (F10)">
+				<i class="fa-solid fa-download"></i> <span>Build</span>
+			</button>
+			<button class="btn btn-code" id="btn-code" title="View Generated Code (F12)" aria-label="View generated code (F12)">
+				<i class="fa-solid fa-code"></i> <span>Code</span>
+			</button>
 		</div>
-		<div class="panel-splitter" data-side="left"></div>
-		<div class="mid-panel mid-center" id="CenterPanel"><div id="main"><div id="window_background" onmousedown="return false;"><div id="window" oncontextmenu="return false;"></div></div></div></div>
-		<div class="panel-splitter" data-side="right"></div>
-		<div class="mid-panel mid-right" id="RightPanel"><div class="container">
-			<input type="radio" name="odin" checked="checked" id="vkl1"><label for="vkl1" onmousedown="return false;"><i class="fa-solid fa-list"></i> Свойства</label>
-			<input type="radio" name="odin" id="vkl2"><label for="vkl2" onmousedown="return false;"><i class="fa-solid fa-bolt"></i> События</label>
-			<div>
-				<div class="glob_title"><i class="fa-solid fa-sitemap"></i> Компоненты</div>
-				<div class="title"><select class="list" id="component_tree"></select></div>
-				<div class="attr">
-					<div id="attribute_element"></div>
+		<div class="toolbar-sep" aria-hidden="true"></div>
+		<div class="toolbar-group">
+			<label for="lang-selector" class="tool-label" aria-label="Language">
+				<i class="fa-solid fa-globe"></i> Lang:
+			</label>
+			<select id="lang-selector" class="tool-select" aria-label="Target language">
+				<option value="cmm">C-- (KolibriOS)</option>
+				<option value="c">C (Generic)</option>
+				<option value="js">JavaScript (Web)</option>
+			</select>
+		</div>
+		<div class="toolbar-sep" aria-hidden="true"></div>
+		<div class="toolbar-group">
+			<button class="btn" id="btn-export" title="Export Project (.kcm)" aria-label="Export project">
+				<i class="fa-solid fa-file-export"></i> <span>Export</span>
+			</button>
+			<button class="btn" id="btn-import-trigger" title="Import Project" aria-label="Import project">
+				<i class="fa-solid fa-file-import"></i> <span>Import</span>
+			</button>
+			<input type="file" id="import-input" accept=".kcm" hidden aria-hidden="true">
+		</div>
+		<div class="toolbar-sep" aria-hidden="true"></div>
+		<div class="toolbar-group">
+			<label for="window-selector" class="tool-label" aria-label="Window">
+				<i class="fa-solid fa-display"></i> Window:
+			</label>
+			<select id="window-selector" class="tool-select" aria-label="Select window"></select>
+		</div>
+		<div class="toolbar-sep" aria-hidden="true"></div>
+		<div class="toolbar-group">
+			<label for="grid-selector" class="tool-label" aria-label="Grid size">
+				<i class="fa-solid fa-border-all"></i> Grid:
+			</label>
+			<select id="grid-selector" class="tool-select" aria-label="Grid size">
+				<option value="0">No Grid</option>
+				<option value="4">4px - Fine</option>
+				<option value="8" selected>8px - Normal</option>
+				<option value="10">10px</option>
+				<option value="16">16px - Coarse</option>
+				<option value="20">20px - Very Coarse</option>
+			</select>
+		</div>
+		<div class="toolbar-sep" aria-hidden="true"></div>
+		<div class="toolbar-group">
+			<label for="compiler-selector" class="tool-label" aria-label="Compiler">
+				<i class="fa-solid fa-gear"></i> Compiler:
+			</label>
+			<select id="compiler-selector" class="tool-select" aria-label="Compiler path">
+				<option value="C:\cmm">C:\cmm (c--.exe)</option>
+				<option value="C:\cmm\c--.exe" selected>C:\cmm\c--.exe</option>
+			</select>
+		</div>
+	</header>
+
+	<main id="main-layout" class="main-layout" role="main">
+		<aside id="left-panel" class="side-panel side-left" role="complementary" aria-label="Components palette">
+			<div class="panel-header">
+				<h2><i class="fa-solid fa-cube"></i> Components</h2>
+				<button class="icon-btn" id="palette-view-btn" title="Toggle view" aria-label="Toggle palette view">
+					<i class="fa-solid fa-table-cells"></i>
+				</button>
+			</div>
+			<div id="properties-panel" class="properties-panel" role="region" aria-label="Component properties"></div>
+		</aside>
+
+		<div class="splitter" data-side="left" role="separator" aria-orientation="vertical" aria-label="Resize left panel" tabindex="0"></div>
+
+		<section id="center-panel" class="center-panel" role="region" aria-label="Design canvas">
+			<div id="canvas-container" class="canvas-container">
+				<div id="window-background" class="window-background" role="application" aria-label="Design canvas">
+					<div id="window-canvas" class="window-canvas" role="graphics-document" aria-label="Form designer"></div>
 				</div>
 			</div>
-			<div>
-				<div class="attr events-panel">
-					<div class="button" id="add_event" onmousedown="return false;"><i class="fa-solid fa-plus"></i> Добавить событие</div>
-					<div class="event-actions">
-						<div onmousedown="return false;" onclick="delete_event_list();" class="button" title="Удалить"><i class="fa-solid fa-trash"></i></div>
-						<div onmousedown="return false;" id="replace_event" class="button" title="Заменить"><i class="fa-solid fa-arrows-rotate"></i></div>
-						<div onmousedown="return false;" onclick="click_edit_code();" class="button grow" id="edit_event"><i class="fa-solid fa-pen"></i> Редактировать</div>
+		</section>
+
+		<div class="splitter" data-side="right" role="separator" aria-orientation="vertical" aria-label="Resize right panel" tabindex="0"></div>
+
+		<aside id="right-panel" class="side-panel side-right" role="complementary" aria-label="Properties and events">
+			<div class="tab-bar" role="tablist" aria-label="Panels">
+				<input type="radio" name="panel-tab" id="tab-components" checked hidden>
+				<label for="tab-components" role="tab" aria-selected="true" aria-controls="panel-components">
+					<i class="fa-solid fa-list"></i> Components
+				</label>
+				<input type="radio" name="panel-tab" id="tab-events" hidden>
+				<label for="tab-events" role="tab" aria-selected="false" aria-controls="panel-events">
+					<i class="fa-solid fa-bolt"></i> Events
+				</label>
+			</div>
+
+			<div class="tab-panel active" id="panel-components" role="tabpanel" aria-labelledby="tab-components">
+				<div class="panel-section">
+					<h3 class="section-title"><i class="fa-solid fa-sitemap"></i> Component Tree</h3>
+					<select id="component-tree" class="form-select" aria-label="Component tree"></select>
+				</div>
+				<div class="panel-section">
+					<div id="attribute-panel" class="attributes-panel" role="region" aria-label="Attributes"></div>
+				</div>
+			</div>
+
+			<div class="tab-panel" id="panel-events" role="tabpanel" aria-labelledby="tab-events" hidden>
+				<div class="events-panel">
+					<div class="events-header">
+						<button class="btn btn-primary" id="btn-add-event" aria-label="Add event">
+							<i class="fa-solid fa-plus"></i> Add Event
+						</button>
+						<div class="event-actions">
+							<button class="btn btn-icon" id="btn-delete-event" title="Delete event" aria-label="Delete event">
+								<i class="fa-solid fa-trash"></i>
+							</button>
+							<button class="btn btn-icon" id="btn-replace-event" title="Replace event" aria-label="Replace event">
+								<i class="fa-solid fa-arrows-rotate"></i>
+							</button>
+							<button class="btn btn-primary btn-grow" id="btn-edit-code" title="Edit code" aria-label="Edit event code">
+								<i class="fa-solid fa-pen"></i> Edit Code
+							</button>
+						</div>
 					</div>
-					<div id="event_cont">
-						<table id="list_event"></table>
+					<div id="event-list-container" class="event-list-container">
+						<table id="event-list" class="event-table" aria-label="Event handlers">
+							<thead>
+								<tr><th>Event</th></tr>
+							</thead>
+							<tbody></tbody>
+						</table>
 					</div>
 				</div>
 			</div>
-		</div></div>
-	</div>
-	<div class="statbar" id="text_status_bar">
-		<span id="status_compiler">Компилятор: C:\cmm\c--.exe</span>
-		<span id="status_os">Цель: KolibriOS</span>
-	</div>
+		</aside>
+	</main>
 
-	<div id="window_edit_code" class="EditCode">
-		<div class="code-editor-body">
-			<div class="code_title" id="code_edit_title">void ComponentName_event()</div>
-			<div class="code_body_mark">{</div>
-			<div class="body_code_container">
-				<textarea id="code_edit_rect" placeholder="// ваш код"></textarea>
+	<footer id="status-bar" class="status-bar" role="status" aria-live="polite">
+		<span id="status-compiler">Compiler: C:\cmm\c--.exe</span>
+		<span id="status-os">OS: KolibriOS</span>
+	</footer>
+
+	<div id="code-editor" class="modal code-editor" role="dialog" aria-modal="true" aria-labelledby="code-editor-title" hidden>
+		<div class="modal-content">
+			<div class="editor-header">
+				<h3 id="code-editor-title">void ComponentName_event()</h3>
+				<div class="editor-braces">{</div>
 			</div>
-			<div class="code_body_mark">}</div>
+			<div class="editor-body">
+				<textarea id="code-textarea" placeholder="// Your code here"></textarea>
+			</div>
+			<div class="editor-braces">}</div>
+			<div class="editor-footer">
+				<button class="btn btn-primary" id="btn-save-code">OK</button>
+				<button class="btn" id="btn-cancel-code">Cancel</button>
+			</div>
 		</div>
-		<div class="table_button_edit_code"><button onclick="save_edit_code();">Ок</button><button onclick="cancel_edit_code();">Отмена</button></div>
 	</div>
 
-	<div id="window_view_code" class="ViewCode">
-		<textarea id="view_code_text" readonly></textarea>
-		<div class="view-code-close"><button class="button" onclick="closeCodeViewer();">Закрыть</button></div>
+	<div id="code-viewer" class="modal code-viewer" role="dialog" aria-modal="true" aria-labelledby="code-viewer-title" hidden>
+		<textarea id="view-code-text" readonly aria-label="Generated code" spellcheck="false"></textarea>
+		<div class="modal-footer">
+			<button class="btn" id="btn-close-viewer">Close</button>
+		</div>
 	</div>
 
-	<div id="context_menu_component" class="list_event"></div>
-	<div id="select_elements_rect"></div>
+	<template id="event-menu-item-template">
+		<div class="event-menu-item" role="menuitem" tabindex="-1">
+			<img class="event-icon" src="" alt="" aria-hidden="true">
+			<span class="event-title"></span>
+		</div>
+	</template>
+	<template id="context-menu-item-template">
+		<div class="context-menu-item" role="menuitem" tabindex="-1">
+			<i class="context-icon" aria-hidden="true"></i>
+			<span class="context-title"></span>
+		</div>
+	</template>
+	<template id="context-menu-separator-template">
+		<div class="context-separator" role="separator"></div>
+	</template>
 </body>
+</html>

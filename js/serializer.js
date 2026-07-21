@@ -1,37 +1,36 @@
-function convert_dom_to_count(o) {
-	return [o.outerHTML, o.style.cssText];
-}
-
-function convert_dom_to_element(window_object, str) {
-	const data = JSON.parse(str);
-	window_object.innerHTML += data[0];
-	const r = window_object.lastChild;
-	r.style.cssText = data[1];
-	return r;
-}
-
 function load_project_source(code) {
-	count_stack = 0;
-	current_win_index = 0;
-	GLOBAL_INIT_COUNT = 0;
-	GLOBAL_INIT_ELEMENT = [];
+	S.count_stack = 0;
+	S.current_win_index = 0;
+	S.GLOBAL_INIT_COUNT = 0;
+	S.GLOBAL_INIT_ELEMENT = [];
 
-	document.getElementById('main').innerHTML = code;
-	win = document.getElementById('window_background');
-	const tmp = addwinelm.onmousedown;
-	addwinelm = document.getElementById('window');
-	addwinelm.onmousedown = tmp;
-	set_element_defunc(addwinelm);
-	window_stack[count_stack++] = win;
-	window_data[0] = {
-		html: addwinelm.innerHTML,
-		attrs: { 'data-name': win.getAttribute('data-name') || 'Window_1', 'data-caption': win.getAttribute('data-caption') || 'Окно', 'data-hide-prop': win.getAttribute('data-hide-prop') || '', 'data-align': '' },
-		style: { width: win.style.width, height: win.style.height, background: win.style.background },
+	const mainLayout = getID('main-layout');
+	if (!mainLayout) return;
+	mainLayout.innerHTML = code;
+	S.win = document.getElementById('window-background');
+	const tmp = S.addwinelm.onmousedown;
+	S.addwinelm = document.getElementById('window-canvas');
+	if (S.addwinelm) S.addwinelm.onmousedown = tmp;
+	set_element_defunc(S.addwinelm);
+	S.window_stack[0] = S.win;
+	S.window_data[0] = {
+		html: S.addwinelm ? S.addwinelm.innerHTML : '',
+		attrs: {
+			'data-name': S.win ? S.win.getAttribute('data-name') || 'Window_1' : 'Window_1',
+			'data-caption': S.win ? S.win.getAttribute('data-caption') || 'Окно' : 'Окно',
+			'data-hide-prop': S.win ? S.win.getAttribute('data-hide-prop') || '' : '',
+			'data-align': ''
+		},
+		style: {
+			width: S.win ? S.win.style.width : '300px',
+			height: S.win ? S.win.style.height : '230px',
+			background: S.win ? S.win.style.background : '#ffffff'
+		},
 		components: []
 	};
-	GLOBAL_INIT_ELEMENT[GLOBAL_INIT_COUNT++] = window_data[0].attrs['data-name'];
-	select_element = null;
-	select_element_added_single(win);
+	S.GLOBAL_INIT_ELEMENT[S.GLOBAL_INIT_COUNT++] = S.window_data[0].attrs['data-name'];
+	S.select_element = null;
+	select_element_added(S.win);
 	update_component_tree();
 }
 
@@ -45,44 +44,15 @@ function load_project(src) {
 	};
 }
 
-function set_element_defunc(window_object) {
-	const list = window_object.children;
-	for (let i = 0; i < list.length; i++) {
-		const child = list[i];
-		if (child.nodeType !== 1) continue;
-		child.onmousedown = func_define_select;
-		child.oncontextmenu = function (e) { show_component_context_menu(e, this); e.stopPropagation(); return false; };
-	}
-}
-
-function source_convert_elements(w_obj) {
-	const w = w_obj.children[0];
-	const list = w.children;
-	let count = list.length;
-	const code = [];
-	let code_count = 0;
-	while (count) {
-		const obj = list[--count];
-		if (class_gui_list_elements.indexOf(obj.className) !== -1) {
-			code[code_count++] = convert_dom_to_count(obj);
-		}
-	}
-	return code;
-}
-
-function to_source_project() {
-	return win.outerHTML;
-}
-
 function get_project_json() {
 	save_window_state();
 	const data = {
 		version: 1,
 		windows: [],
-		initElements: GLOBAL_INIT_ELEMENT
+		initElements: S.GLOBAL_INIT_ELEMENT
 	};
-	for (let i = 0; i < count_stack; i++) {
-		const wd = window_data[i];
+	for (let i = 0; i < S.count_stack; i++) {
+		const wd = S.window_data[i];
 		if (wd) data.windows.push(wd);
 	}
 	return JSON.stringify(data, null, '\t');
@@ -118,45 +88,105 @@ function import_project(input) {
 			alert('Ошибка: файл не содержит данных проекта');
 			return;
 		}
-		count_stack = 0;
-		current_win_index = 0;
-		GLOBAL_INIT_ELEMENT = data.initElements || [];
-		GLOBAL_INIT_COUNT = GLOBAL_INIT_ELEMENT.length;
-		window_data = [];
-		window_stack = [];
+		S.count_stack = 0;
+		S.current_win_index = 0;
+		S.GLOBAL_INIT_ELEMENT = data.initElements || [];
+		S.GLOBAL_INIT_COUNT = S.GLOBAL_INIT_ELEMENT.length;
+		S.window_data = {};
+		S.window_stack = [];
 		for (let i = 0; i < data.windows.length; i++) {
-			window_data[i] = data.windows[i];
-			if (typeof window_data[i] === 'object' && !window_data[i].attrs) {
-				// Backward compat with old JSON format
-				window_data[i].html = window_data[i].html || '';
-				window_data[i].attrs = {
-					'data-name': window_data[i].name || ('Window_' + (i + 1)),
-					'data-caption': window_data[i].caption || '',
-					'data-hide-prop': window_data[i].hide_prop || '',
-					'data-align': window_data[i].align || ''
+			S.window_data[i] = data.windows[i];
+			if (typeof S.window_data[i] === 'object' && !S.window_data[i].attrs) {
+				S.window_data[i].html = S.window_data[i].html || '';
+				S.window_data[i].attrs = {
+					'data-name': S.window_data[i].name || ('Window_' + (i + 1)),
+					'data-caption': S.window_data[i].caption || '',
+					'data-hide-prop': S.window_data[i].hide_prop || '',
+					'data-align': S.window_data[i].align || ''
 				};
-				window_data[i].style = {
-					width: window_data[i].width || '300px',
-					height: window_data[i].height || '230px',
-					background: window_data[i].bg || '#ffffff'
+				S.window_data[i].style = {
+					width: S.window_data[i].width || '300px',
+					height: S.window_data[i].height || '230px',
+					background: S.window_data[i].bg || '#ffffff'
 				};
-				delete window_data[i].name;
-				delete window_data[i].caption;
-				delete window_data[i].width;
-				delete window_data[i].height;
-				delete window_data[i].bg;
-				delete window_data[i].hide_prop;
-				delete window_data[i].align;
+				delete S.window_data[i].name;
+				delete S.window_data[i].caption;
+				delete S.window_data[i].width;
+				delete S.window_data[i].height;
+				delete S.window_data[i].bg;
+				delete S.window_data[i].hide_prop;
+				delete S.window_data[i].align;
 			}
-			window_stack[i] = null;
-			count_stack++;
+			S.window_stack[i] = null;
+			S.count_stack++;
 		}
-		current_win_index = -1;
+		S.current_win_index = -1;
 		switch_window(0);
-		select_element = null;
-		render_props(win);
+		S.select_element = null;
+		render_props(S.win);
 		update_component_tree();
 	};
 	reader.readAsText(file);
 	input.value = '';
+}
+
+function switch_window(index) {
+	if (index === S.current_win_index) return;
+	if (S.window_data[S.current_win_index]) {
+		S.window_data[S.current_win_index] = upgrade_window_data(S.window_data[S.current_win_index]);
+		S.window_data[S.current_win_index].html = S.addwinelm ? S.addwinelm.innerHTML : '';
+	}
+	S.current_win_index = index;
+	const data = S.window_data[index];
+	if (data) {
+		S.window_data[index] = upgrade_window_data(data);
+		if (S.addwinelm) S.addwinelm.innerHTML = S.window_data[index].html || '';
+		for (const key in S.window_data[index].attrs) {
+			if (S.win && S.window_data[index].attrs[key]) S.win.setAttribute(key, S.window_data[index].attrs[key]);
+			else if (S.win) S.win.removeAttribute(key);
+		}
+		const s = S.window_data[index].style || {};
+		if (S.win) {
+			S.win.style.width = s.width || '300px';
+			S.win.style.height = s.height || '230px';
+			S.win.style.background = s.background || '#ffffff';
+		}
+	} else {
+		if (S.addwinelm) S.addwinelm.innerHTML = '';
+		if (S.win) {
+			S.win.setAttribute('data-name', 'Window_' + (index + 1));
+			S.win.setAttribute('data-caption', 'Окно');
+			S.win.style.width = '300px';
+			S.win.style.height = '230px';
+			S.win.style.background = '#ffffff';
+		}
+	}
+	if (S.addwinelm && S.win) {
+		S.addwinelm.style.width = (parseInt(S.win.style.width) - 2) + 'px';
+		S.addwinelm.style.height = (parseInt(S.win.style.height) - 2) + 'px';
+	}
+	set_element_defunc(S.addwinelm);
+	update_component_tree();
+	if (S.win) {
+		RrefreshPOS(S.win); TrefreshPOS(S.win); RTrefreshPOS(S.win);
+	}
+}
+
+function upgrade_window_data(data) {
+	if (data.attrs) return data;
+	return {
+		html: data.html || '',
+		attrs: {
+			'data-name': data.name || 'Window',
+			'data-caption': data.caption || '',
+			'data-hide-prop': data.hide_prop || '',
+			'data-align': data.align || ''
+		},
+		style: {
+			width: data.width || '300px',
+			height: data.height || '230px',
+			background: data.bg || '#ffffff'
+		},
+		components: data.components || []
+	};
 }
