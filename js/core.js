@@ -1210,6 +1210,61 @@ function context_edit_code() {
 	element_list.style.left = Math.round(mouse.x - element_list.offsetWidth / 2) + 'px';
 }
 
+function paste_element() {
+	if (!copy_element_object) return;
+	const el = copy_element_object.cloneNode(true);
+
+	const baseName = (copy_element_object.getAttribute('data-name') || 'Component').replace(/_\d+$/, '');
+	let maxNum = 0;
+	const allElements = addwinelm.querySelectorAll('[data-name]');
+	Array.from(allElements).forEach(function (item) {
+		const n = item.getAttribute('data-name');
+		if (n && n.indexOf(baseName) === 0) {
+			const suffix = n.slice(baseName.length);
+			if (suffix === '' || /^_\d+$/.test(suffix)) {
+				const num = suffix === '' ? 0 : parseInt(suffix.slice(1));
+				if (num > maxNum) maxNum = num;
+			}
+		}
+	});
+	el.setAttribute('data-name', baseName + '_' + (maxNum + 1));
+
+	const left = parseInt(copy_element_object.style.left) || 0;
+	const top = parseInt(copy_element_object.style.top) || 0;
+	el.style.left = (left + 20) + 'px';
+	el.style.top = (top + 20) + 'px';
+
+	el.onmousedown = func_define_select;
+	if (cmd_sensor) el.ontouchstart = el.onmousedown;
+	el.oncontextmenu = function (e) { show_component_context_menu(e, this); return false; };
+
+	addwinelm.appendChild(el);
+	select_element_added_single(el);
+	update_component_tree();
+}
+
+function show_window_context_menu(e) {
+	context_menu_component.innerHTML = '';
+	if (copy_element_object) {
+		context_menu_component.innerHTML +=
+			'<div class="event-item" data-action="paste"><i class="fa-solid fa-paste"></i><span class="title">Вставить</span></div>';
+	} else {
+		context_menu_component.innerHTML +=
+			'<div class="event-item" style="opacity:0.5;cursor:default;"><i class="fa-solid fa-paste"></i><span class="title">Вставить</span></div>';
+	}
+	Array.from(context_menu_component.children).forEach(function (item) {
+		const action = item.getAttribute('data-action');
+		if (!action) return;
+		item.onclick = function () {
+			if (action === 'paste') paste_element();
+			context_menu_component.style.display = 'none';
+		};
+	});
+	context_menu_component.style.top = e.pageY + 'px';
+	context_menu_component.style.display = 'block';
+	context_menu_component.style.left = Math.round(e.pageX - context_menu_component.offsetWidth / 2) + 'px';
+}
+
 function add_stat_element_help(id, txt) {
 	const el = getID(id);
 	if (!el) return;
@@ -1531,6 +1586,7 @@ window.onload = function () {
 		}
 		return false;
 	};
+	addwinelm.oncontextmenu = function (e) { show_window_context_menu(e); return false; };
 
 	if (cmd_sensor) addwinelm.ontouchstart = addwinelm.onmousedown;
 
