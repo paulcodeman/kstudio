@@ -864,20 +864,6 @@ function create_size_rect_change() {
     S.rt_size.style.top = (r.top + r.height - hh) + 'px';
 }
 
-function clear_selected_elements() {
-    for (let i = 0; i < S.selected_elements_array.length; i++) {
-        const item = S.selected_elements_array[i];
-        if (item.dots) {
-            for (let j = 0; j < item.dots.length; j++) {
-                if (item.dots[j].parentNode) {
-                    item.dots[j].parentNode.removeChild(item.dots[j]);
-                }
-            }
-        }
-    }
-    S.selected_elements_array = [];
-}
-
 function update_selection_dots() {
     const parentRect = S.addwinelm.getBoundingClientRect();
     const half = 5;
