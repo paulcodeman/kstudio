@@ -132,10 +132,7 @@ function import_project(input) {
 
 function switch_window(index) {
 	if (index === S.current_win_index) return;
-	if (S.window_data[S.current_win_index]) {
-		S.window_data[S.current_win_index] = upgrade_window_data(S.window_data[S.current_win_index]);
-		S.window_data[S.current_win_index].html = S.addwinelm ? S.addwinelm.innerHTML : '';
-	}
+	save_window_state();
 	S.current_win_index = index;
 	const data = S.window_data[index];
 	if (data) {
