@@ -1763,6 +1763,54 @@ window.onkeydown = function (e) {
 
 window.onkeyup = function (e) {
 	const ev = window.event || e;
-	if (cmd_event_ctrl && ev.keyCode === 67) copy_element_object = select_element ? [select_element] : [];
+	if (cmd_event_ctrl) {
+		if (ev.keyCode === 67) {
+			const items = [];
+			selected_elements_array.forEach(function (si) { items.push(si.el); });
+			if (select_element && items.indexOf(select_element) < 0) items.push(select_element);
+			copy_element_object = items;
+		} else if (ev.keyCode === 88) {
+			const items = [];
+			selected_elements_array.forEach(function (si) { items.push(si.el); });
+			if (select_element && items.indexOf(select_element) < 0) items.push(select_element);
+			copy_element_object = items;
+			clear_selected_elements();
+			items.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
+			select_element = null;
+			TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+			render_props(win);
+			update_component_tree();
+		} else if (ev.keyCode === 86) {
+			paste_element();
+		} else if (ev.keyCode === 65) {
+			e.preventDefault();
+			clear_selected_elements();
+			const children = addwinelm.children;
+			let firstFound = null;
+			for (let i = 0; i < children.length; i++) {
+				const child = children[i];
+				if (!child.getAttribute('data-name')) continue;
+				if (!firstFound) { firstFound = child; continue; }
+				const dots = [];
+				for (let j = 0; j < 3; j++) {
+					const dot = createELM('DIV');
+					dot.className = 'selection-dot';
+					addwinelm.appendChild(dot);
+					dots.push(dot);
+				}
+				const r = child.getBoundingClientRect();
+				const parentRect = addwinelm.getBoundingClientRect();
+				const half = 5;
+				dots[0].style.left = Math.round(r.left - parentRect.left + r.width - half) + 'px';
+				dots[0].style.top = Math.round(r.top - parentRect.top + r.height / 2 - half) + 'px';
+				dots[1].style.left = Math.round(r.left - parentRect.left + r.width / 2 - half) + 'px';
+				dots[1].style.top = Math.round(r.top - parentRect.top + r.height - half) + 'px';
+				dots[2].style.left = Math.round(r.left - parentRect.left + r.width - half) + 'px';
+				dots[2].style.top = Math.round(r.top - parentRect.top + r.height - half) + 'px';
+				selected_elements_array.push({ el: child, dots });
+			}
+			if (firstFound) select_element_added(firstFound);
+		}
+	}
 	cmd_event_ctrl = false;
 };
