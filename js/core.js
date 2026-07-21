@@ -1092,9 +1092,17 @@ function show_component_context_menu(e, el) {
 		'<div class="event-item" data-action="delete"><i class="fa-solid fa-trash"></i><span class="title">Удалить</span></div>' +
 		'<div class="event-separator"></div>' +
 		'<div class="event-item" data-action="bring-to-front"><i class="fa-solid fa-arrow-up-wide-short"></i><span class="title">На передний фон</span></div>' +
-		'<div class="event-item" data-action="send-to-back"><i class="fa-solid fa-arrow-down-wide-short"></i><span class="title">На задний фон</span></div>' +
-		'<div class="event-separator"></div>' +
-		'<div class="event-item" data-action="edit-code"><i class="fa-solid fa-pen"></i><span class="title">Редактировать код</span></div>';
+		'<div class="event-item" data-action="send-to-back"><i class="fa-solid fa-arrow-down-wide-short"></i><span class="title">На задний фон</span></div>';
+
+	const el = select_element || win;
+	const dataListEvent = el.getAttribute('data_list_event');
+	const hasEvents = dataListEvent !== '' && parseInt(dataListEvent) !== 0;
+	if (hasEvents) {
+		context_menu_component.innerHTML +=
+			'<div class="event-separator"></div>' +
+			'<div class="event-item" data-action="edit-code"><i class="fa-solid fa-pen"></i><span class="title">Редактировать код</span></div>';
+	}
+
 	Array.from(context_menu_component.children).forEach(function (item) {
 		if (item.classList.contains('event-separator')) return;
 		item.onclick = function () {
@@ -1168,8 +1176,6 @@ function send_to_back() {
 function context_edit_code() {
 	const el = select_element || win;
 	const events = get_component_events(el);
-	if (!events.length) return;
-
 	const dataList = el.getAttribute('data_list_event');
 	const cmd = dataList !== '' ? parseInt(dataList) : 0;
 
@@ -1183,13 +1189,7 @@ function context_edit_code() {
 				icon + '<span class="title">' + ((edef && edef.label) || ev) + '</span></div>';
 		}
 	}
-	if (!html) {
-		const ev = events[0];
-		const edef = get_event_def(ev);
-		const icon = edef && edef.icon ? '<img src="' + edef.icon + '">' : '';
-		html += '<div class="event-item" data-event="' + ev + '">' +
-			icon + '<span class="title">' + ((edef && edef.label) || ev) + '</span></div>';
-	}
+	if (!html) return;
 
 	element_list.innerHTML = html;
 	Array.from(element_list.children).forEach(function (item) {
