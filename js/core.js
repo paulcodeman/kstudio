@@ -1121,10 +1121,11 @@ function show_component_context_menu(e, el) {
 					update_component_tree();
 				}
 			} else if (action === 'delete') {
+				const toDelete = [];
+				selected_elements_array.forEach(function (si) { toDelete.push(si.el); });
+				if (select_element && toDelete.indexOf(select_element) < 0) toDelete.push(select_element);
 				clear_selected_elements();
-				if (select_element && select_element.parentNode) {
-					select_element.parentNode.removeChild(select_element);
-				}
+				toDelete.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
 				select_element = null;
 				TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 				render_props(win);
@@ -1145,10 +1146,11 @@ function show_component_context_menu(e, el) {
 }
 
 function delete_select_element() {
+	const toDelete = [];
+	selected_elements_array.forEach(function (si) { toDelete.push(si.el); });
+	if (select_element && toDelete.indexOf(select_element) < 0) toDelete.push(select_element);
 	clear_selected_elements();
-	if (select_element && select_element.parentNode) {
-		select_element.parentNode.removeChild(select_element);
-	}
+	toDelete.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
 	select_element = null;
 	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
 	render_props(win);
