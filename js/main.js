@@ -108,6 +108,9 @@ function init() {
 		if (S.context_menu_component && S.context_menu_component.style.display !== 'none' && !S.context_menu_component.contains(e.target)) {
 			S.context_menu_component.style.display = 'none';
 		}
+		if (S.element_list && S.element_list.style.display !== 'none' && !S.element_list.contains(e.target)) {
+			S.element_list.style.display = 'none';
+		}
 	});
 
 	setupGlobalListeners();
