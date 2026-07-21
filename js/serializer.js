@@ -138,9 +138,18 @@ function switch_window(index) {
 	if (data) {
 		S.window_data[index] = upgrade_window_data(data);
 		if (S.addwinelm) S.addwinelm.innerHTML = S.window_data[index].html || '';
-		for (const key in S.window_data[index].attrs) {
-			if (S.win && S.window_data[index].attrs[key]) S.win.setAttribute(key, S.window_data[index].attrs[key]);
-			else if (S.win) S.win.removeAttribute(key);
+		const savedAttrs = S.window_data[index].attrs;
+		if (S.win) {
+			for (let i = S.win.attributes.length - 1; i >= 0; i--) {
+				const a = S.win.attributes[i];
+				if (a.name.indexOf('data-') === 0 && !(a.name in savedAttrs)) {
+					S.win.removeAttribute(a.name);
+				}
+			}
+			for (const key in savedAttrs) {
+				if (savedAttrs[key]) S.win.setAttribute(key, savedAttrs[key]);
+				else S.win.removeAttribute(key);
+			}
 		}
 		const s = S.window_data[index].style || {};
 		if (S.win) {
@@ -151,6 +160,10 @@ function switch_window(index) {
 	} else {
 		if (S.addwinelm) S.addwinelm.innerHTML = '';
 		if (S.win) {
+			for (let i = S.win.attributes.length - 1; i >= 0; i--) {
+				const a = S.win.attributes[i];
+				if (a.name.indexOf('data-') === 0) S.win.removeAttribute(a.name);
+			}
 			S.win.setAttribute('data-name', 'Window_' + (index + 1));
 			S.win.setAttribute('data-caption', 'Окно');
 			S.win.style.width = '300px';
