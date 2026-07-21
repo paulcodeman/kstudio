@@ -1632,7 +1632,14 @@ window.onload = function () {
 		}
 		return false;
 	};
-	addwinelm.oncontextmenu = function (e) { show_window_context_menu(e); return false; };
+	addwinelm.oncontextmenu = function (e) {
+		if (select_element) {
+			show_component_context_menu(e, select_element);
+		} else {
+			show_window_context_menu(e);
+		}
+		return false;
+	};
 
 	if (cmd_sensor) addwinelm.ontouchstart = addwinelm.onmousedown;
 
