@@ -1087,21 +1087,30 @@ function show_component_context_menu(e, el) {
 		select_element_added_single(clicked);
 	}
 	context_menu_component.innerHTML =
+		'<div class="event-item" data-action="cut"><i class="fa-solid fa-scissors"></i><span class="title">Вырезать</span></div>' +
+		'<div class="event-item" data-action="copy"><i class="fa-solid fa-copy"></i><span class="title">Копировать</span></div>' +
+		'<div class="event-item" data-action="delete"><i class="fa-solid fa-trash"></i><span class="title">Удалить</span></div>' +
+		'<div class="event-separator"></div>' +
 		'<div class="event-item" data-action="bring-to-front"><i class="fa-solid fa-arrow-up-wide-short"></i><span class="title">На передний фон</span></div>' +
 		'<div class="event-item" data-action="send-to-back"><i class="fa-solid fa-arrow-down-wide-short"></i><span class="title">На задний фон</span></div>' +
-		'<div class="event-item" data-action="copy"><i class="fa-solid fa-copy"></i><span class="title">Копировать</span></div>' +
-		'<div class="event-item" data-action="delete"><i class="fa-solid fa-trash"></i><span class="title">Удалить</span></div>';
+		'<div class="event-separator"></div>' +
+		'<div class="event-item" data-action="edit-code"><i class="fa-solid fa-pen"></i><span class="title">Редактировать код</span></div>';
 	Array.from(context_menu_component.children).forEach(function (item) {
 		item.onmousedown = function () {
 			const action = this.getAttribute('data-action');
 			if (action === 'copy') {
 				copy_element_object = select_element;
+			} else if (action === 'cut') {
+				copy_element_object = select_element;
+				delete_select_element();
 			} else if (action === 'delete') {
 				delete_select_element();
 			} else if (action === 'bring-to-front') {
 				bring_to_front();
 			} else if (action === 'send-to-back') {
 				send_to_back();
+			} else if (action === 'edit-code') {
+				context_edit_code();
 			}
 			context_menu_component.style.display = 'none';
 		};
@@ -1153,6 +1162,29 @@ function send_to_back() {
 		parent.insertBefore(el, parent.firstChild);
 	});
 	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+}
+
+function context_edit_code() {
+	const el = select_element || win;
+	const events = get_component_events(el);
+	if (!events.length) return;
+
+	const dataList = el.getAttribute('data_list_event');
+	const cmd = dataList !== '' ? parseInt(dataList) : 0;
+
+	let eventName = null;
+	for (let x = 0; x < events.length; x++) {
+		if (cmd & (1 << x)) { eventName = events[x]; break; }
+	}
+	if (!eventName) eventName = events[0];
+
+	const compName = el.getAttribute('data-name') || 'Component';
+	const attrName = event_attr_name(eventName);
+	const tmp = el.getAttribute(attrName);
+	const args = event_args(eventName);
+	getID('code_edit_rect').value = tmp ? decodeURIComponent(tmp) : '';
+	getID('code_edit_title').innerText = 'void ' + compName + '_' + eventName + '(' + args + ')';
+	getID('window_edit_code').style.display = 'flex';
 }
 
 function add_stat_element_help(id, txt) {

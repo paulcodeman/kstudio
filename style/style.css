@@ -139,6 +139,11 @@ input[type="color"]:focus::-webkit-color-swatch {
 	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 	overflow: hidden;
 }
+.event-separator {
+	height: 1px;
+	background: #e0e3e8;
+	margin: 4px 0;
+}
 .event-item {
 	display: flex;
 	align-items: center;
