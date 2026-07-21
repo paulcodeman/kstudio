@@ -56,7 +56,8 @@ function init() {
 			S.select_element_rect.style.top = ey + 'px';
 			S.select_element_rect.style.left = ex + 'px';
 			S.select_element_rect.style.display = 'none';
-			S.select_element_rect_timer = setInterval(changer_rect_select, 50);
+			document.addEventListener('mousemove', onRectSelectMove);
+			if (S.cmd_sensor) document.addEventListener('touchmove', onRectSelectMove, { passive: false });
 			S.rect_select_active = true;
 			return true;
 		}
@@ -112,10 +113,12 @@ function init() {
 	setupGlobalListeners();
 }
 
-function changer_rect_select() {
+function onRectSelectMove(e) {
 	if (!S.rect_select_active) return;
-	let x = S.mouse.x - S.sel_rect_x;
-	let y = S.mouse.y - S.sel_rect_y;
+	const cx = e.touches ? e.touches[0].clientX : e.clientX;
+	const cy = e.touches ? e.touches[0].clientY : e.clientY;
+	let x = cx - S.sel_rect_x;
+	let y = cy - S.sel_rect_y;
 	if (Math.abs(x) < 3 && Math.abs(y) < 3) return;
 	S.select_element_rect.style.display = 'block';
 	if (x < 0) { S.select_element_rect.style.left = (S.sel_rect_x + x) + 'px'; x = -x; }
@@ -273,10 +276,7 @@ function setupGlobalListeners() {
 			S.select_element_rect.style.width = '0px';
 			S.select_element_rect.style.height = '0px';
 		}
-		if (S.select_element_rect_timer) {
-			clearInterval(S.select_element_rect_timer);
-			S.select_element_rect_timer = null;
-		}
+		document.removeEventListener('mousemove', onRectSelectMove);
 		S.rect_select_active = false;
 		S.global_lock_event = false;
 	});
@@ -306,10 +306,7 @@ function setupGlobalListeners() {
 				S.select_element_rect.style.width = '0px';
 				S.select_element_rect.style.height = '0px';
 			}
-			if (S.select_element_rect_timer) {
-				clearInterval(S.select_element_rect_timer);
-				S.select_element_rect_timer = null;
-			}
+			document.removeEventListener('touchmove', onRectSelectMove);
 			S.rect_select_active = false;
 			S.global_lock_event = false;
 		});
