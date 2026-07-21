@@ -142,7 +142,7 @@ function switch_window(index) {
 		if (S.win) {
 			for (let i = S.win.attributes.length - 1; i >= 0; i--) {
 				const a = S.win.attributes[i];
-				if (a.name.indexOf('data-') === 0 && !(a.name in savedAttrs)) {
+				if (a.name.indexOf('data') === 0 && !(a.name in savedAttrs)) {
 					S.win.removeAttribute(a.name);
 				}
 			}
@@ -162,7 +162,7 @@ function switch_window(index) {
 		if (S.win) {
 			for (let i = S.win.attributes.length - 1; i >= 0; i--) {
 				const a = S.win.attributes[i];
-				if (a.name.indexOf('data-') === 0) S.win.removeAttribute(a.name);
+				if (a.name.indexOf('data') === 0) S.win.removeAttribute(a.name);
 			}
 			S.win.setAttribute('data-name', 'Window_' + (index + 1));
 			S.win.setAttribute('data-caption', 'Окно');

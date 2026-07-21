@@ -593,7 +593,7 @@ function save_window_state() {
 	const attrs = {};
 	for (let i = 0; i < S.win.attributes.length; i++) {
 		const a = S.win.attributes[i];
-		if (a.name.indexOf('data-') === 0) attrs[a.name] = a.value;
+		if (a.name.indexOf('data') === 0) attrs[a.name] = a.value;
 	}
 	S.window_data[S.current_win_index] = {
 		html: S.addwinelm.innerHTML,
