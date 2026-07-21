@@ -97,25 +97,8 @@ function import_project(input) {
         for (let i = 0; i < data.windows.length; i++) {
             S.window_data[i] = data.windows[i];
             if (typeof S.window_data[i] === 'object' && !S.window_data[i].attrs) {
-                S.window_data[i].html = S.window_data[i].html || '';
-                S.window_data[i].attrs = {
-                    'data-name': S.window_data[i].name || ('Window_' + (i + 1)),
-                    'data-caption': S.window_data[i].caption || '',
-                    'data-hide-prop': S.window_data[i].hide_prop || '',
-                    'data-align': S.window_data[i].align || ''
-                };
-                S.window_data[i].style = {
-                    width: S.window_data[i].width || '300px',
-                    height: S.window_data[i].height || '230px',
-                    background: S.window_data[i].bg || '#ffffff'
-                };
-                delete S.window_data[i].name;
-                delete S.window_data[i].caption;
-                delete S.window_data[i].width;
-                delete S.window_data[i].height;
-                delete S.window_data[i].bg;
-                delete S.window_data[i].hide_prop;
-                delete S.window_data[i].align;
+                if (!S.window_data[i].name) S.window_data[i].name = 'Window_' + (i + 1);
+                S.window_data[i] = upgrade_window_data(S.window_data[i]);
             }
             S.window_stack[i] = null;
             S.count_stack++;
