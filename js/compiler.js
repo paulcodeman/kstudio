@@ -184,7 +184,7 @@ function generateWindowCode(i, winData, isMain) {
 	const container = win.children[0];
 	const children = container.children;
 
-	for (let j = children.length - 1; j >= 0; j--) {
+	for (let j = 0; j < children.length; j++) {
 		const element = children[j];
 		const componentDef = get_component_def(element);
 		if (!componentDef || componentDef.system) continue;
