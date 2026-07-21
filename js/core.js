@@ -54,7 +54,7 @@ let GLOBAL_INIT_ELEMENT = [], GLOBAL_INIT_COUNT = 0;
 let cmd_sensor = false;
 let global_lock_event = false;
 let save_x, save_y;
-let copy_element_object = null;
+let copy_element_object = [];
 let cmd_event_ctrl = false;
 let test_;
 
@@ -1107,13 +1107,31 @@ function show_component_context_menu(e, el) {
 		if (item.classList.contains('event-separator')) return;
 		item.onclick = function () {
 			const action = this.getAttribute('data-action');
-			if (action === 'copy') {
-				copy_element_object = select_element;
-			} else if (action === 'cut') {
-				copy_element_object = select_element;
-				delete_select_element();
+			if (action === 'copy' || action === 'cut') {
+				const items = [];
+				selected_elements_array.forEach(function (si) { items.push(si.el); });
+				if (select_element && items.indexOf(select_element) < 0) items.push(select_element);
+				copy_element_object = items;
+				if (action === 'cut') {
+					items.forEach(function (el) { el.parentNode.removeChild(el); });
+					select_element = null;
+					selected_elements_array = [];
+					TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+					render_props(win);
+					update_component_tree();
+				}
 			} else if (action === 'delete') {
-				delete_select_element();
+				selected_elements_array.forEach(function (si) {
+					if (si.el.parentNode) si.el.parentNode.removeChild(si.el);
+				});
+				if (select_element && select_element.parentNode) {
+					select_element.parentNode.removeChild(select_element);
+				}
+				select_element = null;
+				selected_elements_array = [];
+				TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+				render_props(win);
+				update_component_tree();
 			} else if (action === 'bring-to-front') {
 				bring_to_front();
 			} else if (action === 'send-to-back') {
@@ -1130,13 +1148,17 @@ function show_component_context_menu(e, el) {
 }
 
 function delete_select_element() {
-	if (select_element !== null) {
+	selected_elements_array.forEach(function (si) {
+		if (si.el.parentNode) si.el.parentNode.removeChild(si.el);
+	});
+	if (select_element && select_element.parentNode) {
 		select_element.parentNode.removeChild(select_element);
-		select_element = null;
-		TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
-		render_props(win);
-		update_component_tree();
 	}
+	select_element = null;
+	selected_elements_array = [];
+	TrefreshPOS(win); RrefreshPOS(win); RTrefreshPOS(win);
+	render_props(win);
+	update_component_tree();
 }
 
 function bring_to_front() {
@@ -1211,42 +1233,48 @@ function context_edit_code() {
 }
 
 function paste_element() {
-	if (!copy_element_object) return;
-	const el = copy_element_object.cloneNode(true);
+	if (!copy_element_object || !copy_element_object.length) return;
+	const pasted = [];
+	copy_element_object.forEach(function (src) {
+		const el = src.cloneNode(true);
 
-	const baseName = (copy_element_object.getAttribute('data-name') || 'Component').replace(/_\d+$/, '');
-	let maxNum = 0;
-	const allElements = addwinelm.querySelectorAll('[data-name]');
-	Array.from(allElements).forEach(function (item) {
-		const n = item.getAttribute('data-name');
-		if (n && n.indexOf(baseName) === 0) {
-			const suffix = n.slice(baseName.length);
-			if (suffix === '' || /^_\d+$/.test(suffix)) {
-				const num = suffix === '' ? 0 : parseInt(suffix.slice(1));
-				if (num > maxNum) maxNum = num;
+		const baseName = (src.getAttribute('data-name') || 'Component').replace(/_\d+$/, '');
+		let maxNum = 0;
+		const allElements = addwinelm.querySelectorAll('[data-name]');
+		Array.from(allElements).forEach(function (item) {
+			const n = item.getAttribute('data-name');
+			if (n && n.indexOf(baseName) === 0) {
+				const suffix = n.slice(baseName.length);
+				if (suffix === '' || /^_\d+$/.test(suffix)) {
+					const num = suffix === '' ? 0 : parseInt(suffix.slice(1));
+					if (num > maxNum) maxNum = num;
+				}
 			}
-		}
+		});
+		el.setAttribute('data-name', baseName + '_' + (maxNum + 1));
+
+		const left = parseInt(src.style.left) || 0;
+		const top = parseInt(src.style.top) || 0;
+		el.style.left = (left + 20) + 'px';
+		el.style.top = (top + 20) + 'px';
+
+		el.onmousedown = func_define_select;
+		if (cmd_sensor) el.ontouchstart = el.onmousedown;
+		el.oncontextmenu = function (e) { show_component_context_menu(e, this); e.stopPropagation(); return false; };
+
+		addwinelm.appendChild(el);
+		pasted.push(el);
 	});
-	el.setAttribute('data-name', baseName + '_' + (maxNum + 1));
-
-	const left = parseInt(copy_element_object.style.left) || 0;
-	const top = parseInt(copy_element_object.style.top) || 0;
-	el.style.left = (left + 20) + 'px';
-	el.style.top = (top + 20) + 'px';
-
-	el.onmousedown = func_define_select;
-	if (cmd_sensor) el.ontouchstart = el.onmousedown;
-	el.oncontextmenu = function (e) { show_component_context_menu(e, this); e.stopPropagation(); return false; };
-
-	addwinelm.appendChild(el);
-	select_element_added_single(el);
-	update_component_tree();
-	copy_element_object = null;
+	if (pasted.length) {
+		select_element_added_single(pasted[pasted.length - 1]);
+		update_component_tree();
+	}
+	copy_element_object = [];
 }
 
 function show_window_context_menu(e) {
 	context_menu_component.innerHTML = '';
-	if (copy_element_object) {
+	if (copy_element_object && copy_element_object.length) {
 		context_menu_component.innerHTML +=
 			'<div class="event-item" data-action="paste"><i class="fa-solid fa-paste"></i><span class="title">Вставить</span></div>';
 	} else {
@@ -1718,6 +1746,6 @@ window.onkeydown = function (e) {
 
 window.onkeyup = function (e) {
 	const ev = window.event || e;
-	if (cmd_event_ctrl && ev.keyCode === 67) copy_element_object = select_element;
+	if (cmd_event_ctrl && ev.keyCode === 67) copy_element_object = select_element ? [select_element] : [];
 	cmd_event_ctrl = false;
 };
