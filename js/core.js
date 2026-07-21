@@ -635,7 +635,7 @@ function past_gui_window(win, name_type) {
 	element.setAttribute('data-name', name);
 	element.onmousedown = func_define_select;
 	if (cmd_sensor) element.ontouchstart = element.onmousedown;
-	element.oncontextmenu = function (e) { show_component_context_menu(e, this); return false; };
+	element.oncontextmenu = function (e) { show_component_context_menu(e, this); e.stopPropagation(); return false; };
 
 	if (comp.system) {
 		const img = createELM('IMG');
@@ -1236,7 +1236,7 @@ function paste_element() {
 
 	el.onmousedown = func_define_select;
 	if (cmd_sensor) el.ontouchstart = el.onmousedown;
-	el.oncontextmenu = function (e) { show_component_context_menu(e, this); return false; };
+	el.oncontextmenu = function (e) { show_component_context_menu(e, this); e.stopPropagation(); return false; };
 
 	addwinelm.appendChild(el);
 	select_element_added_single(el);

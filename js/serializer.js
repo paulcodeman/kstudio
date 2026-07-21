@@ -51,7 +51,7 @@ function set_element_defunc(window_object) {
 		const child = list[i];
 		if (child.nodeType !== 1) continue;
 		child.onmousedown = func_define_select;
-		child.oncontextmenu = function (e) { show_component_context_menu(e, this); return false; };
+		child.oncontextmenu = function (e) { show_component_context_menu(e, this); e.stopPropagation(); return false; };
 	}
 }
 
