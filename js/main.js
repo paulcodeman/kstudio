@@ -55,7 +55,7 @@ function init() {
 			S.sel_rect_x = ex;
 			S.select_element_rect.style.top = ey + 'px';
 			S.select_element_rect.style.left = ex + 'px';
-			S.select_element_rect.style.display = 'block';
+			S.select_element_rect.style.display = 'none';
 			S.select_element_rect_timer = setInterval(changer_rect_select, 50);
 			S.rect_select_active = true;
 			return true;
@@ -115,6 +115,8 @@ function init() {
 function changer_rect_select() {
 	let x = S.mouse.x - S.sel_rect_x;
 	let y = S.mouse.y - S.sel_rect_y;
+	if (Math.abs(x) < 3 && Math.abs(y) < 3) return;
+	S.select_element_rect.style.display = 'block';
 	if (x < 0) { S.select_element_rect.style.left = (S.sel_rect_x + x) + 'px'; x = -x; }
 	if (y < 0) { S.select_element_rect.style.top = (S.sel_rect_y + y) + 'px'; y = -y; }
 	S.select_element_rect.style.width = x + 'px';
