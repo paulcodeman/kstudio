@@ -21,6 +21,16 @@
 
 <header aria-label="Main toolbar" class="toolbar" id="toolbar" role="toolbar">
     <div class="toolbar-group">
+        <button aria-label="Export project" class="btn" id="btn-export" title="Export Project (.kcm)">
+            <i class="fa-solid fa-file-export"></i> <span>Export</span>
+        </button>
+        <button aria-label="Import project" class="btn" id="btn-import-trigger" title="Import Project">
+            <i class="fa-solid fa-file-import"></i> <span>Import</span>
+        </button>
+        <input accept=".kcm" aria-hidden="true" hidden id="import-input" type="file">
+    </div>
+    <div aria-hidden="true" class="toolbar-sep"></div>
+    <div class="toolbar-group">
         <button aria-label="Undo" class="btn" id="btn-undo" title="Undo (Ctrl+Z)">
             <i class="fa-solid fa-undo"></i>
         </button>
@@ -40,16 +50,6 @@
                 title="View Generated Code (F12)">
             <i class="fa-solid fa-code"></i> <span>Code</span>
         </button>
-    </div>
-    <div aria-hidden="true" class="toolbar-sep"></div>
-    <div class="toolbar-group">
-        <button aria-label="Export project" class="btn" id="btn-export" title="Export Project (.kcm)">
-            <i class="fa-solid fa-file-export"></i> <span>Export</span>
-        </button>
-        <button aria-label="Import project" class="btn" id="btn-import-trigger" title="Import Project">
-            <i class="fa-solid fa-file-import"></i> <span>Import</span>
-        </button>
-        <input accept=".kcm" aria-hidden="true" hidden id="import-input" type="file">
     </div>
     <div aria-hidden="true" class="toolbar-sep"></div>
     <div class="toolbar-group">
