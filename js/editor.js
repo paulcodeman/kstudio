@@ -1459,6 +1459,7 @@ function add_new_window(name) {
         add_new_window();
         return;
     }
+    push_undo_state();
     const index = S.count_stack;
     S.window_stack[index] = null;
     S.window_data[S.current_win_index] = S.window_data[S.current_win_index] || upgrade_window_data({
@@ -1483,26 +1484,53 @@ function add_new_window(name) {
     switch_window(index);
 }
 
+function clone_window_data() {
+    const copy = {};
+    for (const key in S.window_data) {
+        copy[key] = JSON.parse(JSON.stringify(S.window_data[key]));
+    }
+    return copy;
+}
+
 function push_undo_state() {
     if (S._undo_lock) return;
     S.undo_stack.push({
         html: S.addwinelm.innerHTML,
         select_name: S.select_element ? S.select_element.getAttribute('data-name') : null,
-        win_index: S.current_win_index
+        win_index: S.current_win_index,
+        window_data: clone_window_data(),
+        count_stack: S.count_stack
     });
     if (S.undo_stack.length > 50) S.undo_stack.shift();
     S.redo_stack = [];
 }
 
 function apply_undo_state(state) {
-    if (state.win_index !== S.current_win_index) {
-        S.window_data[state.win_index].html = state.html;
-        S.current_win_index = state.win_index;
-        S.addwinelm.innerHTML = state.html;
-    } else {
-        S.addwinelm.innerHTML = state.html;
-    }
+    S.window_data = JSON.parse(JSON.stringify(state.window_data));
+    S.count_stack = state.count_stack;
+    S.current_win_index = state.win_index;
+    S.addwinelm.innerHTML = state.html || '';
     set_element_defunc(S.addwinelm);
+    if (S.win) {
+        const winData = S.window_data[state.win_index];
+        for (let i = S.win.attributes.length - 1; i >= 0; i--) {
+            const a = S.win.attributes[i];
+            if (a.name.indexOf('data') === 0) S.win.removeAttribute(a.name);
+        }
+        if (winData) {
+            for (const key in winData.attrs) {
+                if (winData.attrs[key]) S.win.setAttribute(key, winData.attrs[key]);
+            }
+            const s = winData.style || {};
+            S.win.style.width = s.width || '300px';
+            S.win.style.height = s.height || '230px';
+            S.win.style.background = s.background || '#ffffff';
+        }
+    }
+    if (S.addwinelm && S.win) {
+        S.addwinelm.style.width = (parseInt(S.win.style.width) - 2) + 'px';
+        S.addwinelm.style.height = (parseInt(S.win.style.height) - 2) + 'px';
+    }
     if (state.select_name) {
         const children = S.addwinelm.children;
         for (let i = 0; i < children.length; i++) {
@@ -1523,15 +1551,21 @@ function apply_undo_state(state) {
     }
 }
 
+function capture_current_state() {
+    return {
+        html: S.addwinelm.innerHTML,
+        select_name: S.select_element ? S.select_element.getAttribute('data-name') : null,
+        win_index: S.current_win_index,
+        window_data: clone_window_data(),
+        count_stack: S.count_stack
+    };
+}
+
 function undo() {
     if (!S.undo_stack.length) return;
     S._undo_lock = true;
     try {
-        S.redo_stack.push({
-            html: S.addwinelm.innerHTML,
-            select_name: S.select_element ? S.select_element.getAttribute('data-name') : null,
-            win_index: S.current_win_index
-        });
+        S.redo_stack.push(capture_current_state());
         apply_undo_state(S.undo_stack.pop());
     } finally {
         S._undo_lock = false;
@@ -1542,11 +1576,7 @@ function redo() {
     if (!S.redo_stack.length) return;
     S._undo_lock = true;
     try {
-        S.undo_stack.push({
-            html: S.addwinelm.innerHTML,
-            select_name: S.select_element ? S.select_element.getAttribute('data-name') : null,
-            win_index: S.current_win_index
-        });
+        S.undo_stack.push(capture_current_state());
         apply_undo_state(S.redo_stack.pop());
     } finally {
         S._undo_lock = false;
