@@ -42,6 +42,9 @@ const S = {
     save_y: 0,
     copy_element_object: [],
     cmd_event_ctrl: false,
+    undo_stack: [],
+    redo_stack: [],
+    _undo_lock: false,
 
     window_data: {},
     current_win_index: 0,

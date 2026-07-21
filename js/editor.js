@@ -73,6 +73,7 @@ function RTrefreshPOS(o) {
 }
 
 function startResize(e, type) {
+    push_undo_state();
     const el = S.select_element || S.win;
     const rect = el.getBoundingClientRect();
     const containerRect = S.addwinelm.getBoundingClientRect();
@@ -161,6 +162,7 @@ function select_element_menu(o) {
 }
 
 function startDrag(e, el) {
+    push_undo_state();
     S.select_element = el;
     render_props(el);
     const rect = el.getBoundingClientRect();
@@ -184,6 +186,7 @@ function startDrag(e, el) {
 }
 
 function startGroupDrag(e, el) {
+    push_undo_state();
     const containerRect = S.addwinelm.getBoundingClientRect();
     const positions = [];
 
@@ -617,6 +620,7 @@ function past_gui_window(win, name_type) {
         element.innerText = comp.defaultText;
     }
 
+    push_undo_state();
     win.appendChild(element);
     select_element_added_single(element);
     update_component_tree();
@@ -912,9 +916,11 @@ function show_component_context_menu(e, el) {
     if (!isInSelection) {
         select_element_added_single(clicked);
     }
+    const hasClipboard = S.copy_element_object && S.copy_element_object.length;
     S.context_menu_component.innerHTML =
         '<div class="event-item" data-action="cut"><i class="fa-solid fa-scissors"></i><span class="title">Вырезать</span></div>' +
         '<div class="event-item" data-action="copy"><i class="fa-solid fa-copy"></i><span class="title">Копировать</span></div>' +
+        '<div class="event-item" data-action="paste' + (hasClipboard ? '"' : '" style="opacity:0.5;cursor:default;"') + '><i class="fa-solid fa-paste"></i><span class="title">Вставить</span></div>' +
         '<div class="event-item" data-action="delete"><i class="fa-solid fa-trash"></i><span class="title">Удалить</span></div>' +
         '<div class="event-separator"></div>' +
         '<div class="event-item" data-action="bring-to-front"><i class="fa-solid fa-arrow-up-wide-short"></i><span class="title">На передний фон</span></div>' +
@@ -941,6 +947,7 @@ function show_component_context_menu(e, el) {
                 if (S.select_element && items.indexOf(S.select_element) < 0) items.push(S.select_element);
                 S.copy_element_object = items;
                 if (action === 'cut') {
+                    push_undo_state();
                     clear_selected_elements();
                     items.forEach(function (el) {
                         el.parentNode.removeChild(el);
@@ -968,6 +975,8 @@ function show_component_context_menu(e, el) {
                 RTrefreshPOS(S.win);
                 render_props(S.win);
                 update_component_tree();
+            } else if (action === 'paste') {
+                paste_element();
             } else if (action === 'bring-to-front') {
                 bring_to_front();
             } else if (action === 'send-to-back') {
@@ -989,6 +998,7 @@ function delete_select_element() {
         toDelete.push(si.el);
     });
     if (S.select_element && toDelete.indexOf(S.select_element) < 0) toDelete.push(S.select_element);
+    push_undo_state();
     clear_selected_elements();
     toDelete.forEach(function (el) {
         if (el.parentNode) el.parentNode.removeChild(el);
@@ -1002,6 +1012,7 @@ function delete_select_element() {
 }
 
 function bring_to_front() {
+    push_undo_state();
     const parent = S.addwinelm;
     const arr = S.selected_elements_array.slice();
     const hasPrimary = S.selected_elements_array.some(function (item) {
@@ -1009,20 +1020,22 @@ function bring_to_front() {
     });
     if (S.select_element && !hasPrimary) arr.push({el: S.select_element});
     arr.sort((a, b) => {
-        const ai = Array.from(parent.children).indexOf(a.el || a);
-        const bi = Array.from(parent.children).indexOf(b.el || b);
+        const ai = Array.prototype.indexOf.call(parent.children, a.el || a);
+        const bi = Array.prototype.indexOf.call(parent.children, b.el || b);
         return ai - bi;
     });
     arr.forEach(function (item) {
         const el = item.el || item;
         parent.appendChild(el);
     });
+    update_component_tree();
     TrefreshPOS(S.win);
     RrefreshPOS(S.win);
     RTrefreshPOS(S.win);
 }
 
 function send_to_back() {
+    push_undo_state();
     const parent = S.addwinelm;
     const arr = S.selected_elements_array.slice();
     const hasPrimary = S.selected_elements_array.some(function (item) {
@@ -1030,14 +1043,15 @@ function send_to_back() {
     });
     if (S.select_element && !hasPrimary) arr.push({el: S.select_element});
     arr.sort((a, b) => {
-        const ai = Array.from(parent.children).indexOf(a.el || a);
-        const bi = Array.from(parent.children).indexOf(b.el || b);
+        const ai = Array.prototype.indexOf.call(parent.children, a.el || a);
+        const bi = Array.prototype.indexOf.call(parent.children, b.el || b);
         return ai - bi;
     });
     arr.forEach(function (item) {
         const el = item.el || item;
         parent.insertBefore(el, parent.firstChild);
     });
+    update_component_tree();
     TrefreshPOS(S.win);
     RrefreshPOS(S.win);
     RTrefreshPOS(S.win);
@@ -1082,6 +1096,7 @@ function context_edit_code() {
 
 function paste_element() {
     if (!S.copy_element_object || !S.copy_element_object.length) return;
+    push_undo_state();
     const pasted = [];
     S.copy_element_object.forEach(function (src) {
         const el = src.cloneNode(true);
@@ -1466,6 +1481,76 @@ function add_new_window(name) {
     S.count_stack++;
     S.GLOBAL_INIT_ELEMENT[S.GLOBAL_INIT_COUNT++] = name;
     switch_window(index);
+}
+
+function push_undo_state() {
+    if (S._undo_lock) return;
+    S.undo_stack.push({
+        html: S.addwinelm.innerHTML,
+        select_name: S.select_element ? S.select_element.getAttribute('data-name') : null,
+        win_index: S.current_win_index
+    });
+    if (S.undo_stack.length > 50) S.undo_stack.shift();
+    S.redo_stack = [];
+}
+
+function apply_undo_state(state) {
+    if (state.win_index !== S.current_win_index) {
+        S.window_data[state.win_index].html = state.html;
+        S.current_win_index = state.win_index;
+        S.addwinelm.innerHTML = state.html;
+    } else {
+        S.addwinelm.innerHTML = state.html;
+    }
+    set_element_defunc(S.addwinelm);
+    if (state.select_name) {
+        const children = S.addwinelm.children;
+        for (let i = 0; i < children.length; i++) {
+            if (children[i].getAttribute('data-name') === state.select_name) {
+                select_element_added(children[i]);
+                return;
+            }
+        }
+    }
+    S.select_element = null;
+    render_props(S.win);
+    load_attribute_list_event();
+    update_component_tree();
+    if (S.win) {
+        RrefreshPOS(S.win);
+        TrefreshPOS(S.win);
+        RTrefreshPOS(S.win);
+    }
+}
+
+function undo() {
+    if (!S.undo_stack.length) return;
+    S._undo_lock = true;
+    try {
+        S.redo_stack.push({
+            html: S.addwinelm.innerHTML,
+            select_name: S.select_element ? S.select_element.getAttribute('data-name') : null,
+            win_index: S.current_win_index
+        });
+        apply_undo_state(S.undo_stack.pop());
+    } finally {
+        S._undo_lock = false;
+    }
+}
+
+function redo() {
+    if (!S.redo_stack.length) return;
+    S._undo_lock = true;
+    try {
+        S.undo_stack.push({
+            html: S.addwinelm.innerHTML,
+            select_name: S.select_element ? S.select_element.getAttribute('data-name') : null,
+            win_index: S.current_win_index
+        });
+        apply_undo_state(S.redo_stack.pop());
+    } finally {
+        S._undo_lock = false;
+    }
 }
 
 function set_element_defunc(window_object) {

@@ -360,6 +360,7 @@ function setupGlobalListeners() {
                 });
                 if (S.select_element && items.indexOf(S.select_element) < 0) items.push(S.select_element);
                 S.copy_element_object = items;
+                push_undo_state();
                 clear_selected_elements();
                 items.forEach(function (el) {
                     if (el.parentNode) el.parentNode.removeChild(el);
@@ -372,6 +373,15 @@ function setupGlobalListeners() {
                 update_component_tree();
             } else if (ev.keyCode === 86) {
                 paste_element();
+            } else if (ev.keyCode === 90 && !ev.shiftKey) {
+                e.preventDefault();
+                undo();
+            } else if (ev.keyCode === 90 && ev.shiftKey) {
+                e.preventDefault();
+                redo();
+            } else if (ev.keyCode === 89) {
+                e.preventDefault();
+                redo();
             } else if (ev.keyCode === 65) {
                 e.preventDefault();
                 clear_selected_elements();
