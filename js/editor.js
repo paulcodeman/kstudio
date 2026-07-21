@@ -141,6 +141,7 @@ function onResizeEnd() {
 
 function deleteElement(elem) {
 	if (elem === null) return false;
+	if (!elem.parentNode) return false;
 	return elem.parentNode.removeChild(elem);
 }
 
@@ -1214,6 +1215,7 @@ function add_event_list(eventName) {
 
 function load_attribute_list_event() {
 	S.tmp_event_data = [];
+	S.list_eval_select = null;
 	const tmp = S.element_list_event.children;
 	let count = tmp.length;
 	while (count--) S.element_list_event.removeChild(tmp[count]);
