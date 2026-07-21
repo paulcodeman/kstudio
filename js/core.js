@@ -1096,7 +1096,8 @@ function show_component_context_menu(e, el) {
 		'<div class="event-separator"></div>' +
 		'<div class="event-item" data-action="edit-code"><i class="fa-solid fa-pen"></i><span class="title">Редактировать код</span></div>';
 	Array.from(context_menu_component.children).forEach(function (item) {
-		item.onmousedown = function () {
+		if (item.classList.contains('event-separator')) return;
+		item.onclick = function () {
 			const action = this.getAttribute('data-action');
 			if (action === 'copy') {
 				copy_element_object = select_element;
