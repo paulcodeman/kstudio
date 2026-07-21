@@ -113,6 +113,7 @@ function init() {
 }
 
 function changer_rect_select() {
+	if (!S.rect_select_active) return;
 	let x = S.mouse.x - S.sel_rect_x;
 	let y = S.mouse.y - S.sel_rect_y;
 	if (Math.abs(x) < 3 && Math.abs(y) < 3) return;
@@ -272,6 +273,10 @@ function setupGlobalListeners() {
 			S.select_element_rect.style.width = '0px';
 			S.select_element_rect.style.height = '0px';
 		}
+		if (S.select_element_rect_timer) {
+			clearInterval(S.select_element_rect_timer);
+			S.select_element_rect_timer = null;
+		}
 		S.rect_select_active = false;
 		S.global_lock_event = false;
 	});
@@ -300,6 +305,10 @@ function setupGlobalListeners() {
 				S.select_element_rect.style.display = 'none';
 				S.select_element_rect.style.width = '0px';
 				S.select_element_rect.style.height = '0px';
+			}
+			if (S.select_element_rect_timer) {
+				clearInterval(S.select_element_rect_timer);
+				S.select_element_rect_timer = null;
 			}
 			S.rect_select_active = false;
 			S.global_lock_event = false;
