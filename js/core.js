@@ -1172,19 +1172,41 @@ function context_edit_code() {
 	const dataList = el.getAttribute('data_list_event');
 	const cmd = dataList !== '' ? parseInt(dataList) : 0;
 
-	let eventName = null;
+	let html = '';
 	for (let x = 0; x < events.length; x++) {
-		if (cmd & (1 << x)) { eventName = events[x]; break; }
+		if (cmd & (1 << x)) {
+			const ev = events[x];
+			const edef = get_event_def(ev);
+			const icon = edef && edef.icon ? '<img src="' + edef.icon + '">' : '';
+			html += '<div class="event-item" data-event="' + ev + '">' +
+				icon + '<span class="title">' + ((edef && edef.label) || ev) + '</span></div>';
+		}
 	}
-	if (!eventName) eventName = events[0];
+	if (!html) {
+		const ev = events[0];
+		const edef = get_event_def(ev);
+		const icon = edef && edef.icon ? '<img src="' + edef.icon + '">' : '';
+		html += '<div class="event-item" data-event="' + ev + '">' +
+			icon + '<span class="title">' + ((edef && edef.label) || ev) + '</span></div>';
+	}
 
-	const compName = el.getAttribute('data-name') || 'Component';
-	const attrName = event_attr_name(eventName);
-	const tmp = el.getAttribute(attrName);
-	const args = event_args(eventName);
-	getID('code_edit_rect').value = tmp ? decodeURIComponent(tmp) : '';
-	getID('code_edit_title').innerText = 'void ' + compName + '_' + eventName + '(' + args + ')';
-	getID('window_edit_code').style.display = 'flex';
+	element_list.innerHTML = html;
+	Array.from(element_list.children).forEach(function (item) {
+		item.onmousedown = function () {
+			const eventName = this.getAttribute('data-event');
+			const compName = el.getAttribute('data-name') || 'Component';
+			const attrName = event_attr_name(eventName);
+			const tmp = el.getAttribute(attrName);
+			const args = event_args(eventName);
+			getID('code_edit_rect').value = tmp ? decodeURIComponent(tmp) : '';
+			getID('code_edit_title').innerText = 'void ' + compName + '_' + eventName + '(' + args + ')';
+			getID('window_edit_code').style.display = 'flex';
+			element_list.style.display = 'none';
+		};
+	});
+	element_list.style.top = mouse.y + 'px';
+	element_list.style.display = html ? 'block' : 'none';
+	element_list.style.left = Math.round(mouse.x - element_list.offsetWidth / 2) + 'px';
 }
 
 function add_stat_element_help(id, txt) {
