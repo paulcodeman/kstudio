@@ -1096,7 +1096,7 @@ function show_component_context_menu(e, el) {
 
 	const target = select_element || win;
 	const dataListEvent = target.getAttribute('data_list_event');
-	const hasEvents = dataListEvent !== '' && parseInt(dataListEvent) !== 0;
+	const hasEvents = dataListEvent !== null && parseInt(dataListEvent) !== 0;
 	if (hasEvents) {
 		context_menu_component.innerHTML +=
 			'<div class="event-separator"></div>' +
