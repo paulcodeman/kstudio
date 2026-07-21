@@ -1094,8 +1094,8 @@ function show_component_context_menu(e, el) {
 		'<div class="event-item" data-action="bring-to-front"><i class="fa-solid fa-arrow-up-wide-short"></i><span class="title">На передний фон</span></div>' +
 		'<div class="event-item" data-action="send-to-back"><i class="fa-solid fa-arrow-down-wide-short"></i><span class="title">На задний фон</span></div>';
 
-	const el = select_element || win;
-	const dataListEvent = el.getAttribute('data_list_event');
+	const target = select_element || win;
+	const dataListEvent = target.getAttribute('data_list_event');
 	const hasEvents = dataListEvent !== '' && parseInt(dataListEvent) !== 0;
 	if (hasEvents) {
 		context_menu_component.innerHTML +=
