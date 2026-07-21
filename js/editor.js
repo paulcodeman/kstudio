@@ -1205,6 +1205,9 @@ function add_event_list(eventName) {
 		S.list_eval_select = this;
 		this.classList.add('select');
 	};
+	item.addEventListener('dblclick', function () {
+		click_edit_code();
+	});
 	S.element_list_event.appendChild(item);
 	S.element_list.style.display = 'none';
 }
@@ -1241,9 +1244,9 @@ function load_attribute_list_event() {
 				S.list_eval_select = this;
 				this.classList.add('select');
 			};
-			item.ondblclick = function () {
+			item.addEventListener('dblclick', function () {
 				click_edit_code();
-			};
+			});
 			S.element_list_event.appendChild(item);
 		}
 	}
